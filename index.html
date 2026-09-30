@@ -77,6 +77,30 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 }
 </style>
 
+
+<style>
+/* スマホ最適化：盤面6列を画面幅に収める */
+@media(max-width:699px){
+  main{padding:10px 6px 28px}
+  .boardScroll{overflow-x:visible;width:100%}
+  .board{width:100%;grid-template-columns:repeat(6,minmax(0,1fr));grid-template-rows:repeat(3,auto);gap:3px;padding:4px}
+  .slot{width:100%;height:auto;aspect-ratio:1;border-radius:6px}
+  .bottomRow{width:100%;gap:3px;align-items:flex-start}
+  #extras{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px!important;flex:1;min-width:0}
+  .extra{width:100%;height:auto;aspect-ratio:1;border-radius:6px}
+  .bottomCount{display:none}
+  .slot.empty:after,.extra.empty:after{font-size:20px}
+  .badge{right:2px;bottom:2px;padding:1px 4px;font-size:12px}
+  .sectionTitle{margin:9px 0 5px}
+  .tools{gap:5px}.count{margin-left:0;padding:7px 9px}.statsBox{margin-left:0;width:100%;font-size:13px}
+  .pool{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
+  .charName{font-size:10px}.card{padding:2px}
+  .card,.slot,.extra{touch-action:none;-webkit-user-select:none;user-select:none}
+}
+.touchMoving{outline:3px solid #6eb7ff!important;outline-offset:-3px}
+#touchGhost{position:fixed;z-index:100000;pointer-events:none;width:64px;height:64px;display:none;align-items:center;justify-content:center;background:#172b46dd;border:2px solid #6eb7ff;border-radius:10px;transform:translate(-50%,-50%)}
+#touchGhost img{max-width:100%;max-height:100%;object-fit:contain}
+</style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>3×6 編成メーカー</h1>
@@ -151,7 +175,7 @@ try{
  if(Array.isArray(st)) charStats=charStats.map((v,i)=>st[i]||v);
 }catch(e){}
 
-let grid=Array.from({length:TOTAL_SLOTS},()=>null), selected=0, dragData=null;
+let grid=Array.from({length:TOTAL_SLOTS},()=>null), selected=-1, dragData=null;
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===TOTAL_SLOTS)grid=x}catch(e){}
 const board=document.getElementById("board"),extras=document.getElementById("extras"),poolImmortal=document.getElementById("poolImmortal"),
 poolMyth=document.getElementById("poolMyth"),
@@ -236,15 +260,18 @@ function dropOn(i){
    if(grid[i] && grid[i].char===ci){
      if(canStack(ci) && grid[i].stack<3 && canAdd(ci,1)) grid[i].stack++;
    }else{
-     const replaced=grid[i];
      const existingWithoutTarget=charCount(ci,i);
-     if(existingWithoutTarget+1<=maxCopies(ci)) grid[i]={char:ci,stack:1};
+     if(maxCopies(ci)===1 && existingWithoutTarget>=1){
+       const oldIndex=grid.findIndex((v,idx)=>idx!==i && v && v.char===ci);
+       if(oldIndex>=0) grid[oldIndex]=null;
+       grid[i]={char:ci,stack:1};
+     }else if(existingWithoutTarget+1<=maxCopies(ci)) grid[i]={char:ci,stack:1};
    }
  }else if(dragData.type==="slot" && dragData.from!==i){
    const from=dragData.from;
    [grid[from],grid[i]]=[grid[i],grid[from]];
  }
- selected=i; dragData=null; normalizeRules(); render();
+ selected=-1; dragData=null; normalizeRules(); render();
 }
 function makeSlot(i,extra=false){
  const v=grid[i],s=document.createElement("div");
@@ -311,10 +338,17 @@ chars.forEach((src,i)=>{
    if(target){dropOn(Number(target.dataset.index));e.preventDefault()}
  },{passive:false});
  c.addEventListener("click",()=>{
-   if(selected>=activeSlots())selected=0;
+   // タップ配置は「空きマスを1回選択 → キャラを1回配置」で選択を解除する
+   if(selected<0 || selected>=activeSlots()) return;
+   let placed=false;
    if(grid[selected] && grid[selected].char===i){
-     if(canStack(i) && grid[selected].stack<3 && canAdd(i,1))grid[selected].stack++;
-   }else if(charCount(i,selected)+1<=maxCopies(i)) grid[selected]={char:i,stack:1};
+     if(canStack(i) && grid[selected].stack<3 && canAdd(i,1)){grid[selected].stack++;placed=true;}
+   }else if(maxCopies(i)===1 && charCount(i,selected)>=1){
+     // 不朽など1体限定キャラは、2回目の配置で以前の場所から選択マスへ移動
+     const oldIndex=grid.findIndex((v,idx)=>idx!==selected && v && v.char===i);
+     if(oldIndex>=0){grid[oldIndex]=null;grid[selected]={char:i,stack:1};placed=true;}
+   }else if(charCount(i,selected)+1<=maxCopies(i)){grid[selected]={char:i,stack:1};placed=true;}
+   if(placed) selected=-1;
    normalizeRules();render()
  });
  targetPool(i).appendChild(wrap)
@@ -335,7 +369,7 @@ chars.forEach((src,i)=>{ if(![0,9,1,2,3,4,5].includes(i)) return;
  pfield.querySelector("input").addEventListener("input",e=>{charStats[i].passive=Number(e.target.value)||0;saveStats()});
  row.append(fields,pfield);adminGrid.appendChild(row);
 });
-document.getElementById("clearBtn").addEventListener("click",()=>{grid=Array.from({length:TOTAL_SLOTS},()=>null);selected=0;localStorage.removeItem("grid_stack_drag_24_v1");render()});
+document.getElementById("clearBtn").addEventListener("click",()=>{grid=Array.from({length:TOTAL_SLOTS},()=>null);selected=-1;localStorage.removeItem("grid_stack_drag_24_v1");render()});
 
 
 try{
@@ -470,4 +504,45 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 </script>
 
+
+<script>
+/* スマホ用：キャラ一覧/盤面のどちらからでも指でスライドして移動 */
+(()=>{
+  const ghost=document.createElement('div'); ghost.id='touchGhost'; document.body.appendChild(ghost);
+  let touch=null, moved=false, startX=0, startY=0;
+  const showGhost=(ci,x,y)=>{ghost.replaceChildren(makeImg(chars[ci]));ghost.style.display='flex';ghost.style.left=x+'px';ghost.style.top=y+'px'};
+  const hideGhost=()=>{ghost.style.display='none';document.querySelectorAll('.touchMoving').forEach(e=>e.classList.remove('touchMoving'))};
+  document.addEventListener('touchstart',e=>{
+    if(e.touches.length!==1)return;
+    const el=e.target.closest('.card,.slot,.extra'); if(!el)return;
+    const t=e.touches[0]; startX=t.clientX;startY=t.clientY;moved=false;
+    if(el.classList.contains('card')){
+      const wrap=el.closest('.charCardWrap'); const wraps=[...document.querySelectorAll('.charCardWrap')];
+      const ci=wraps.indexOf(wrap); if(ci<0)return; touch={type:'char',char:ci,el};
+    }else{
+      const from=Number(el.dataset.index); if(!grid[from])return; touch={type:'slot',from,char:grid[from].char,el};
+    }
+  },{passive:true});
+  document.addEventListener('touchmove',e=>{
+    if(!touch||e.touches.length!==1)return; const t=e.touches[0];
+    if(!moved && Math.hypot(t.clientX-startX,t.clientY-startY)>7){moved=true;touch.el.classList.add('touchMoving')}
+    if(!moved)return; e.preventDefault(); showGhost(touch.char,t.clientX,t.clientY);
+    document.querySelectorAll('.slot,.extra').forEach(x=>x.style.outline='');
+    ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY); ghost.style.display='flex';
+    const target=under&&under.closest('.slot,.extra'); if(target)target.style.outline='3px solid #6eb7ff';
+  },{passive:false});
+  document.addEventListener('touchend',e=>{
+    if(!touch)return;
+    document.querySelectorAll('.slot,.extra').forEach(x=>x.style.outline='');
+    if(moved){
+      const t=e.changedTouches[0]; ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY);
+      const target=under&&under.closest('.slot,.extra');
+      if(target){dragData=touch.type==='char'?{type:'char',char:touch.char}:{type:'slot',from:touch.from};dropOn(Number(target.dataset.index));}
+      e.preventDefault();
+    }
+    hideGhost();touch=null;moved=false;
+  },{passive:false});
+  document.addEventListener('touchcancel',()=>{hideGhost();touch=null;moved=false},{passive:true});
+})();
+</script>
 </body></html>
