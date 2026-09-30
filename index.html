@@ -101,6 +101,13 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 #touchGhost{position:fixed;z-index:100000;pointer-events:none;width:64px;height:64px;display:none;align-items:center;justify-content:center;background:#172b46dd;border:2px solid #6eb7ff;border-radius:10px;transform:translate(-50%,-50%)}
 #touchGhost img{max-width:100%;max-height:100%;object-fit:contain}
 </style>
+
+<style>
+#mobileTrash{display:flex;align-items:center;justify-content:center;gap:7px;margin:7px 0 9px;padding:9px 12px;border-radius:11px;background:#b3262e;border:2px solid #ff6b72;color:#fff;font-weight:900;font-size:15px;user-select:none;-webkit-user-select:none;transition:.12s}
+#mobileTrash.trashHover{transform:scale(1.03);background:#e0323c;box-shadow:0 0 0 3px rgba(255,107,114,.25)}
+#mobileTrash .trashIcon{font-size:21px;line-height:1}
+@media(min-width:700px){#mobileTrash{max-width:260px}}
+</style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>3×6 編成メーカー</h1>
@@ -110,7 +117,7 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 <label><input type="checkbox" id="debuffCollapse"> 総崩れ</label>
 <label><input type="checkbox" id="debuffForbidden"> 禁制領域</label>
 </div></div></div>
-<div class="boardScroll"><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
+<div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
 <div class="sectionTitle dungeonTitle">ダンジョン</div><div class="bottomRow"><div id="extras" style="display:flex;gap:5px"></div><div class="bottomCount">合計 <b id="total">0</b>体</div></div></div>
 <h2>キャラ一覧</h2>
 <div class="roleSection"><h3>不朽</h3><div id="poolImmortal" class="pool"></div></div>
@@ -330,7 +337,7 @@ allPools.forEach(pool=>{
  },{passive:true});
 });
 chars.forEach((src,i)=>{
- const wrap=document.createElement("div");wrap.className="charCardWrap";const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);
+ const wrap=document.createElement("div");wrap.className="charCardWrap";wrap.dataset.charIndex=i;const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);
  c.addEventListener("dragstart",e=>{dragData={type:"char",char:i};e.dataTransfer.effectAllowed="copy"});
  c.addEventListener("touchstart",()=>{dragData={type:"char",char:i}},{passive:true});
  c.addEventListener("touchend",e=>{
@@ -508,6 +515,29 @@ document.addEventListener("DOMContentLoaded",()=>{
 <script>
 /* スマホ用：キャラ一覧/盤面のどちらからでも指でスライドして移動 */
 (()=>{
+  // ゴミ箱: PCのHTML5ドラッグ&ドロップにも対応
+  const desktopTrash=document.getElementById('mobileTrash');
+  if(desktopTrash){
+    desktopTrash.addEventListener('dragover',e=>{
+      if(dragData && dragData.type==='slot'){e.preventDefault();e.dataTransfer.dropEffect='move';desktopTrash.classList.add('trashHover');}
+    });
+    desktopTrash.addEventListener('dragenter',e=>{
+      if(dragData && dragData.type==='slot'){e.preventDefault();desktopTrash.classList.add('trashHover');}
+    });
+    desktopTrash.addEventListener('dragleave',e=>{
+      if(!desktopTrash.contains(e.relatedTarget)) desktopTrash.classList.remove('trashHover');
+    });
+    desktopTrash.addEventListener('drop',e=>{
+      e.preventDefault();desktopTrash.classList.remove('trashHover');
+      if(dragData && dragData.type==='slot'){
+        const from=dragData.from;
+        if(Number.isInteger(from) && grid[from]) grid[from]=null;
+        selected=-1;dragData=null;normalizeRules();render();
+      }
+    });
+    document.addEventListener('dragend',()=>desktopTrash.classList.remove('trashHover'));
+  }
+
   const ghost=document.createElement('div'); ghost.id='touchGhost'; document.body.appendChild(ghost);
   let touch=null, moved=false, startX=0, startY=0;
   const showGhost=(ci,x,y)=>{ghost.replaceChildren(makeImg(chars[ci]));ghost.style.display='flex';ghost.style.left=x+'px';ghost.style.top=y+'px'};
@@ -518,7 +548,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     const t=e.touches[0]; startX=t.clientX;startY=t.clientY;moved=false;
     if(el.classList.contains('card')){
       const wrap=el.closest('.charCardWrap'); const wraps=[...document.querySelectorAll('.charCardWrap')];
-      const ci=wraps.indexOf(wrap); if(ci<0)return; touch={type:'char',char:ci,el};
+      const ci=Number(wrap.dataset.charIndex); if(!Number.isInteger(ci)||ci<0||ci>=chars.length)return; touch={type:'char',char:ci,el};
     }else{
       const from=Number(el.dataset.index); if(!grid[from])return; touch={type:'slot',from,char:grid[from].char,el};
     }
@@ -529,7 +559,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(!moved)return; e.preventDefault(); showGhost(touch.char,t.clientX,t.clientY);
     document.querySelectorAll('.slot,.extra').forEach(x=>x.style.outline='');
     ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY); ghost.style.display='flex';
-    const target=under&&under.closest('.slot,.extra'); if(target)target.style.outline='3px solid #6eb7ff';
+    const target=under&&under.closest('.slot,.extra'); if(target)target.style.outline='3px solid #6eb7ff'; const trash=under&&under.closest('#mobileTrash'); document.getElementById('mobileTrash')?.classList.toggle('trashHover',!!trash && touch.type==='slot');
   },{passive:false});
   document.addEventListener('touchend',e=>{
     if(!touch)return;
@@ -537,12 +567,15 @@ document.addEventListener("DOMContentLoaded",()=>{
     if(moved){
       const t=e.changedTouches[0]; ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY);
       const target=under&&under.closest('.slot,.extra');
-      if(target){dragData=touch.type==='char'?{type:'char',char:touch.char}:{type:'slot',from:touch.from};dropOn(Number(target.dataset.index));}
+      const trash=under&&under.closest('#mobileTrash');
+      if(trash && touch.type==='slot'){grid[touch.from]=null;selected=-1;dragData=null;normalizeRules();render();}
+      else if(target){dragData=touch.type==='char'?{type:'char',char:touch.char}:{type:'slot',from:touch.from};dropOn(Number(target.dataset.index));}
+      document.getElementById('mobileTrash')?.classList.remove('trashHover');
       e.preventDefault();
     }
     hideGhost();touch=null;moved=false;
   },{passive:false});
-  document.addEventListener('touchcancel',()=>{hideGhost();touch=null;moved=false},{passive:true});
+  document.addEventListener('touchcancel',()=>{hideGhost();document.getElementById('mobileTrash')?.classList.remove('trashHover');touch=null;moved=false},{passive:true});
 })();
 </script>
 </body></html>
