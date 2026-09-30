@@ -93,8 +93,10 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
   .badge{right:2px;bottom:2px;padding:1px 4px;font-size:12px}
   .sectionTitle{margin:9px 0 5px}
   .tools{gap:5px}.count{margin-left:0;padding:7px 9px}.statsBox{margin-left:0;width:100%;font-size:13px}
-  .pool{grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
-  .charName{font-size:10px}.card{padding:2px}
+  .pool{grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+  .roleSection{margin:8px 0}.roleSection h3{font-size:13px;margin:0 0 4px;padding-left:6px}
+  .charCardWrap{gap:2px;min-width:0}.charName{font-size:9px;line-height:1.05;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;width:100%}
+  .card{padding:1px;border-radius:6px}.card img{max-width:100%;max-height:100%}
   .card,.slot,.extra{touch-action:none;-webkit-user-select:none;user-select:none}
 }
 .touchMoving{outline:3px solid #6eb7ff!important;outline-offset:-3px}
@@ -124,7 +126,7 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 <div class="roleSection"><h3>神話</h3><div id="poolMyth" class="pool"></div></div>
 <div class="roleSection"><h3>伝説</h3><div id="poolLegend" class="pool"></div></div>
 <div class="roleSection"><h3>その他</h3><div id="poolOther" class="pool"></div></div>
-<p class="tip">空きマスを選択 → キャラをタップで配置。配置済みキャラをタップすると ×2、もう一度で ×3。×3の状態でもう一度タップすると ×1 に戻ります。下の追加3枠も同じ操作です。</p>
+<p class="tip">空きマスを選択 → キャラをタップで配置できます。キャラ一覧から空きマスへドラッグ＆ドロップ（スマホでは指でスライド）して配置することもできます。配置済みキャラは別のマスへドラッグ＆ドロップ／スライドして移動できます。配置済みキャラをタップすると ×2、もう一度で ×3、×3の状態でもう一度タップすると ×1 に戻ります。下の追加3枠も同じ操作です。</p>
 <section class="admin">
 <h2>管理画面：キャラ数値</h2>
 <p class="adminNote">各キャラの「攻撃」「速度」「パッシブ上昇」を入力してください。×2・×3スタック分も盤面合計に反映されます。領主は「残りマス」の計算では空きマス扱いです。</p>
@@ -201,7 +203,7 @@ function debuffState(){
 }
 function maxCopies(charIndex){
  const role=roleByIndex[charIndex], d=debuffState();
- if(role==="immortal") return 1;
+ if(role==="immortal" || charIndex===7) return 1;
  if(d.collapse && role==="myth") return 3;
  if(d.collapse && role==="legend") return 9;
  return Infinity;
