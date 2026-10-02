@@ -230,10 +230,6 @@ Object.entries(DEFAULT_CHAR_STATS).forEach(([i,v])=>{
   charStats[Number(i)]={...charStats[Number(i)],...v};
 });
 
-try{
- const st=JSON.parse(localStorage.getItem("char_stats_v1")||"null");
- if(Array.isArray(st)) charStats=charStats.map((v,i)=>st[i]||v);
-}catch(e){}
 
 // スキン効果（初期キャラ数値に加算）
 const SKIN_DATA={
