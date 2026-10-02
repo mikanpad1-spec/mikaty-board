@@ -143,7 +143,7 @@ button{transition:.15s ease}button:active{transform:scale(.97)}#shareBtn{backgro
 .skinCharGroup{padding:11px 0;border-top:1px solid #29466a}.skinCharGroup:first-child{border-top:0}.skinCharTitle{margin:0 0 7px;font-size:16px;color:#fff}.skinEffectCompact{margin-top:7px;font-size:12px;color:#c8d8eb;padding:7px 9px}.skinCharGroup .skinChoices{margin-top:0}
 @media(max-width:699px){.skinCharGroup{padding:9px 0}.skinCharTitle{font-size:15px}.skinCharGroup .skinChoices{grid-template-columns:1fr}.skinEffectCompact{font-size:11px;line-height:1.5}}
 
-.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}
+.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#28523d;border-color:#4b8a69;color:#fff}.modeBtn.opponentMode.active{background:#34704f;box-shadow:0 0 0 2px rgba(90,190,130,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}
 .board.collapseBoard{grid-template-rows:repeat(5,105px)}
 @media(min-width:700px){.board.collapseBoard{grid-template-rows:repeat(5,130px)}}
 @media(max-width:699px){.board.collapseBoard{grid-template-rows:repeat(5,auto)}}
@@ -151,7 +151,7 @@ button{transition:.15s ease}button:active{transform:scale(.97)}#shareBtn{backgro
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1>
-<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button></div>
+<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
 <div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">全消去</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox">残りマス：<b id="remainingSlots">24</b><br>攻撃 合計：<b id="atkTotal">0</b><br>速度 合計：<b id="spdTotal">0</b><br>パッシブ上昇 合計：<b id="passTotal">0</b>
 <div class="debuff"><strong>デバフ選択</strong>
@@ -302,28 +302,29 @@ function totalSkinBonus(i){
   return {attack:own.attack+linked.attack,speed:own.speed+linked.speed,passive:own.passive+linked.passive};
 }
 // イサイ：盤面＋ダンジョンにいる「イサイ or 天使」1体につき攻撃+5%、最大+20%
-function isaiAttackBuff(){
-  if(!Array.isArray(grid)) return 0;
-  const bodies=grid.reduce((n,v)=>n+(v && (v.char===3 || v.char===2) ? (Number(v.stack)||1) : 0),0);
+function isaiAttackBuff(sourceGrid=grid){
+  if(!Array.isArray(sourceGrid)) return 0;
+  const bodies=sourceGrid.reduce((n,v)=>n+(v && (v.char===3 || v.char===2) ? (Number(v.stack)||1) : 0),0);
   return Math.min(bodies,4)*5;
 }
-// ミカエル：盤面＋ダンジョンにいる「イサイ or 天使」1体につき攻撃+5%、最大+25%
-function michaelAttackBuff(){
-  if(!Array.isArray(grid)) return 0;
-  const bodies=grid.reduce((n,v)=>n+(v && (v.char===3 || v.char===2) ? (Number(v.stack)||1) : 0),0);
+// ミカエル：同じ側の盤面＋ダンジョンにいる「イサイ or 天使」1体につき攻撃+5%、最大+25%
+function michaelAttackBuff(sourceGrid=grid){
+  if(!Array.isArray(sourceGrid)) return 0;
+  const bodies=sourceGrid.reduce((n,v)=>n+(v && (v.char===3 || v.char===2) ? (Number(v.stack)||1) : 0),0);
   return Math.min(bodies,5)*5;
 }
-function effectiveStats(i){
+function effectiveStats(i,sourceGrid=grid){
   const base=charStats[i]||{attack:0,speed:0,passive:0}, bonus=totalSkinBonus(i);
-  // イサイ・ミカエルの攻撃値は現在の盤面構成から算出する
-  const attackBase=(i===3 ? isaiAttackBuff() : (i===9 ? (Number(base.attack)||0)+michaelAttackBuff() : (Number(base.attack)||0)));
+  // イサイ・ミカエルは「自分側」「相手側」を混ぜず、それぞれの盤面内だけで算出
+  const attackBase=(i===3 ? isaiAttackBuff(sourceGrid) : (i===9 ? (Number(base.attack)||0)+michaelAttackBuff(sourceGrid) : (Number(base.attack)||0)));
   return {attack:attackBase+bonus.attack,speed:(Number(base.speed)||0)+bonus.speed,passive:(Number(base.passive)||0)+bonus.passive};
 }
 function saveSkins(){try{localStorage.setItem("skin_selections_v1",JSON.stringify(skinSelections));}catch(e){} updateTotal();}
 
 let boardMode="normal";
-let normalGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null);
+let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
+try{const x=JSON.parse(localStorage.getItem("grid_opponent_24_v1")||"null");if(Array.isArray(x)&&x.length===24)opponentGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_collapse_space_30_v1")||"null");if(Array.isArray(x)&&x.length===30)collapseSpaceGrid=x}catch(e){}
 let grid=normalGrid, selected=-1, dragData=null;
 const board=document.getElementById("board"),extras=document.getElementById("extras"),poolImmortal=document.getElementById("poolImmortal"),
@@ -339,7 +340,7 @@ function targetPool(i){
 }
 
 function debuffState(){
- if(boardMode==="collapseSpace") return {collapse:false,forbidden:false};
+ if(boardMode!=="normal") return {collapse:false,forbidden:false};
  return {collapse:document.getElementById("debuffCollapse").checked, forbidden:document.getElementById("debuffForbidden").checked};
 }
 function maxCopies(charIndex){
@@ -359,7 +360,7 @@ function canStack(charIndex){
 function canAdd(charIndex,amount=1,excludeSlot=-1){
  return charCount(charIndex,excludeSlot)+amount<=maxCopies(charIndex);
 }
-function activeSlots(){return boardMode==="collapseSpace"?30:(debuffState().forbidden?21:24)}
+function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="normal"&&debuffState().forbidden?21:24)}
 function normalizeRules(){
  // 禁制領域ON時は使えない後半3マスを空にする
  if(boardMode==="normal" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
@@ -384,35 +385,34 @@ function normalizeRules(){
 function makeImg(src){const im=new Image();im.src=src;im.decoding="async";im.draggable=false;return im}
 function totalCount(){return grid.reduce((n,v)=>n+(v?v.stack:0),0)}
 function updateTotal(){
- const n=totalCount();
+ // 通常盤面と相手盤面では両方を合算。崩壊空間は従来どおり単独計算。
+ const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:[normalGrid,opponentGrid];
+ const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1):0),0),0);
  document.getElementById("total").textContent=n;
  document.getElementById("topTotal").textContent=n;
  let atk=0,spd=0,pas=0;
- // イサイの攻撃加算は最大5体分まで。6体目以降のイサイは攻撃のみ0換算。
- // シンガーのパッシブ効果は、シンガーが複数いても1体分だけ加算する。
- // かぐや姫は別キャラ扱いなので、シンガー由来のパッシブを通常どおり別途加算する。
- let isaiAttackBodiesLeft=5;
- let singerPassiveBodiesLeft=1;
- grid.forEach(v=>{
-   if(!v)return;
-   const st=effectiveStats(v.char);
-   const stack=Number(v.stack)||1;
-   if(v.char===3){
-     const attackBodies=Math.min(stack,isaiAttackBodiesLeft);
-     atk+=(Number(st.attack)||0)*attackBodies;
-     isaiAttackBodiesLeft=Math.max(0,isaiAttackBodiesLeft-attackBodies);
-   }else{
-     atk+=(Number(st.attack)||0)*stack;
-   }
-   spd+=(Number(st.speed)||0)*stack;
-   if(v.char===1){
-     const passiveBodies=Math.min(stack,singerPassiveBodiesLeft);
-     pas+=(Number(st.passive)||0)*passiveBodies;
-     singerPassiveBodiesLeft=Math.max(0,singerPassiveBodiesLeft-passiveBodies);
-   }else{
-     pas+=(Number(st.passive)||0)*stack;
-   }
- });
+ function addGridStats(sourceGrid){
+   // イサイ攻撃は各陣営ごとに最大5体分まで。シンガーのパッシブも各陣営ごとに1体分まで。
+   let isaiAttackBodiesLeft=5;
+   let singerPassiveBodiesLeft=1;
+   sourceGrid.forEach(v=>{
+     if(!v)return;
+     const st=effectiveStats(v.char,sourceGrid);
+     const stack=Number(v.stack)||1;
+     if(v.char===3){
+       const attackBodies=Math.min(stack,isaiAttackBodiesLeft);
+       atk+=(Number(st.attack)||0)*attackBodies;
+       isaiAttackBodiesLeft=Math.max(0,isaiAttackBodiesLeft-attackBodies);
+     }else atk+=(Number(st.attack)||0)*stack;
+     spd+=(Number(st.speed)||0)*stack;
+     if(v.char===1){
+       const passiveBodies=Math.min(stack,singerPassiveBodiesLeft);
+       pas+=(Number(st.passive)||0)*passiveBodies;
+       singerPassiveBodiesLeft=Math.max(0,singerPassiveBodiesLeft-passiveBodies);
+     }else pas+=(Number(st.passive)||0)*stack;
+   });
+ }
+ gridsToTotal.forEach(addGridStats);
  const fmt=n=>Number.isInteger(n)?String(n):String(Math.round(n*100)/100);
  document.getElementById("atkTotal").textContent=fmt(atk);
  document.getElementById("spdTotal").textContent=fmt(spd);
@@ -479,7 +479,8 @@ function render(){
  board.classList.toggle("collapseBoard",collapseSpace);
  document.getElementById("dungeonTitle").style.display=collapseSpace?"none":"";
  document.getElementById("dungeonRow").style.display=collapseSpace?"none":"";
- document.querySelector(".debuff").style.display=collapseSpace?"none":"";
+ document.querySelector(".debuff").style.display=boardMode==="normal"?"":"none";
+ const titleEl=document.querySelector(".sectionTitle"); if(titleEl) titleEl.textContent=boardMode==="opponent"?"相手の盤面":"盤面";
  if(collapseSpace){
    for(let i=0;i<30;i++)board.appendChild(makeSlot(i));
  }else{
@@ -578,17 +579,20 @@ renderSkinUI();
 
 document.getElementById("clearBtn").addEventListener("click",()=>{
  if(boardMode==="collapseSpace"){collapseSpaceGrid=Array.from({length:30},()=>null);grid=collapseSpaceGrid;localStorage.removeItem("grid_collapse_space_30_v1");}
+ else if(boardMode==="opponent"){opponentGrid=Array.from({length:24},()=>null);grid=opponentGrid;localStorage.removeItem("grid_opponent_24_v1");}
  else{normalGrid=Array.from({length:24},()=>null);grid=normalGrid;localStorage.removeItem("grid_stack_drag_24_v1");}
  selected=-1;render();
 });
-function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
+function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
 function switchBoardMode(mode){
- saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:normalGrid;selected=-1;dragData=null;
+ saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="opponent"?opponentGrid:normalGrid);selected=-1;dragData=null;
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
+ document.getElementById("opponentModeBtn").classList.toggle("active",mode==="opponent");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
  render();
 }
 document.getElementById("normalModeBtn").addEventListener("click",()=>switchBoardMode("normal"));
+document.getElementById("opponentModeBtn").addEventListener("click",()=>switchBoardMode("opponent"));
 document.getElementById("collapseSpaceBtn").addEventListener("click",()=>switchBoardMode("collapseSpace"));
 
 
@@ -618,7 +622,7 @@ async function exportFormationImage(){
   const c=document.createElement("canvas"); c.width=W;c.height=H;
   const ctx=c.getContext("2d");
   ctx.fillStyle="#f5f5f7";ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(collapseSpace?"崩壊空間":"盤面",65,60);
+  ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(collapseSpace?"崩壊空間":(boardMode==="opponent"?"相手の盤面":"盤面"),65,60);
   function loadImg(src){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;});}
   const used=[...new Set(grid.filter(Boolean).map(v=>v.char))];
   const pairs=await Promise.all(used.map(async i=>[i,await loadImg(chars[i])]));
@@ -631,7 +635,7 @@ async function exportFormationImage(){
   }
   if(collapseSpace){for(let i=0;i<30;i++)drawCell(i,startX+(i%6)*(cell+gap),startY+Math.floor(i/6)*(cell+gap));}
   else{for(let i=0;i<18;i++)drawCell(i,startX+(i%6)*(cell+gap),startY+Math.floor(i/6)*(cell+gap));ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("ダンジョン",65,605);for(let j=0;j<6;j++)drawCell(18+j,65+j*(cell+gap),630);}
-  c.toBlob(blob=>{if(!blob)return;const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=collapseSpace?"崩壊空間.png":"盤面.png";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);},"image/png");
+  c.toBlob(blob=>{if(!blob)return;const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=collapseSpace?"崩壊空間.png":(boardMode==="opponent"?"相手の盤面.png":"盤面.png");document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);},"image/png");
 }
 document.addEventListener("DOMContentLoaded",()=>{
   const b=document.getElementById("exportImageBtn");
@@ -785,7 +789,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   function persist(){saveCurrentBoard();}
   const oldRender=render;
   render=function(){oldRender();persist();};
-  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':'normal';grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');saveDebuffs();normalizeRules();render();historyLock=false}
+  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':(st.mode==='opponent'?'opponent':'normal');grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else if(boardMode==='opponent')opponentGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('opponentModeBtn').classList.toggle('active',boardMode==='opponent');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');saveDebuffs();normalizeRules();render();historyLock=false}
   function startHistory(e){if(historyLock||e.target.closest?.('#undoBtn,#redoBtn,#shareBtn,#exportImageBtn,.admin'))return;before=state()}
   function endHistory(){if(historyLock||!before)return;setTimeout(()=>{const after=state();if(!same(before,after)){undo.push(before);if(undo.length>50)undo.shift();redo=[];updateHistoryButtons()}before=null},0)}
   ['pointerdown','touchstart','dragstart'].forEach(n=>document.addEventListener(n,startHistory,{capture:true,passive:true}));
