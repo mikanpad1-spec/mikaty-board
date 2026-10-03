@@ -143,25 +143,165 @@ button{transition:.15s ease}button:active{transform:scale(.97)}#shareBtn{backgro
 .skinCharGroup{padding:11px 0;border-top:1px solid #29466a}.skinCharGroup:first-child{border-top:0}.skinCharTitle{margin:0 0 7px;font-size:16px;color:#fff}.skinEffectCompact{margin-top:7px;font-size:12px;color:#c8d8eb;padding:7px 9px}.skinCharGroup .skinChoices{margin-top:0}
 @media(max-width:699px){.skinCharGroup{padding:9px 0}.skinCharTitle{font-size:15px}.skinCharGroup .skinChoices{grid-template-columns:1fr}.skinEffectCompact{font-size:11px;line-height:1.5}}
 
-.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#28523d;border-color:#4b8a69;color:#fff}.modeBtn.opponentMode.active{background:#34704f;box-shadow:0 0 0 2px rgba(90,190,130,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}
+.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#5a2b31;border-color:#9b5059;color:#fff}.modeBtn.opponentMode.active{background:#873b46;box-shadow:0 0 0 2px rgba(220,90,110,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}
 .board.collapseBoard{grid-template-rows:repeat(5,105px)}
 @media(min-width:700px){.board.collapseBoard{grid-template-rows:repeat(5,130px)}}
 @media(max-width:699px){.board.collapseBoard{grid-template-rows:repeat(5,auto)}}
+.statsBreakdown{margin-top:7px;padding-top:7px;border-top:1px solid #29435f;font-size:11px;line-height:1.6;color:#a9bfd7}.statsBreakdown b{color:#eaf4ff}.statsBreakdown .opp{color:#ffb8c1}
+body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#26151a}body.opponent-board .sectionTitle{color:#ffb8c1}
 </style>
+
+<style id="uiPolishAll">
+/* 追加UI改善 */
+@media(max-width:699px){
+  .modeSwitch{position:sticky;top:0;z-index:180;background:#08111ff2;padding:6px 4px;margin:0 -2px 7px;backdrop-filter:blur(9px);box-shadow:0 5px 14px #0005}
+  .modeBtn{padding:8px 9px;font-size:11px;flex:1}
+  .statsBox{grid-template-columns:repeat(3,1fr)!important;text-align:center;gap:4px!important;padding:6px!important}
+  .statsBox>br{display:none}.statsBox>b{font-size:15px}.statsBox #remainingSlots{grid-column:auto}
+  #statsBreakdown{grid-column:1/-1;text-align:left;margin-top:3px}
+  .characterHeading{margin-top:8px}
+  .characterControls{border:1px solid #294866;border-radius:12px 12px 0 0;padding:6px!important;box-shadow:0 -5px 18px #0005}
+  .roleSection.activeRole{background:#0d1c30;border:1px solid #294866;border-top:0;border-radius:0 0 12px 12px;padding:5px 4px 1px;margin-top:0}
+  .charCardWrap.placeReady .card{outline:2px solid #f1ca52;outline-offset:-2px;box-shadow:0 0 10px #f1ca5266}
+}
+.placeHint{display:none;color:#f6d86e;font-size:11px;font-weight:800;text-align:center;margin:3px 0}
+@media(max-width:699px){.placeHint.show{display:block}}
+#exportPreviewModal{position:fixed;inset:0;z-index:300000;background:#000c;display:none;align-items:center;justify-content:center;padding:14px}
+#exportPreviewModal.open{display:flex}
+#exportPreviewCard{width:min(94vw,760px);max-height:94vh;overflow:auto;background:#101d30;border:1px solid #45617f;border-radius:16px;padding:12px;box-shadow:0 18px 60px #000}
+#exportPreviewCard h3{margin:2px 0 10px}#exportPreviewImg{display:block;width:100%;height:auto;background:#fff;border-radius:10px}
+#exportPreviewActions{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}#exportPreviewActions button:first-child{background:#27384d}#exportPreviewSave{background:#246446;border-color:#3d9a70}
+</style>
+
+<style id="pcCompactUI">
+/* PC版コンパクト表示 */
+@media(min-width:700px){
+  main{max-width:940px;padding:14px 12px 28px}
+  h1{font-size:22px}.sub{font-size:12px;margin-bottom:8px}
+  .modeSwitch{margin:5px 0 8px}.modeBtn{padding:7px 13px;font-size:13px}
+  .tools{padding:6px;margin:6px 0;gap:5px}.tools button{padding:7px 9px;font-size:12px}
+  .count{padding:6px 9px;font-size:12px}.count b{font-size:16px}
+  .statsBox{min-width:260px;padding:6px 9px;font-size:12px;line-height:1.35}
+  .statsBox b{font-size:15px}.statsBreakdown{font-size:10px;margin-top:4px;padding-top:4px}
+  .board{grid-template-columns:repeat(6,105px);grid-template-rows:repeat(3,105px);gap:4px;padding:5px}
+  .board.collapseBoard{grid-template-rows:repeat(5,105px)}
+  .extra{width:105px;height:105px}.bottomRow{margin-top:6px}.bottomCount{padding:7px 10px;font-size:12px}.bottomCount b{font-size:17px}
+  .sectionTitle{font-size:14px;margin:10px 0 5px}.dungeonTitle{margin-top:9px}
+  .characterHeading{font-size:16px;margin:12px 0 5px}
+  .characterControls{margin:5px 0 7px}.characterControls input{width:190px;padding:8px 9px;font-size:13px}
+  .roleSection{margin:8px 0}.roleSection h3{font-size:13px;margin-bottom:5px}
+  .pool{gap:5px}.card{width:82px;height:82px;padding:2px}.charCardWrap{gap:2px}.charName{font-size:10px}
+  .skinPanel{margin:10px 0;padding:10px}.skinPanel h2{font-size:16px}.skinCharGroup{padding:7px 0}.skinCharTitle{font-size:14px}
+  .tip{font-size:11px;line-height:1.45}
+}
+</style>
+
+<style id="compactStatsAll">
+.statsBox{display:flex;align-items:center;gap:7px;flex-wrap:wrap;min-width:0!important}
+.statsBox .statItem{display:inline-flex;align-items:baseline;gap:3px;white-space:nowrap;background:#0b1b2d;border:1px solid #29435f;border-radius:8px;padding:4px 7px;font-size:11px;font-weight:700;color:#b9cbe0}
+.statsBox .statItem b{font-size:15px;color:#fff}
+.statsBreakdown{flex-basis:100%;width:100%}
+@media(min-width:700px){
+ .statsBox{padding:5px 7px!important;gap:5px!important;line-height:1!important}
+ .statsBox .statItem{padding:4px 6px;font-size:10px}
+ .statsBox .statItem b{font-size:14px}
+ .statsBreakdown{font-size:9px!important;line-height:1.4!important;margin-top:1px!important;padding-top:4px!important}
+}
+@media(max-width:699px){
+ .statsBox{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important}
+ .statsBox .statItem{justify-content:center;padding:4px 2px;font-size:9px}
+ .statsBox .statItem b{font-size:13px}
+ #statsBreakdown{grid-column:1/-1!important}
+}
+</style>
+
+<style id="ultraCompactStats">
+/* 合計ステータスを1本のコンパクトバーに */
+.statsBox{gap:0!important;padding:4px 7px!important;border-radius:8px!important;line-height:1!important}
+.statsBox .statItem{background:transparent!important;border:0!important;border-radius:0!important;padding:2px 7px!important;font-size:10px!important;gap:2px!important}
+.statsBox .statItem+.statItem{border-left:1px solid #365574!important}
+.statsBox .statItem b{font-size:13px!important}
+@media(max-width:699px){
+ .statsBox{display:flex!important;flex-wrap:wrap!important;width:100%!important;justify-content:center!important}
+ .statsBox .statItem{flex:0 0 auto!important;padding:3px 5px!important;font-size:9px!important}
+ .statsBox .statItem b{font-size:12px!important}
+ #statsBreakdown,.statsBox .debuff{flex-basis:100%!important;width:100%!important}
+}
+</style>
+
+<style id="uxUpgradeV2">
+.boardIdentity{font-weight:900;font-size:13px;text-align:center;padding:5px 10px;border-radius:999px;margin:4px auto 7px;width:max-content;background:#16385b;color:#ddecff}.opponent-board .boardIdentity{background:#642f38;color:#ffe5e8}body:has(#collapseSpaceBtn.active) .boardIdentity{background:#613593;color:#f2e6ff}
+#selectedCharBar{display:none;align-items:center;justify-content:center;gap:7px;padding:5px 8px;margin:5px 0;border:1px solid #365574;border-radius:9px;background:#0d1d30;font-size:12px}#selectedCharBar.show{display:flex}#selectedCharBar img{width:28px;height:28px;object-fit:contain}#selectedCharCancel{border:0;background:#253d58;color:#fff;border-radius:999px;width:23px;height:23px;cursor:pointer}
+#charCollapseBtn,#resetAllBtn{border:1px solid #365574;background:#132741;color:#e7f2ff;border-radius:9px;padding:7px 10px;font-weight:800;cursor:pointer}#charCollapseBtn{display:none;width:100%;margin:5px 0}
+#recentChars{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:5px 0;margin:3px 0 6px}#recentChars:empty{display:none}.recentLabel{font-size:11px;color:#9fb3c9;white-space:nowrap}.recentChar{flex:0 0 auto;width:42px;height:42px;border:1px solid #365574;background:#10233a;border-radius:9px;padding:2px;cursor:pointer}.recentChar img{width:100%;height:100%;object-fit:contain}
+#charDetailPopup{position:fixed;z-index:9999;display:none;min-width:175px;background:#0b1829;color:#fff;border:1px solid #52779e;border-radius:11px;padding:9px 11px;box-shadow:0 10px 30px #0009;font-size:12px;line-height:1.55;pointer-events:none}#charDetailPopup.show{display:block}
+@media(max-width:699px){
+ #charCollapseBtn{display:block}.statsBox{position:sticky!important;top:48px!important;z-index:175!important;background:#0b1829f2!important;backdrop-filter:blur(8px)}
+ body.charListCollapsed .characterControls,body.charListCollapsed .roleSection,body.charListCollapsed #recentChars{display:none!important}
+}
+@media(min-width:900px){
+ main{display:grid;grid-template-columns:minmax(560px,1.35fr) minmax(360px,.85fr);column-gap:16px;align-items:start}main>h1,main>.modeSwitch,main>.sub,main>.tools,main>.skinPanel,main>.tip{grid-column:1/-1}
+ main>.boardScroll{grid-column:1;grid-row:5 / span 7;position:sticky;top:8px}main>.characterHeading,main>.characterControls,main>.roleSection,main>#recentChars{grid-column:2}.characterHeading{margin-top:0!important}.characterControls{position:sticky;top:0;z-index:80;background:#08111ff2}
+ .roleSection .pool{max-height:330px;overflow-y:auto;align-content:flex-start}
+}
+</style>
+<style id="pcBoardNoStickyFit">
+/* PC: 盤面は追従させず、横スクロールなしで表示領域に収める */
+@media (min-width:900px){
+  main>.boardScroll{
+    position:static!important;
+    top:auto!important;
+    overflow-x:hidden!important;
+    width:100%!important;
+    min-width:0!important;
+  }
+  .board{
+    width:100%!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    grid-template-rows:none!important;
+  }
+  .board .slot{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1/1!important;
+    min-width:0!important;
+  }
+  .board.collapseBoard{
+    grid-template-rows:none!important;
+  }
+  #dungeonRow{width:100%!important;min-width:0!important}
+  #extras{
+    display:grid!important;
+    grid-template-columns:repeat(6,minmax(0,1fr))!important;
+    gap:4px!important;
+    flex:1 1 auto!important;
+    min-width:0!important;
+  }
+  #extras .extra{
+    width:100%!important;
+    height:auto!important;
+    aspect-ratio:1/1!important;
+    min-width:0!important;
+  }
+}
+</style>
+
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1>
 <div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
-<div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">全消去</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox">残りマス：<b id="remainingSlots">24</b><br>攻撃 合計：<b id="atkTotal">0</b><br>速度 合計：<b id="spdTotal">0</b><br>パッシブ上昇 合計：<b id="passTotal">0</b>
+<div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><div id="statsBreakdown" class="statsBreakdown"></div>
 <div class="debuff"><strong>デバフ選択</strong>
 <label><input type="checkbox" id="debuffCollapse"> 総崩れ</label>
 <label><input type="checkbox" id="debuffForbidden"> 禁制領域</label>
 </div></div></div>
-<div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
+<div id="boardIdentity" class="boardIdentity">🔵 自分の盤面</div><div id="selectedCharBar"><span>配置中：</span><img id="selectedCharImg" alt=""><b id="selectedCharName"></b><button id="selectedCharCancel" type="button">×</button></div><div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
 <div class="sectionTitle dungeonTitle" id="dungeonTitle">ダンジョン</div><div class="bottomRow" id="dungeonRow"><div id="extras" style="display:flex;gap:5px"></div><div class="bottomCount">合計 <b id="total">0</b>体</div></div></div>
-<h2 class="characterHeading">キャラ一覧</h2>
-<div class="characterControls"><div class="roleTabs" role="tablist"><button class="roleTab active" data-role="immortal">不朽</button><button class="roleTab" data-role="myth">神話</button><button class="roleTab" data-role="legend">伝説</button><button class="roleTab" data-role="other">その他</button></div><input id="charSearch" type="search" placeholder="🔍 キャラ名を検索" autocomplete="off"></div>
+<button type="button" id="charCollapseBtn">キャラ一覧を折りたたむ ▲</button><h2 class="characterHeading">キャラ一覧</h2><div id="recentChars"></div>
+<div class="characterControls"><div class="roleTabs" role="tablist"><button class="roleTab active" data-role="immortal">不朽</button><button class="roleTab" data-role="myth">神話</button><button class="roleTab" data-role="legend">伝説</button><button class="roleTab" data-role="other">その他</button></div><input id="charSearch" type="search" placeholder="🔍 キャラ名を検索" autocomplete="off"></div><div id="placeHint" class="placeHint">配置先を選択中 — キャラをタップして配置</div>
 <div class="roleSection" data-role-section="immortal"><h3>不朽</h3><div id="poolImmortal" class="pool"></div></div>
 <div class="roleSection" data-role-section="myth"><h3>神話</h3><div id="poolMyth" class="pool"></div></div>
 <div class="roleSection" data-role-section="legend"><h3>伝説</h3><div id="poolLegend" class="pool"></div></div>
@@ -322,6 +462,7 @@ function effectiveStats(i,sourceGrid=grid){
 function saveSkins(){try{localStorage.setItem("skin_selections_v1",JSON.stringify(skinSelections));}catch(e){} updateTotal();}
 
 let boardMode="normal";
+let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
 let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_opponent_24_v1")||"null");if(Array.isArray(x)&&x.length===24)opponentGrid=x}catch(e){}
@@ -340,8 +481,15 @@ function targetPool(i){
 }
 
 function debuffState(){
- if(boardMode!=="normal") return {collapse:false,forbidden:false};
- return {collapse:document.getElementById("debuffCollapse").checked, forbidden:document.getElementById("debuffForbidden").checked};
+ if(boardMode==="collapseSpace") return {collapse:false,forbidden:false};
+ return boardMode==="opponent" ? opponentDebuffs : normalDebuffs;
+}
+function syncDebuffUI(){
+ const d=debuffState();
+ document.getElementById("debuffCollapse").checked=!!d.collapse;
+ document.getElementById("debuffForbidden").checked=!!d.forbidden;
+ const box=document.querySelector(".debuff");
+ if(box) box.style.display=boardMode==="collapseSpace"?"none":"";
 }
 function maxCopies(charIndex){
  const role=roleByIndex[charIndex], d=debuffState();
@@ -360,10 +508,10 @@ function canStack(charIndex){
 function canAdd(charIndex,amount=1,excludeSlot=-1){
  return charCount(charIndex,excludeSlot)+amount<=maxCopies(charIndex);
 }
-function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="normal"&&debuffState().forbidden?21:24)}
+function activeSlots(){return boardMode==="collapseSpace"?30:(debuffState().forbidden?21:24)}
 function normalizeRules(){
  // 禁制領域ON時は使えない後半3マスを空にする
- if(boardMode==="normal" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
+ if(boardMode!=="collapseSpace" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
  for(let i=0;i<grid.length;i++){
    const v=grid[i];
@@ -390,9 +538,9 @@ function updateTotal(){
  const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1):0),0),0);
  document.getElementById("total").textContent=n;
  document.getElementById("topTotal").textContent=n;
- let atk=0,spd=0,pas=0;
- function addGridStats(sourceGrid){
-   // イサイ攻撃は各陣営ごとに最大5体分まで。シンガーのパッシブも各陣営ごとに1体分まで。
+ function calcGridStats(sourceGrid){
+   let atk=0,spd=0,pas=0;
+   // 特殊効果は盤面ごとに独立。シンガーも各盤面につき1体分まで。
    let isaiAttackBodiesLeft=5;
    let singerPassiveBodiesLeft=1;
    sourceGrid.forEach(v=>{
@@ -411,12 +559,22 @@ function updateTotal(){
        singerPassiveBodiesLeft=Math.max(0,singerPassiveBodiesLeft-passiveBodies);
      }else pas+=(Number(st.passive)||0)*stack;
    });
+   return {atk,spd,pas};
  }
- gridsToTotal.forEach(addGridStats);
  const fmt=n=>Number.isInteger(n)?String(n):String(Math.round(n*100)/100);
+ let atk=0,spd=0,pas=0;
+ gridsToTotal.forEach(g=>{const x=calcGridStats(g);atk+=x.atk;spd+=x.spd;pas+=x.pas;});
  document.getElementById("atkTotal").textContent=fmt(atk);
  document.getElementById("spdTotal").textContent=fmt(spd);
  document.getElementById("passTotal").textContent=fmt(pas);
+ const breakdown=document.getElementById("statsBreakdown");
+ if(breakdown){
+   if(boardMode==="collapseSpace") breakdown.innerHTML="崩壊空間のみの合計";
+   else{
+     const a=calcGridStats(normalGrid), b=calcGridStats(opponentGrid);
+     breakdown.innerHTML='<b>自分</b>　攻撃 '+fmt(a.atk)+'% ｜ 速度 '+fmt(a.spd)+'% ｜ パッシブ '+fmt(a.pas)+'%<br><span class="opp"><b>相手</b>　攻撃 '+fmt(b.atk)+'% ｜ 速度 '+fmt(b.spd)+'% ｜ パッシブ '+fmt(b.pas)+'%</span>';
+   }
+ }
  const cap=activeSlots();
  const usedSlots=grid.slice(0,cap).reduce((sum,v)=>sum+(v ? 1 : 0),0);
  document.getElementById("remainingSlots").textContent=Math.max(0,cap-usedSlots);
@@ -479,7 +637,7 @@ function render(){
  board.classList.toggle("collapseBoard",collapseSpace);
  document.getElementById("dungeonTitle").style.display=collapseSpace?"none":"";
  document.getElementById("dungeonRow").style.display=collapseSpace?"none":"";
- document.querySelector(".debuff").style.display=boardMode==="normal"?"":"none";
+ document.querySelector(".debuff").style.display=boardMode==="collapseSpace"?"none":"";
  const titleEl=document.querySelector(".sectionTitle"); if(titleEl) titleEl.textContent=boardMode==="opponent"?"相手の盤面":"盤面";
  if(collapseSpace){
    for(let i=0;i<30;i++)board.appendChild(makeSlot(i));
@@ -488,7 +646,12 @@ function render(){
    const end=activeSlots();
    for(let i=18;i<end;i++)extras.appendChild(makeSlot(i,true));
  }
- updateTotal()
+ updateTotal();
+ const ready=selected>=0 && selected<activeSlots() && !grid[selected];
+ document.querySelectorAll(".charCardWrap").forEach(el=>el.classList.toggle("placeReady",ready));
+ const ph=document.getElementById("placeHint"); if(ph) ph.classList.toggle("show",ready);
+ const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="opponent"?"🔴 相手の盤面":(boardMode==="collapseSpace"?"🟣 崩壊空間":"🔵 自分の盤面");
+ const selBar=document.getElementById("selectedCharBar"); if(selBar) selBar.classList.toggle("show",ready);
 }
 
 
@@ -508,7 +671,7 @@ allPools.forEach(pool=>{
  },{passive:true});
 });
 chars.forEach((src,i)=>{
- const wrap=document.createElement("div");wrap.className="charCardWrap";wrap.dataset.charIndex=i;const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);
+ const wrap=document.createElement("div");wrap.className="charCardWrap";wrap.dataset.charIndex=i;if(selected>=0&&selected<activeSlots()&&!grid[selected])wrap.classList.add("placeReady");const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);
  c.addEventListener("dragstart",e=>{dragData={type:"char",char:i};e.dataTransfer.effectAllowed="copy"});
  c.addEventListener("touchstart",()=>{dragData={type:"char",char:i}},{passive:true});
  c.addEventListener("touchend",e=>{
@@ -578,6 +741,8 @@ function renderSkinUI(){
 renderSkinUI();
 
 document.getElementById("clearBtn").addEventListener("click",()=>{
+ const boardLabel=boardMode==="collapseSpace"?"崩壊空間":(boardMode==="opponent"?"相手の盤面":"通常盤面");
+ if(!confirm(boardLabel+"を全消去しますか？"))return;
  if(boardMode==="collapseSpace"){collapseSpaceGrid=Array.from({length:30},()=>null);grid=collapseSpaceGrid;localStorage.removeItem("grid_collapse_space_30_v1");}
  else if(boardMode==="opponent"){opponentGrid=Array.from({length:24},()=>null);grid=opponentGrid;localStorage.removeItem("grid_opponent_24_v1");}
  else{normalGrid=Array.from({length:24},()=>null);grid=normalGrid;localStorage.removeItem("grid_stack_drag_24_v1");}
@@ -586,9 +751,11 @@ document.getElementById("clearBtn").addEventListener("click",()=>{
 function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
 function switchBoardMode(mode){
  saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="opponent"?opponentGrid:normalGrid);selected=-1;dragData=null;
+ document.body.classList.toggle("opponent-board",mode==="opponent");
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("opponentModeBtn").classList.toggle("active",mode==="opponent");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
+ syncDebuffUI();
  render();
 }
 document.getElementById("normalModeBtn").addEventListener("click",()=>switchBoardMode("normal"));
@@ -597,49 +764,88 @@ document.getElementById("collapseSpaceBtn").addEventListener("click",()=>switchB
 
 
 try{
- const d=JSON.parse(localStorage.getItem("debuff_v1")||"{}");
- document.getElementById("debuffCollapse").checked=!!d.collapse;
- document.getElementById("debuffForbidden").checked=!!d.forbidden;
+ const d=JSON.parse(localStorage.getItem("debuff_v2")||"null");
+ if(d && typeof d==="object"){
+  normalDebuffs={collapse:!!d.normal?.collapse,forbidden:!!d.normal?.forbidden};
+  opponentDebuffs={collapse:!!d.opponent?.collapse,forbidden:!!d.opponent?.forbidden};
+ }else{
+  const old=JSON.parse(localStorage.getItem("debuff_v1")||"{}");
+  normalDebuffs={collapse:!!old.collapse,forbidden:!!old.forbidden};
+ }
 }catch(e){}
 function saveDebuffs(){
- localStorage.setItem("debuff_v1",JSON.stringify({
-  collapse:document.getElementById("debuffCollapse").checked,
-  forbidden:document.getElementById("debuffForbidden").checked
- }));
+ if(boardMode!=="collapseSpace"){
+  const target=boardMode==="opponent"?opponentDebuffs:normalDebuffs;
+  target.collapse=document.getElementById("debuffCollapse").checked;
+  target.forbidden=document.getElementById("debuffForbidden").checked;
+ }
+ localStorage.setItem("debuff_v2",JSON.stringify({normal:normalDebuffs,opponent:opponentDebuffs}));
 }
 document.getElementById("debuffCollapse").addEventListener("change",()=>{saveDebuffs();normalizeRules();render()});
 document.getElementById("debuffForbidden").addEventListener("change",()=>{saveDebuffs();normalizeRules();render()});
-
+syncDebuffUI();
 normalizeRules();render();
-</script></main><div style="text-align:center;color:#666;font-size:14px;margin:28px 12px 18px;padding-top:16px;border-top:1px solid #ddd">お問い合わせはdiscord @m10k4_ まで</div>
+</script><div id="exportPreviewModal"><div id="exportPreviewCard"><h3>保存画像プレビュー</h3><img id="exportPreviewImg" alt="保存画像プレビュー"><div id="exportPreviewActions"><button type="button" id="exportPreviewClose">戻る</button><button type="button" id="exportPreviewSave">この画像を保存</button></div></div></div></main><div style="text-align:center;color:#666;font-size:14px;margin:28px 12px 18px;padding-top:16px;border-top:1px solid #ddd">お問い合わせはdiscord @m10k4_ まで</div>
 
 <script>
 (function(){
 async function exportFormationImage(){
   const collapseSpace=boardMode==="collapseSpace";
-  const cell=150,gap=14,startX=65,startY=100;
-  const W=1200,H=collapseSpace?960:860;
+  const hasNormal=normalGrid.some(Boolean), hasOpponent=opponentGrid.some(Boolean);
+  const versusExport=!collapseSpace && hasNormal && hasOpponent;
+  const cell=versusExport?125:150, gap=versusExport?10:14, startX=versusExport?170:65;
+  const boardBlockH=versusExport?610:0;
+  const W=1200,H=versusExport?1420:(collapseSpace?960:860);
   const c=document.createElement("canvas"); c.width=W;c.height=H;
   const ctx=c.getContext("2d");
   ctx.fillStyle="#f5f5f7";ctx.fillRect(0,0,W,H);
-  ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(collapseSpace?"崩壊空間":(boardMode==="opponent"?"相手の盤面":"盤面"),65,60);
   function loadImg(src){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;});}
-  const used=[...new Set(grid.filter(Boolean).map(v=>v.char))];
+  const sourceGrids=versusExport?[normalGrid,opponentGrid]:[grid];
+  const used=[...new Set(sourceGrids.flatMap(g=>g.filter(Boolean).map(v=>v.char)))];
   const pairs=await Promise.all(used.map(async i=>[i,await loadImg(chars[i])]));
   const map=new Map(pairs);
-  function drawCell(idx,x,y){
+  function drawCell(sourceGrid,idx,x,y){
     ctx.fillStyle="#fff";ctx.strokeStyle="#cfcfd6";ctx.lineWidth=2;ctx.fillRect(x,y,cell,cell);ctx.strokeRect(x,y,cell,cell);
-    const v=grid[idx]; if(!v)return; const im=map.get(v.char);
-    if(im){const sc=Math.min((cell-14)/im.width,(cell-14)/im.height);const iw=im.width*sc,ih=im.height*sc;ctx.drawImage(im,x+(cell-iw)/2,y+(cell-ih)/2,iw,ih);}
-    if(v.stack>1){ctx.fillStyle="#111";ctx.font="bold 24px sans-serif";ctx.fillText("×"+v.stack,x+8,y+30);}
+    const v=sourceGrid[idx]; if(!v)return; const im=map.get(v.char);
+    if(im){const sc=Math.min((cell-12)/im.width,(cell-12)/im.height);const iw=im.width*sc,ih=im.height*sc;ctx.drawImage(im,x+(cell-iw)/2,y+(cell-ih)/2,iw,ih);}
+    if(v.stack>1){ctx.fillStyle="#111";ctx.font="bold 22px sans-serif";ctx.fillText("×"+v.stack,x+7,y+27);}
   }
-  if(collapseSpace){for(let i=0;i<30;i++)drawCell(i,startX+(i%6)*(cell+gap),startY+Math.floor(i/6)*(cell+gap));}
-  else{for(let i=0;i<18;i++)drawCell(i,startX+(i%6)*(cell+gap),startY+Math.floor(i/6)*(cell+gap));ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("ダンジョン",65,605);for(let j=0;j<6;j++)drawCell(18+j,65+j*(cell+gap),630);}
-  c.toBlob(blob=>{if(!blob)return;const a=document.createElement("a"),url=URL.createObjectURL(blob);a.href=url;a.download=collapseSpace?"崩壊空間.png":(boardMode==="opponent"?"相手の盤面.png":"盤面.png");document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);},"image/png");
+  function drawNormalBoard(sourceGrid,top,title,titleColor){
+    ctx.fillStyle=titleColor;ctx.font="bold 30px sans-serif";ctx.textAlign="center";ctx.fillText(title,W/2,top+34);ctx.textAlign="left";
+    const y0=top+60;
+    for(let i=0;i<18;i++)drawCell(sourceGrid,i,startX+(i%6)*(cell+gap),y0+Math.floor(i/6)*(cell+gap));
+    const dungeonY=y0+3*(cell+gap)+18;
+    ctx.fillStyle="#333";ctx.font="bold 22px sans-serif";ctx.fillText("ダンジョン",startX,dungeonY);
+    for(let j=0;j<6;j++)drawCell(sourceGrid,18+j,startX+j*(cell+gap),dungeonY+14);
+  }
+  if(versusExport){
+    // 両方にキャラがいる場合は「相手が上・自分が下」のVS画像にする
+    drawNormalBoard(opponentGrid,35,"🔴 相手の盤面","#b52f3a");
+    ctx.fillStyle="#222";ctx.font="bold 42px sans-serif";ctx.textAlign="center";ctx.fillText("VS",W/2,710);ctx.textAlign="left";
+    drawNormalBoard(normalGrid,735,"🔵 自分の盤面","#24527d");
+  }else if(collapseSpace){
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("崩壊空間",65,60);
+    for(let i=0;i<30;i++)drawCell(grid,i,65+(i%6)*(cell+gap),100+Math.floor(i/6)*(cell+gap));
+  }else{
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(boardMode==="opponent"?"相手の盤面":"自分の盤面",65,60);
+    for(let i=0;i<18;i++)drawCell(grid,i,65+(i%6)*(cell+gap),100+Math.floor(i/6)*(cell+gap));
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("ダンジョン",65,605);
+    for(let j=0;j<6;j++)drawCell(grid,18+j,65+j*(cell+gap),630);
+  }
+  c.toBlob(blob=>{
+    if(!blob)return;
+    const url=URL.createObjectURL(blob), modal=document.getElementById("exportPreviewModal"), img=document.getElementById("exportPreviewImg");
+    img.src=url; modal.classList.add("open");
+    const save=document.getElementById("exportPreviewSave"), close=document.getElementById("exportPreviewClose");
+    const cleanup=()=>{modal.classList.remove("open");img.removeAttribute("src");URL.revokeObjectURL(url);save.onclick=null;close.onclick=null;};
+    close.onclick=cleanup;
+    save.onclick=()=>{const a=document.createElement("a");a.href=url;a.download=versusExport?"自分VS相手_盤面.png":(collapseSpace?"崩壊空間.png":(boardMode==="opponent"?"相手の盤面.png":"自分の盤面.png"));document.body.appendChild(a);a.click();a.remove();setTimeout(cleanup,200);};
+  },"image/png");
 }
 document.addEventListener("DOMContentLoaded",()=>{
   const b=document.getElementById("exportImageBtn");
   if(b)b.addEventListener("click",exportFormationImage);
+  const m=document.getElementById("exportPreviewModal");if(m)m.addEventListener("click",e=>{if(e.target===m)document.getElementById("exportPreviewClose")?.click();});
 });
 })();
 </script>
@@ -819,4 +1025,62 @@ document.addEventListener("DOMContentLoaded",()=>{
 })();
 </script>
 <style>body.isDragging .slot.empty,body.isDragging .extra.empty{box-shadow:inset 0 0 0 2px rgba(110,183,255,.42)}button:disabled{cursor:default}</style>
+
+<style id="mobilePoolSliderStyle">
+@media(max-width:699px){
+  .poolSlideBar{display:block;width:100%;height:24px;margin:2px 0 4px;accent-color:#6eb7ff;touch-action:pan-x;}
+  .poolSlideBar::-webkit-slider-runnable-track{height:7px;background:#203b5b;border:1px solid #355674;border-radius:999px;}
+  .poolSlideBar::-webkit-slider-thumb{-webkit-appearance:none;width:30px;height:18px;margin-top:-6px;border-radius:999px;background:#8fc9ff;border:2px solid #d8ecff;}
+  .poolSlideBar{appearance:none;background:transparent;}
+}
+@media(min-width:700px){.poolSlideBar{display:none}}
+</style>
+<script id="mobilePoolSliderFeature">
+(()=>{
+  const pools=[...document.querySelectorAll('.roleSection .pool')];
+  pools.forEach(pool=>{
+    if(pool.nextElementSibling?.classList.contains('poolSlideBar'))return;
+    const slider=document.createElement('input');
+    slider.type='range'; slider.min='0'; slider.max='1000'; slider.value='0';
+    slider.className='poolSlideBar'; slider.setAttribute('aria-label','キャラ一覧を横にスクロール');
+    pool.insertAdjacentElement('afterend',slider);
+    let syncing=false;
+    const maxScroll=()=>Math.max(0,pool.scrollWidth-pool.clientWidth);
+    const syncFromPool=()=>{if(syncing)return;const m=maxScroll();slider.value=m?Math.round(pool.scrollLeft/m*1000):0;slider.disabled=m<=1;};
+    slider.addEventListener('input',()=>{syncing=true;const m=maxScroll();pool.scrollLeft=m*(Number(slider.value)/1000);requestAnimationFrame(()=>{syncing=false})});
+    pool.addEventListener('scroll',syncFromPool,{passive:true});
+    new ResizeObserver(syncFromPool).observe(pool);
+    new MutationObserver(()=>requestAnimationFrame(syncFromPool)).observe(pool,{childList:true,subtree:true,attributes:true,attributeFilter:['style','class']});
+    window.addEventListener('resize',syncFromPool,{passive:true});
+    requestAnimationFrame(syncFromPool);
+  });
+})();
+</script>
+
+<script id="uxUpgradeV2Script">
+(()=>{
+ const collapseBtn=document.getElementById('charCollapseBtn');
+ if(collapseBtn) collapseBtn.addEventListener('click',()=>{document.body.classList.toggle('charListCollapsed');const c=document.body.classList.contains('charListCollapsed');collapseBtn.textContent=c?'キャラ一覧を開く ▼':'キャラ一覧を折りたたむ ▲';});
+ const cancel=document.getElementById('selectedCharCancel'); if(cancel)cancel.addEventListener('click',()=>{selected=-1;render()});
+ // 選択中キャラ表示：キャラカードを押した時に更新
+ document.addEventListener('click',e=>{const w=e.target.closest?.('.charCardWrap');if(!w)return;const i=Number(w.dataset.charIndex);if(!Number.isInteger(i))return;const im=document.getElementById('selectedCharImg'),nm=document.getElementById('selectedCharName');if(im)im.src=chars[i];if(nm)nm.textContent=charNames[i];rememberRecent(i);},true);
+ // 右クリックで盤面キャラ削除
+ document.addEventListener('contextmenu',e=>{const slot=e.target.closest?.('.slot,.extra');if(!slot)return;const i=Number(slot.dataset.index);if(!Number.isInteger(i)||!grid[i])return;e.preventDefault();grid[i]=null;selected=-1;normalizeRules();render();});
+ // ショートカット
+ document.addEventListener('keydown',e=>{if(e.target.matches?.('input,textarea'))return;if(e.key==='Escape'){selected=-1;render();return;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();document.getElementById('undoBtn')?.click();}if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))){e.preventDefault();document.getElementById('redoBtn')?.click();}});
+ // 全盤面リセット
+ document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='opponent'?opponentGrid:normalGrid);selected=-1;render();});
+ // 最近使ったキャラ
+ let recent=[];try{recent=JSON.parse(localStorage.getItem('recent_chars_v1')||'[]')}catch(e){};if(!Array.isArray(recent))recent=[];
+ function drawRecent(){const box=document.getElementById('recentChars');if(!box)return;box.replaceChildren();if(!recent.length)return;const lab=document.createElement('span');lab.className='recentLabel';lab.textContent='最近使用';box.appendChild(lab);recent.slice(0,6).forEach(i=>{const b=document.createElement('button');b.type='button';b.className='recentChar';b.title=charNames[i];const im=makeImg(chars[i]);b.appendChild(im);b.addEventListener('click',()=>document.querySelector('.charCardWrap[data-char-index="'+i+'"] .card')?.click());box.appendChild(b);});}
+ window.rememberRecent=function(i){recent=[i,...recent.filter(x=>x!==i)].slice(0,6);try{localStorage.setItem('recent_chars_v1',JSON.stringify(recent))}catch(e){}drawRecent()};drawRecent();
+ // 長押しで詳細
+ const pop=document.createElement('div');pop.id='charDetailPopup';document.body.appendChild(pop);let timer=null,sx=0,sy=0;
+ function hidePop(){clearTimeout(timer);timer=null;pop.classList.remove('show')}
+ document.addEventListener('touchstart',e=>{const card=e.target.closest?.('.card');if(!card||e.touches.length!==1)return;const wrap=card.closest('.charCardWrap'),i=Number(wrap?.dataset.charIndex);if(!Number.isInteger(i))return;const t=e.touches[0];sx=t.clientX;sy=t.clientY;timer=setTimeout(()=>{const st=effectiveStats(i,grid);pop.innerHTML='<b>'+charNames[i]+'</b><br>攻撃 +'+(st.attack||0)+'%<br>速度 +'+(st.speed||0)+'%<br>パッシブ +'+(st.passive||0)+'%';pop.style.left=Math.min(innerWidth-195,sx+8)+'px';pop.style.top=Math.max(8,sy-105)+'px';pop.classList.add('show');navigator.vibrate?.(20)},550)}, {passive:true});
+ document.addEventListener('touchmove',e=>{if(!timer)return;const t=e.touches[0];if(Math.hypot(t.clientX-sx,t.clientY-sy)>8)hidePop()},{passive:true});document.addEventListener('touchend',()=>setTimeout(hidePop,650),{passive:true});document.addEventListener('touchcancel',hidePop,{passive:true});
+ // PC hoverでも詳細をタイトルで確認
+ document.querySelectorAll('.charCardWrap').forEach(w=>{const i=Number(w.dataset.charIndex);const st=effectiveStats(i,grid);w.title=charNames[i]+'｜攻撃 '+(st.attack||0)+'% / 速度 '+(st.speed||0)+'% / パッシブ '+(st.passive||0)+'%';});
+})();
+</script>
 </body></html>
