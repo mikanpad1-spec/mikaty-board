@@ -248,15 +248,15 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 .boardIdentity{font-weight:900;font-size:13px;text-align:center;padding:5px 10px;border-radius:999px;margin:4px auto 7px;width:max-content;background:#16385b;color:#ddecff}.opponent-board .boardIdentity{background:#642f38;color:#ffe5e8}body:has(#collapseSpaceBtn.active) .boardIdentity{background:#613593;color:#f2e6ff}
 #selectedCharBar{display:none;align-items:center;justify-content:center;gap:7px;padding:5px 8px;margin:5px 0;border:1px solid #365574;border-radius:9px;background:#0d1d30;font-size:12px}#selectedCharBar.show{display:flex}#selectedCharBar img{width:28px;height:28px;object-fit:contain}#selectedCharCancel{border:0;background:#253d58;color:#fff;border-radius:999px;width:23px;height:23px;cursor:pointer}
 #charCollapseBtn,#resetAllBtn{border:1px solid #365574;background:#132741;color:#e7f2ff;border-radius:9px;padding:7px 10px;font-weight:800;cursor:pointer}#charCollapseBtn{display:none;width:100%;margin:5px 0}
-#recentChars{display:flex;gap:6px;align-items:center;overflow-x:auto;padding:5px 0;margin:3px 0 6px}#recentChars:empty{display:none}.recentLabel{font-size:11px;color:#9fb3c9;white-space:nowrap}.recentChar{flex:0 0 auto;width:42px;height:42px;border:1px solid #365574;background:#10233a;border-radius:9px;padding:2px;cursor:pointer}.recentChar img{width:100%;height:100%;object-fit:contain}
+
 #charDetailPopup{position:fixed;z-index:9999;display:none;min-width:175px;background:#0b1829;color:#fff;border:1px solid #52779e;border-radius:11px;padding:9px 11px;box-shadow:0 10px 30px #0009;font-size:12px;line-height:1.55;pointer-events:none}#charDetailPopup.show{display:block}
 @media(max-width:699px){
  #charCollapseBtn{display:block}.statsBox{position:sticky!important;top:48px!important;z-index:175!important;background:#0b1829f2!important;backdrop-filter:blur(8px)}
- body.charListCollapsed .characterControls,body.charListCollapsed .roleSection,body.charListCollapsed #recentChars{display:none!important}
+ body.charListCollapsed .characterControls,body.charListCollapsed .roleSection{display:none!important}
 }
 @media(min-width:900px){
  main{display:grid;grid-template-columns:minmax(560px,1.35fr) minmax(360px,.85fr);column-gap:16px;align-items:start}main>h1,main>.modeSwitch,main>.sub,main>.tools,main>.skinPanel,main>.tip{grid-column:1/-1}
- main>.boardScroll{grid-column:1;grid-row:5 / span 7;position:sticky;top:8px}main>.characterHeading,main>.characterControls,main>.roleSection,main>#recentChars{grid-column:2}.characterHeading{margin-top:0!important}.characterControls{position:sticky;top:0;z-index:80;background:#08111ff2}
+ main>.boardScroll{grid-column:1;grid-row:5 / span 7;position:sticky;top:8px}main>.characterHeading,main>.characterControls,main>.roleSection{grid-column:2}.characterHeading{margin-top:0!important}.characterControls{position:sticky;top:0;z-index:80;background:#08111ff2}
  .roleSection .pool{max-height:330px;overflow-y:auto;align-content:flex-start}
 }
 </style>
@@ -325,6 +325,18 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 .roleSection.rarityCollapsed .rarityToggleBtn{background:#24527d;border-color:#6c9ac8;color:#fff;opacity:1}
 @media(max-width:699px){.rarityToggleBtn{padding:6px 9px;font-size:11px}.rarityCount{font-size:10px;padding:2px 6px}}
 </style>
+
+<style id="mobileBoardNoSticky">
+/* スマホ: 盤面を画面に追従させず、通常の位置に固定 */
+@media (max-width:699px){
+  main>.boardScroll{
+    position:relative!important;
+    top:auto!important;
+    z-index:auto!important;
+    background:transparent!important;
+  }
+}
+</style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1>
@@ -337,7 +349,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 </div></div></div>
 <div id="boardIdentity" class="boardIdentity">🔵 自分の盤面</div><div id="slotDetailBar"><span>盤面 残り <b id="boardRemain">18</b></span><span>ダンジョン 残り <b id="dungeonRemain">6</b></span></div><div id="specialEffectBar"></div><div id="selectedCharBar"><span>配置中：</span><img id="selectedCharImg" alt=""><b id="selectedCharName"></b><button id="selectedCharCancel" type="button">×</button></div><div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
 <div class="sectionTitle dungeonTitle" id="dungeonTitle">ダンジョン</div><div class="bottomRow" id="dungeonRow"><div id="extras" style="display:flex;gap:5px"></div><div class="bottomCount">合計 <b id="total">0</b>体</div></div></div>
-<button type="button" id="charCollapseBtn">キャラ一覧を折りたたむ ▲</button><div id="favoriteChars"></div><h2 class="characterHeading">キャラ一覧</h2><div id="recentChars"></div>
+<button type="button" id="charCollapseBtn">キャラ一覧を折りたたむ ▲</button><div id="favoriteChars"></div><h2 class="characterHeading">キャラ一覧</h2>
 <div class="characterControls"><div class="roleTabs" role="tablist"><button class="roleTab active" data-role="immortal">不朽</button><button class="roleTab" data-role="myth">神話</button><button class="roleTab" data-role="legend">伝説</button><button class="roleTab" data-role="other">その他</button></div><input id="charSearch" type="search" placeholder="🔍 キャラ名を検索" autocomplete="off"></div><div id="placeHint" class="placeHint">配置先を選択中 — キャラをタップして配置</div>
 <div class="roleSection" data-role-section="immortal"><h3>不朽</h3><div id="poolImmortal" class="pool"></div></div>
 <div class="roleSection" data-role-section="myth"><h3>神話</h3><div id="poolMyth" class="pool"></div></div>
@@ -1123,17 +1135,13 @@ document.addEventListener("DOMContentLoaded",()=>{
  if(collapseBtn) collapseBtn.addEventListener('click',()=>{document.body.classList.toggle('charListCollapsed');const c=document.body.classList.contains('charListCollapsed');collapseBtn.textContent=c?'キャラ一覧を開く ▼':'キャラ一覧を折りたたむ ▲';});
  const cancel=document.getElementById('selectedCharCancel'); if(cancel)cancel.addEventListener('click',()=>{selected=-1;render()});
  // 選択中キャラ表示：キャラカードを押した時に更新
- document.addEventListener('click',e=>{const w=e.target.closest?.('.charCardWrap');if(!w)return;const i=Number(w.dataset.charIndex);if(!Number.isInteger(i))return;const im=document.getElementById('selectedCharImg'),nm=document.getElementById('selectedCharName');if(im)im.src=chars[i];if(nm)nm.textContent=charNames[i];rememberRecent(i);},true);
+ document.addEventListener('click',e=>{const w=e.target.closest?.('.charCardWrap');if(!w)return;const i=Number(w.dataset.charIndex);if(!Number.isInteger(i))return;const im=document.getElementById('selectedCharImg'),nm=document.getElementById('selectedCharName');if(im)im.src=chars[i];if(nm)nm.textContent=charNames[i];},true);
  // 右クリックで盤面キャラ削除
  document.addEventListener('contextmenu',e=>{const slot=e.target.closest?.('.slot,.extra');if(!slot)return;const i=Number(slot.dataset.index);if(!Number.isInteger(i)||!grid[i])return;e.preventDefault();grid[i]=null;selected=-1;normalizeRules();render();});
  // ショートカット
  document.addEventListener('keydown',e=>{if(e.target.matches?.('input,textarea'))return;if(e.key==='Escape'){selected=-1;render();return;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();document.getElementById('undoBtn')?.click();}if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))){e.preventDefault();document.getElementById('redoBtn')?.click();}});
  // 全盤面リセット
  document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間・神の試練をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);godTrialGrid=Array.from({length:30},()=>null);localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');localStorage.removeItem('grid_god_trial_30_v2');localStorage.removeItem('grid_god_trial_42_v1');localStorage.removeItem('grid_god_trial_36_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='godTrial'?godTrialGrid:(boardMode==='opponent'?opponentGrid:normalGrid));selected=-1;render();});
- // 最近使ったキャラ
- let recent=[];try{recent=JSON.parse(localStorage.getItem('recent_chars_v1')||'[]')}catch(e){};if(!Array.isArray(recent))recent=[];
- function drawRecent(){const box=document.getElementById('recentChars');if(!box)return;box.replaceChildren();if(!recent.length)return;const lab=document.createElement('span');lab.className='recentLabel';lab.textContent='最近使用';box.appendChild(lab);recent.slice(0,6).forEach(i=>{const b=document.createElement('button');b.type='button';b.className='recentChar';b.title=charNames[i];const im=makeImg(chars[i]);b.appendChild(im);b.addEventListener('click',()=>document.querySelector('.charCardWrap[data-char-index="'+i+'"] .card')?.click());box.appendChild(b);});}
- window.rememberRecent=function(i){recent=[i,...recent.filter(x=>x!==i)].slice(0,6);try{localStorage.setItem('recent_chars_v1',JSON.stringify(recent))}catch(e){}drawRecent()};drawRecent();
  // 長押しで詳細
  const pop=document.createElement('div');pop.id='charDetailPopup';document.body.appendChild(pop);let timer=null,sx=0,sy=0;
  function hidePop(){clearTimeout(timer);timer=null;pop.classList.remove('show')}
@@ -1175,11 +1183,9 @@ document.addEventListener("DOMContentLoaded",()=>{
  const prevRender=render;render=function(){prevRender();refreshInfo();decorateFavorites();};
  // 5: お気に入り + 使用回数ベースの「よく使う」
  let fav=[];try{fav=JSON.parse(localStorage.getItem('favorite_chars_v1')||'[]')}catch(e){};if(!Array.isArray(fav))fav=[];
- let use={};try{use=JSON.parse(localStorage.getItem('char_use_counts_v1')||'{}')}catch(e){};if(!use||typeof use!=='object')use={};
  function saveFav(){localStorage.setItem('favorite_chars_v1',JSON.stringify(fav))}
  function drawFav(){const box=$('favoriteChars');if(!box)return;box.replaceChildren();if(!fav.length)return;const l=document.createElement('span');l.className='favLabel';l.textContent='★ お気に入り';box.appendChild(l);fav.slice(0,8).forEach(i=>{const b=document.createElement('button');b.className='favChar';b.title=charNames[i];b.appendChild(makeImg(chars[i]));b.onclick=()=>document.querySelector('.charCardWrap[data-char-index="'+i+'"] .card')?.click();box.appendChild(b)})}
  function decorateFavorites(){document.querySelectorAll('.charCardWrap').forEach(w=>{if(w.querySelector('.favToggle')){w.querySelector('.favToggle').classList.toggle('on',fav.includes(Number(w.dataset.charIndex)));return}const i=Number(w.dataset.charIndex),b=document.createElement('button');b.type='button';b.className='favToggle'+(fav.includes(i)?' on':'');b.textContent='★';b.title='お気に入り';b.onclick=e=>{e.stopPropagation();e.preventDefault();fav.includes(i)?fav=fav.filter(x=>x!==i):fav.unshift(i);saveFav();drawFav();decorateFavorites()};w.appendChild(b)})}
- document.addEventListener('click',e=>{const w=e.target.closest?.('.charCardWrap');if(!w||e.target.closest('.favToggle'))return;const i=Number(w.dataset.charIndex);if(!Number.isInteger(i))return;use[i]=(use[i]||0)+1;try{localStorage.setItem('char_use_counts_v1',JSON.stringify(use))}catch(_){}},true);
  drawFav();decorateFavorites();
  // 8: スマホの低頻度操作を「…」へ
  const more=$('moreToolsBtn');if(more){const menu=document.createElement('div');menu.className='mobileMoreMenu';[['clearBtn','盤面消去'],['resetAllBtn','全部リセット'],['shareBtn','編成URLをコピー']].forEach(([id,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>{$(id)?.click();menu.classList.remove('open')};menu.appendChild(b)});document.body.appendChild(menu);more.onclick=e=>{e.stopPropagation();menu.classList.toggle('open')};document.addEventListener('click',()=>menu.classList.remove('open'));}
