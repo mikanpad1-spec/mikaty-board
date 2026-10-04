@@ -338,6 +338,37 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   }
 }
 </style>
+
+<style id="pcLayoutAlignmentFix">
+/* PC: 2カラム化で発生していた配置ズレを解消。各セクションを自然な縦順に戻す */
+@media (min-width:900px){
+  main{
+    display:block!important;
+    width:min(100% - 24px,980px)!important;
+    max-width:980px!important;
+    margin:0 auto!important;
+  }
+  main>.boardScroll{
+    position:static!important;
+    width:min(100%,700px)!important;
+    margin:0 auto!important;
+    overflow:visible!important;
+  }
+  .boardIdentity,#slotDetailBar,#specialEffectBar,#selectedCharBar{
+    width:min(100%,700px)!important;
+    margin-left:auto!important;
+    margin-right:auto!important;
+    box-sizing:border-box!important;
+  }
+  .characterHeading{margin-top:16px!important;text-align:left!important}
+  .characterControls{position:static!important;top:auto!important;width:100%!important}
+  .roleSection{width:100%!important}
+  .roleSection .pool{max-height:none!important;overflow:visible!important}
+  .pool{display:flex!important;flex-wrap:wrap!important}
+  #favoriteChars{width:100%!important}
+  .skinPanel{width:100%!important;box-sizing:border-box!important}
+}
+</style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1><p class="seoIntro">ペタペン盤面シュミレーター｜ペタペタペンギン団の盤面・編成作成とステータス計算に対応。</p>
@@ -1236,4 +1267,49 @@ document.addEventListener("DOMContentLoaded",()=>{
   });
 })();
 </script>
+
+<style id="pcTwoColumnRestored">
+/* PC: 2カラムを維持しつつ、盤面は追従させずズレない配置 */
+@media (min-width:900px){
+  main{
+    display:grid!important;
+    grid-template-columns:minmax(0,1.65fr) minmax(330px,.85fr)!important;
+    column-gap:18px!important;
+    row-gap:0!important;
+    align-items:start!important;
+    width:min(100% - 28px,1180px)!important;
+    max-width:1180px!important;
+    margin:0 auto!important;
+  }
+  main>h1,main>.seoIntro,main>.modeSwitch,main>.sub,main>.tools,main>.tip,main>.skinPanel{grid-column:1/-1!important}
+  main>#boardIdentity,main>#slotDetailBar,main>#specialEffectBar,main>#selectedCharBar,main>.boardScroll{grid-column:1!important}
+  main>#charCollapseBtn,main>#favoriteChars,main>.characterHeading,main>.characterControls,main>#placeHint,main>.roleSection{grid-column:2!important}
+
+  main>#boardIdentity{grid-row:6!important}
+  main>#slotDetailBar{grid-row:7!important}
+  main>#specialEffectBar{grid-row:8!important}
+  main>#selectedCharBar{grid-row:9!important}
+  main>.boardScroll{grid-row:10 / span 8!important;position:static!important;top:auto!important;align-self:start!important;width:100%!important;margin:0!important;overflow:visible!important}
+
+  main>#charCollapseBtn{grid-row:6!important}
+  main>#favoriteChars{grid-row:7!important}
+  main>.characterHeading{grid-row:8!important;margin:4px 0 5px!important}
+  main>.characterControls{grid-row:9!important;position:static!important;top:auto!important;width:100%!important;margin:0 0 7px!important}
+  main>#placeHint{grid-row:10!important}
+  main>.roleSection[data-role-section="immortal"]{grid-row:11!important}
+  main>.roleSection[data-role-section="myth"]{grid-row:12!important}
+  main>.roleSection[data-role-section="legend"]{grid-row:13!important}
+  main>.roleSection[data-role-section="other"]{grid-row:14!important}
+
+  .boardIdentity,#slotDetailBar,#specialEffectBar,#selectedCharBar{width:100%!important;max-width:none!important;margin-left:0!important;margin-right:0!important;box-sizing:border-box!important}
+  .board{width:100%!important;max-width:100%!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;box-sizing:border-box!important}
+  .board .slot{width:100%!important;height:auto!important;aspect-ratio:1/1!important;min-width:0!important}
+  #dungeonRow{width:100%!important;min-width:0!important}
+  #extras{display:grid!important;grid-template-columns:repeat(6,minmax(0,1fr))!important;gap:4px!important;flex:1 1 auto!important;min-width:0!important}
+  #extras .extra{width:100%!important;height:auto!important;aspect-ratio:1/1!important;min-width:0!important}
+  .roleSection{width:100%!important;min-width:0!important;margin:6px 0!important}
+  .roleSection .pool{max-height:250px!important;overflow-y:auto!important;overflow-x:hidden!important;align-content:flex-start!important}
+  .characterControls input{width:100%!important}
+}
+</style>
 </body></html>
