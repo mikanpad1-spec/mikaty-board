@@ -41,6 +41,15 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 .skinTop select{min-height:42px;background:#0b1728;color:#fff;border:1px solid #49698f;border-radius:10px;padding:8px 10px;font-size:16px;flex:1;min-width:180px}
 .skinChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}.skinChoice{display:flex;align-items:center;gap:7px;background:#152842;border:1px solid #2b4566;border-radius:10px;padding:9px;font-size:14px}.skinChoice input{width:20px;height:20px;flex:none}.skinEffect{margin-top:10px;background:#0b1728;border-radius:10px;padding:10px;line-height:1.7;font-size:14px}.skinLimit{color:#a9bdd5;font-size:12px;margin-top:7px}.skinError{color:#ff9b9b;font-size:12px;min-height:1.2em;margin-top:4px}
 @media(max-width:699px){.skinPanel{margin:10px 0;padding:10px}.skinChoices{grid-template-columns:1fr}.skinChoice{padding:7px 9px}.skinEffect{padding:8px}}
+
+/* rarity section individual collapse */
+.roleSection h3{cursor:pointer;user-select:none;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.roleSection h3::after{content:"▲";font-size:11px;opacity:.75}
+.roleSection.rarityCollapsed h3::after{content:"▼"}
+.roleSection.rarityCollapsed .pool{display:none!important}
+@media(max-width:699px){
+  .roleSection.activeRole h3{display:flex!important;background:#10243d;border-radius:8px;padding:7px 9px;margin:0 0 4px;border-left:4px solid #6787ad}
+}
 </style>
 <style>
 /* 牛・パルス・ハンターだけ追加輪郭を無効化 */
@@ -143,10 +152,13 @@ button{transition:.15s ease}button:active{transform:scale(.97)}#shareBtn{backgro
 .skinCharGroup{padding:11px 0;border-top:1px solid #29466a}.skinCharGroup:first-child{border-top:0}.skinCharTitle{margin:0 0 7px;font-size:16px;color:#fff}.skinEffectCompact{margin-top:7px;font-size:12px;color:#c8d8eb;padding:7px 9px}.skinCharGroup .skinChoices{margin-top:0}
 @media(max-width:699px){.skinCharGroup{padding:9px 0}.skinCharTitle{font-size:15px}.skinCharGroup .skinChoices{grid-template-columns:1fr}.skinEffectCompact{font-size:11px;line-height:1.5}}
 
-.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#5a2b31;border-color:#9b5059;color:#fff}.modeBtn.opponentMode.active{background:#873b46;box-shadow:0 0 0 2px rgba(220,90,110,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}
+.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#5a2b31;border-color:#9b5059;color:#fff}.modeBtn.opponentMode.active{background:#873b46;box-shadow:0 0 0 2px rgba(220,90,110,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}.modeBtn.godTrialMode{background:#7a5a18;border-color:#d2a83f;color:#fff}.modeBtn.godTrialMode.active{background:#a77a1f;box-shadow:0 0 0 2px rgba(255,205,80,.22)}
 .board.collapseBoard{grid-template-rows:repeat(5,105px)}
+.board.godTrialBoard{grid-template-rows:repeat(6,105px);overflow:visible;padding-left:58px;padding-right:58px}
+.board.godTrialBoard>.slot:nth-child(-n+6){transform:translateX(52px)}
+.board.godTrialBoard>.slot:nth-child(n+31){transform:translateX(-52px)}
 @media(min-width:700px){.board.collapseBoard{grid-template-rows:repeat(5,130px)}}
-@media(max-width:699px){.board.collapseBoard{grid-template-rows:repeat(5,auto)}}
+@media(max-width:699px){.board.collapseBoard{grid-template-rows:repeat(5,auto)}.board.godTrialBoard{grid-template-rows:repeat(6,auto);padding-left:calc((100vw - 20px)/12);padding-right:calc((100vw - 20px)/12)}.board.godTrialBoard>.slot:nth-child(-n+6){transform:translateX(45%)}.board.godTrialBoard>.slot:nth-child(n+31){transform:translateX(-45%)}}
 .statsBreakdown{margin-top:7px;padding-top:7px;border-top:1px solid #29435f;font-size:11px;line-height:1.6;color:#a9bfd7}.statsBreakdown b{color:#eaf4ff}.statsBreakdown .opp{color:#ffb8c1}
 body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#26151a}body.opponent-board .sectionTitle{color:#ffb8c1}
 </style>
@@ -185,6 +197,9 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   .statsBox b{font-size:15px}.statsBreakdown{font-size:10px;margin-top:4px;padding-top:4px}
   .board{grid-template-columns:repeat(6,105px);grid-template-rows:repeat(3,105px);gap:4px;padding:5px}
   .board.collapseBoard{grid-template-rows:repeat(5,105px)}
+.board.godTrialBoard{grid-template-rows:repeat(6,105px);overflow:visible;padding-left:58px;padding-right:58px}
+.board.godTrialBoard>.slot:nth-child(-n+6){transform:translateX(52px)}
+.board.godTrialBoard>.slot:nth-child(n+31){transform:translateX(-52px)}
   .extra{width:105px;height:105px}.bottomRow{margin-top:6px}.bottomCount{padding:7px 10px;font-size:12px}.bottomCount b{font-size:17px}
   .sectionTitle{font-size:14px;margin:10px 0 5px}.dungeonTitle{margin-top:9px}
   .characterHeading{font-size:16px;margin:12px 0 5px}
@@ -288,19 +303,41 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 }
 </style>
 
+
+<style id="godTrialShapeV2">
+/* 神の試練：指定の6x6形状。空白セルはスペースだけ保持 */
+.board.godTrialBoard{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:repeat(6,105px)!important;padding-left:3px!important;padding-right:3px!important;overflow:visible!important}
+.board.godTrialBoard>.slot{transform:none!important}
+.board.godTrialBoard>.godTrialBlank{visibility:hidden;pointer-events:none;min-width:0}
+@media(min-width:700px){.board.godTrialBoard{grid-template-rows:repeat(6,minmax(0,1fr))!important;aspect-ratio:1/1;max-height:none!important}}
+@media(max-width:699px){.board.godTrialBoard{grid-template-rows:repeat(6,auto)!important;padding-left:3px!important;padding-right:3px!important}.board.godTrialBoard>.godTrialBlank{aspect-ratio:1/1}}
+</style>
+
+<style>
+/* レアリティ別折りたたみ：分かりやすい文字付きボタン */
+.roleSection h3::after{content:none!important}
+.roleSection h3{cursor:default!important}
+.rarityHeadLeft{display:flex;align-items:center;gap:7px;min-width:0}
+.rarityCount{font-size:11px;font-weight:700;color:#9fb4cc;background:#0a1728;border:1px solid #294866;border-radius:999px;padding:2px 7px;white-space:nowrap}
+.rarityToggleBtn{margin-left:auto;flex:none;border:1px solid #4d6f94;background:#183451;color:#f2f7ff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;line-height:1.2}
+.rarityToggleBtn:hover{background:#21476d}
+.roleSection.rarityCollapsed h3{opacity:.78}
+.roleSection.rarityCollapsed .rarityToggleBtn{background:#24527d;border-color:#6c9ac8;color:#fff;opacity:1}
+@media(max-width:699px){.rarityToggleBtn{padding:6px 9px;font-size:11px}.rarityCount{font-size:10px;padding:2px 6px}}
+</style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1>
-<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button></div>
+<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
-<div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><div id="statsBreakdown" class="statsBreakdown"></div>
+<div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><button type="button" id="moreToolsBtn" aria-label="その他の操作">⋯</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><div id="statsBreakdown" class="statsBreakdown"></div>
 <div class="debuff"><strong>デバフ選択</strong>
 <label><input type="checkbox" id="debuffCollapse"> 総崩れ</label>
 <label><input type="checkbox" id="debuffForbidden"> 禁制領域</label>
 </div></div></div>
-<div id="boardIdentity" class="boardIdentity">🔵 自分の盤面</div><div id="selectedCharBar"><span>配置中：</span><img id="selectedCharImg" alt=""><b id="selectedCharName"></b><button id="selectedCharCancel" type="button">×</button></div><div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
+<div id="boardIdentity" class="boardIdentity">🔵 自分の盤面</div><div id="slotDetailBar"><span>盤面 残り <b id="boardRemain">18</b></span><span>ダンジョン 残り <b id="dungeonRemain">6</b></span></div><div id="specialEffectBar"></div><div id="selectedCharBar"><span>配置中：</span><img id="selectedCharImg" alt=""><b id="selectedCharName"></b><button id="selectedCharCancel" type="button">×</button></div><div class="boardScroll"><div id="mobileTrash" aria-label="キャラを削除"><span class="trashIcon">🗑️</span><span>ここにスライドで削除</span></div><div class="sectionTitle">盤面</div><div id="board" class="board"></div>
 <div class="sectionTitle dungeonTitle" id="dungeonTitle">ダンジョン</div><div class="bottomRow" id="dungeonRow"><div id="extras" style="display:flex;gap:5px"></div><div class="bottomCount">合計 <b id="total">0</b>体</div></div></div>
-<button type="button" id="charCollapseBtn">キャラ一覧を折りたたむ ▲</button><h2 class="characterHeading">キャラ一覧</h2><div id="recentChars"></div>
+<button type="button" id="charCollapseBtn">キャラ一覧を折りたたむ ▲</button><div id="favoriteChars"></div><h2 class="characterHeading">キャラ一覧</h2><div id="recentChars"></div>
 <div class="characterControls"><div class="roleTabs" role="tablist"><button class="roleTab active" data-role="immortal">不朽</button><button class="roleTab" data-role="myth">神話</button><button class="roleTab" data-role="legend">伝説</button><button class="roleTab" data-role="other">その他</button></div><input id="charSearch" type="search" placeholder="🔍 キャラ名を検索" autocomplete="off"></div><div id="placeHint" class="placeHint">配置先を選択中 — キャラをタップして配置</div>
 <div class="roleSection" data-role-section="immortal"><h3>不朽</h3><div id="poolImmortal" class="pool"></div></div>
 <div class="roleSection" data-role-section="myth"><h3>神話</h3><div id="poolMyth" class="pool"></div></div>
@@ -463,10 +500,18 @@ function saveSkins(){try{localStorage.setItem("skin_selections_v1",JSON.stringif
 
 let boardMode="normal";
 let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
-let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null);
+let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_opponent_24_v1")||"null");if(Array.isArray(x)&&x.length===24)opponentGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_collapse_space_30_v1")||"null");if(Array.isArray(x)&&x.length===30)collapseSpaceGrid=x}catch(e){}
+try{
+ const x=JSON.parse(localStorage.getItem("grid_god_trial_30_v2")||"null");
+ if(Array.isArray(x)&&x.length===30) godTrialGrid=x;
+ else{
+   const old42=JSON.parse(localStorage.getItem("grid_god_trial_42_v1")||"null");
+   if(Array.isArray(old42)&&old42.length===42) godTrialGrid=[...old42.slice(0,24),...old42.slice(36,42)];
+ }
+}catch(e){}
 let grid=normalGrid, selected=-1, dragData=null;
 const board=document.getElementById("board"),extras=document.getElementById("extras"),poolImmortal=document.getElementById("poolImmortal"),
 poolMyth=document.getElementById("poolMyth"),
@@ -481,7 +526,7 @@ function targetPool(i){
 }
 
 function debuffState(){
- if(boardMode==="collapseSpace") return {collapse:false,forbidden:false};
+ if(boardMode==="collapseSpace" || boardMode==="godTrial") return {collapse:false,forbidden:false};
  return boardMode==="opponent" ? opponentDebuffs : normalDebuffs;
 }
 function syncDebuffUI(){
@@ -489,7 +534,7 @@ function syncDebuffUI(){
  document.getElementById("debuffCollapse").checked=!!d.collapse;
  document.getElementById("debuffForbidden").checked=!!d.forbidden;
  const box=document.querySelector(".debuff");
- if(box) box.style.display=boardMode==="collapseSpace"?"none":"";
+ if(box) box.style.display=(boardMode==="collapseSpace" || boardMode==="godTrial")?"none":"";
 }
 function maxCopies(charIndex){
  const role=roleByIndex[charIndex], d=debuffState();
@@ -508,10 +553,10 @@ function canStack(charIndex){
 function canAdd(charIndex,amount=1,excludeSlot=-1){
  return charCount(charIndex,excludeSlot)+amount<=maxCopies(charIndex);
 }
-function activeSlots(){return boardMode==="collapseSpace"?30:(debuffState().forbidden?21:24)}
+function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(debuffState().forbidden?21:24))}
 function normalizeRules(){
  // 禁制領域ON時は使えない後半3マスを空にする
- if(boardMode!=="collapseSpace" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
+ if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
  for(let i=0;i<grid.length;i++){
    const v=grid[i];
@@ -534,7 +579,7 @@ function makeImg(src){const im=new Image();im.src=src;im.decoding="async";im.dra
 function totalCount(){return grid.reduce((n,v)=>n+(v?v.stack:0),0)}
 function updateTotal(){
  // 通常盤面と相手盤面では両方を合算。崩壊空間は従来どおり単独計算。
- const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:[normalGrid,opponentGrid];
+ const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:(boardMode==="godTrial"?[godTrialGrid]:[normalGrid,opponentGrid]);
  const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1):0),0),0);
  document.getElementById("total").textContent=n;
  document.getElementById("topTotal").textContent=n;
@@ -570,6 +615,7 @@ function updateTotal(){
  const breakdown=document.getElementById("statsBreakdown");
  if(breakdown){
    if(boardMode==="collapseSpace") breakdown.innerHTML="崩壊空間のみの合計";
+   else if(boardMode==="godTrial") breakdown.innerHTML="神の試練のみの合計";
    else{
      const a=calcGridStats(normalGrid), b=calcGridStats(opponentGrid);
      breakdown.innerHTML='<b>自分</b>　攻撃 '+fmt(a.atk)+'% ｜ 速度 '+fmt(a.spd)+'% ｜ パッシブ '+fmt(a.pas)+'%<br><span class="opp"><b>相手</b>　攻撃 '+fmt(b.atk)+'% ｜ 速度 '+fmt(b.spd)+'% ｜ パッシブ '+fmt(b.pas)+'%</span>';
@@ -634,13 +680,24 @@ function makeSlot(i,extra=false){
 function render(){
  board.replaceChildren();extras.replaceChildren();
  const collapseSpace=boardMode==="collapseSpace";
+ const godTrial=boardMode==="godTrial";
  board.classList.toggle("collapseBoard",collapseSpace);
+ board.classList.toggle("godTrialBoard",godTrial);
  document.getElementById("dungeonTitle").style.display=collapseSpace?"none":"";
  document.getElementById("dungeonRow").style.display=collapseSpace?"none":"";
- document.querySelector(".debuff").style.display=boardMode==="collapseSpace"?"none":"";
+ document.querySelector(".debuff").style.display=(collapseSpace||godTrial)?"none":"";
  const titleEl=document.querySelector(".sectionTitle"); if(titleEl) titleEl.textContent=boardMode==="opponent"?"相手の盤面":"盤面";
  if(collapseSpace){
    for(let i=0;i<30;i++)board.appendChild(makeSlot(i));
+ }else if(godTrial){
+   // ●の位置だけ配置可能。○は空白スペースとして残す
+   const shape=[[0,1,1,1,0,0],[0,1,1,1,1,1],[0,1,1,1,1,0],[0,1,1,1,1,0],[1,1,1,1,1,0],[0,0,1,1,1,0]];
+   let slotIndex=0;
+   shape.flat().forEach(on=>{
+     if(on) board.appendChild(makeSlot(slotIndex++));
+     else{const blank=document.createElement("div");blank.className="godTrialBlank";board.appendChild(blank);}
+   });
+   for(let i=24;i<30;i++)extras.appendChild(makeSlot(i,true));
  }else{
    for(let i=0;i<18;i++)board.appendChild(makeSlot(i));
    const end=activeSlots();
@@ -650,7 +707,7 @@ function render(){
  const ready=selected>=0 && selected<activeSlots() && !grid[selected];
  document.querySelectorAll(".charCardWrap").forEach(el=>el.classList.toggle("placeReady",ready));
  const ph=document.getElementById("placeHint"); if(ph) ph.classList.toggle("show",ready);
- const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="opponent"?"🔴 相手の盤面":(boardMode==="collapseSpace"?"🟣 崩壊空間":"🔵 自分の盤面");
+ const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="opponent"?"🔴 相手の盤面":(boardMode==="collapseSpace"?"🟣 崩壊空間":(boardMode==="godTrial"?"🟡 神の試練":"🔵 自分の盤面"));
  const selBar=document.getElementById("selectedCharBar"); if(selBar) selBar.classList.toggle("show",ready);
 }
 
@@ -741,26 +798,29 @@ function renderSkinUI(){
 renderSkinUI();
 
 document.getElementById("clearBtn").addEventListener("click",()=>{
- const boardLabel=boardMode==="collapseSpace"?"崩壊空間":(boardMode==="opponent"?"相手の盤面":"通常盤面");
+ const boardLabel=boardMode==="collapseSpace"?"崩壊空間":(boardMode==="godTrial"?"神の試練":(boardMode==="opponent"?"相手の盤面":"通常盤面"));
  if(!confirm(boardLabel+"を全消去しますか？"))return;
  if(boardMode==="collapseSpace"){collapseSpaceGrid=Array.from({length:30},()=>null);grid=collapseSpaceGrid;localStorage.removeItem("grid_collapse_space_30_v1");}
+ else if(boardMode==="godTrial"){godTrialGrid=Array.from({length:30},()=>null);grid=godTrialGrid;localStorage.removeItem("grid_god_trial_30_v2");localStorage.removeItem("grid_god_trial_42_v1");localStorage.removeItem("grid_god_trial_36_v1");}
  else if(boardMode==="opponent"){opponentGrid=Array.from({length:24},()=>null);grid=opponentGrid;localStorage.removeItem("grid_opponent_24_v1");}
  else{normalGrid=Array.from({length:24},()=>null);grid=normalGrid;localStorage.removeItem("grid_stack_drag_24_v1");}
  selected=-1;render();
 });
-function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
+function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="godTrial"){godTrialGrid=grid;localStorage.setItem("grid_god_trial_30_v2",JSON.stringify(godTrialGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
 function switchBoardMode(mode){
- saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="opponent"?opponentGrid:normalGrid);selected=-1;dragData=null;
+ saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="opponent"?opponentGrid:normalGrid));selected=-1;dragData=null;
  document.body.classList.toggle("opponent-board",mode==="opponent");
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("opponentModeBtn").classList.toggle("active",mode==="opponent");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
+ document.getElementById("godTrialBtn").classList.toggle("active",mode==="godTrial");
  syncDebuffUI();
  render();
 }
 document.getElementById("normalModeBtn").addEventListener("click",()=>switchBoardMode("normal"));
 document.getElementById("opponentModeBtn").addEventListener("click",()=>switchBoardMode("opponent"));
 document.getElementById("collapseSpaceBtn").addEventListener("click",()=>switchBoardMode("collapseSpace"));
+document.getElementById("godTrialBtn").addEventListener("click",()=>switchBoardMode("godTrial"));
 
 
 try{
@@ -795,10 +855,10 @@ async function exportFormationImage(){
   const versusExport=!collapseSpace && hasNormal && hasOpponent;
   const cell=versusExport?125:150, gap=versusExport?10:14, startX=versusExport?170:65;
   const boardBlockH=versusExport?610:0;
-  const W=1200,H=versusExport?1420:(collapseSpace?960:860);
+  const W=1200,H=versusExport?1510:(collapseSpace?1040:940);
   const c=document.createElement("canvas"); c.width=W;c.height=H;
   const ctx=c.getContext("2d");
-  ctx.fillStyle="#f5f5f7";ctx.fillRect(0,0,W,H);
+  ctx.fillStyle="#f5f5f7";ctx.fillRect(0,0,W,H);ctx.fillStyle="#111";ctx.font="bold 34px sans-serif";ctx.textAlign="center";ctx.fillText("ペタペタペンギン団 編成",W/2,42);ctx.textAlign="left";
   function loadImg(src){return new Promise(res=>{const im=new Image();im.onload=()=>res(im);im.onerror=()=>res(null);im.src=src;});}
   const sourceGrids=versusExport?[normalGrid,opponentGrid]:[grid];
   const used=[...new Set(sourceGrids.flatMap(g=>g.filter(Boolean).map(v=>v.char)))];
@@ -820,17 +880,17 @@ async function exportFormationImage(){
   }
   if(versusExport){
     // 両方にキャラがいる場合は「相手が上・自分が下」のVS画像にする
-    drawNormalBoard(opponentGrid,35,"🔴 相手の盤面","#b52f3a");
-    ctx.fillStyle="#222";ctx.font="bold 42px sans-serif";ctx.textAlign="center";ctx.fillText("VS",W/2,710);ctx.textAlign="left";
-    drawNormalBoard(normalGrid,735,"🔵 自分の盤面","#24527d");
+    drawNormalBoard(opponentGrid,75,"🔴 相手の盤面","#b52f3a");
+    ctx.fillStyle="#222";ctx.font="bold 42px sans-serif";ctx.textAlign="center";ctx.fillText("VS",W/2,750);ctx.textAlign="left";
+    drawNormalBoard(normalGrid,775,"🔵 自分の盤面","#24527d");
   }else if(collapseSpace){
-    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("崩壊空間",65,60);
-    for(let i=0;i<30;i++)drawCell(grid,i,65+(i%6)*(cell+gap),100+Math.floor(i/6)*(cell+gap));
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("崩壊空間",65,90);
+    for(let i=0;i<30;i++)drawCell(grid,i,65+(i%6)*(cell+gap),130+Math.floor(i/6)*(cell+gap));
   }else{
-    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(boardMode==="opponent"?"相手の盤面":"自分の盤面",65,60);
-    for(let i=0;i<18;i++)drawCell(grid,i,65+(i%6)*(cell+gap),100+Math.floor(i/6)*(cell+gap));
-    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("ダンジョン",65,605);
-    for(let j=0;j<6;j++)drawCell(grid,18+j,65+j*(cell+gap),630);
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(boardMode==="godTrial"?"神の試練":(boardMode==="opponent"?"相手の盤面":"自分の盤面"),65,90);
+    for(let i=0;i<18;i++)drawCell(grid,i,65+(i%6)*(cell+gap),130+Math.floor(i/6)*(cell+gap));
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("ダンジョン",65,635);
+    for(let j=0;j<6;j++)drawCell(grid,18+j,65+j*(cell+gap),660);
   }
   c.toBlob(blob=>{
     if(!blob)return;
@@ -995,7 +1055,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   function persist(){saveCurrentBoard();}
   const oldRender=render;
   render=function(){oldRender();persist();};
-  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':(st.mode==='opponent'?'opponent':'normal');grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else if(boardMode==='opponent')opponentGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('opponentModeBtn').classList.toggle('active',boardMode==='opponent');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');saveDebuffs();normalizeRules();render();historyLock=false}
+  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':(st.mode==='godTrial'?'godTrial':(st.mode==='opponent'?'opponent':'normal'));grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else if(boardMode==='godTrial')godTrialGrid=grid;else if(boardMode==='opponent')opponentGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('opponentModeBtn').classList.toggle('active',boardMode==='opponent');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');document.getElementById('godTrialBtn').classList.toggle('active',boardMode==='godTrial');saveDebuffs();normalizeRules();render();historyLock=false}
   function startHistory(e){if(historyLock||e.target.closest?.('#undoBtn,#redoBtn,#shareBtn,#exportImageBtn,.admin'))return;before=state()}
   function endHistory(){if(historyLock||!before)return;setTimeout(()=>{const after=state();if(!same(before,after)){undo.push(before);if(undo.length>50)undo.shift();redo=[];updateHistoryButtons()}before=null},0)}
   ['pointerdown','touchstart','dragstart'].forEach(n=>document.addEventListener(n,startHistory,{capture:true,passive:true}));
@@ -1069,7 +1129,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  // ショートカット
  document.addEventListener('keydown',e=>{if(e.target.matches?.('input,textarea'))return;if(e.key==='Escape'){selected=-1;render();return;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();document.getElementById('undoBtn')?.click();}if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))){e.preventDefault();document.getElementById('redoBtn')?.click();}});
  // 全盤面リセット
- document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='opponent'?opponentGrid:normalGrid);selected=-1;render();});
+ document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間・神の試練をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);godTrialGrid=Array.from({length:30},()=>null);localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');localStorage.removeItem('grid_god_trial_30_v2');localStorage.removeItem('grid_god_trial_42_v1');localStorage.removeItem('grid_god_trial_36_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='godTrial'?godTrialGrid:(boardMode==='opponent'?opponentGrid:normalGrid));selected=-1;render();});
  // 最近使ったキャラ
  let recent=[];try{recent=JSON.parse(localStorage.getItem('recent_chars_v1')||'[]')}catch(e){};if(!Array.isArray(recent))recent=[];
  function drawRecent(){const box=document.getElementById('recentChars');if(!box)return;box.replaceChildren();if(!recent.length)return;const lab=document.createElement('span');lab.className='recentLabel';lab.textContent='最近使用';box.appendChild(lab);recent.slice(0,6).forEach(i=>{const b=document.createElement('button');b.type='button';b.className='recentChar';b.title=charNames[i];const im=makeImg(chars[i]);b.appendChild(im);b.addEventListener('click',()=>document.querySelector('.charCardWrap[data-char-index="'+i+'"] .card')?.click());box.appendChild(b);});}
@@ -1081,6 +1141,92 @@ document.addEventListener("DOMContentLoaded",()=>{
  document.addEventListener('touchmove',e=>{if(!timer)return;const t=e.touches[0];if(Math.hypot(t.clientX-sx,t.clientY-sy)>8)hidePop()},{passive:true});document.addEventListener('touchend',()=>setTimeout(hidePop,650),{passive:true});document.addEventListener('touchcancel',hidePop,{passive:true});
  // PC hoverでも詳細をタイトルで確認
  document.querySelectorAll('.charCardWrap').forEach(w=>{const i=Number(w.dataset.charIndex);const st=effectiveStats(i,grid);w.title=charNames[i]+'｜攻撃 '+(st.attack||0)+'% / 速度 '+(st.speed||0)+'% / パッシブ '+(st.passive||0)+'%';});
+})();
+</script>
+
+<style id="uiUpgradeAllCss">
+/* 1: モードを同幅タブ化 */
+.modeSwitch{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px!important;max-width:760px;margin-left:auto!important;margin-right:auto!important}.modeBtn{border-radius:10px!important;padding:8px 6px!important;white-space:nowrap}
+/* 2,3,6: 盤面情報 */
+#slotDetailBar{display:flex;justify-content:center;gap:14px;font-size:11px;color:#9fb3c9;margin:-2px 0 5px}#slotDetailBar span{background:#0d1d30;border:1px solid #29435f;border-radius:999px;padding:3px 8px}#slotDetailBar b{color:#fff}
+#specialEffectBar{display:none;max-width:620px;margin:0 auto 6px;padding:6px 9px;border:1px solid #365574;border-radius:9px;background:#0d1d30;color:#c9daec;font-size:11px;text-align:center}#specialEffectBar.show{display:block}
+/* 4: 検索とレア度を見失わない */
+.characterControls{z-index:120!important}
+/* 5: お気に入り */
+#favoriteChars{display:flex;gap:6px;align-items:center;overflow-x:auto;margin:3px 0 5px;padding:3px 0}#favoriteChars:empty{display:none}.favLabel{font-size:11px;color:#ffd76b;white-space:nowrap}.favChar{position:relative;flex:0 0 auto;width:42px;height:42px;border:1px solid #826b2e;background:#241e0f;border-radius:9px;padding:2px}.favChar img{width:100%;height:100%;object-fit:contain}.favToggle{position:absolute;right:2px;top:2px;z-index:3;width:19px;height:19px;border:0;border-radius:50%;padding:0;background:#07111dcc;color:#8799ad;font-size:13px;line-height:19px}.favToggle.on{color:#ffd34e}.charCardWrap{position:relative}
+/* 8: スマホ操作整理 */
+#moreToolsBtn{display:none}.mobileMoreMenu{display:none}
+/* 9: PC盤面を主役に。固定はしない */
+@media(min-width:700px){main{grid-template-columns:minmax(0,1.85fr) minmax(300px,1fr)!important}main>.boardScroll{position:relative!important;top:auto!important;align-self:start}.boardIdentity{font-size:13px!important}.characterControls{position:sticky!important;top:0!important}.board{width:100%!important;max-width:100%!important}.bottomRow{max-width:100%!important}}
+@media(max-width:699px){.modeSwitch{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important}.modeBtn{font-size:10px!important;padding:7px 2px!important}.modeBtn:nth-child(3){font-size:0!important}.modeBtn:nth-child(3)::after{content:'崩壊';font-size:10px}.tools>#clearBtn,.tools>#resetAllBtn,.tools>#shareBtn{display:none!important}#moreToolsBtn{display:inline-flex!important}.mobileMoreMenu{position:fixed;z-index:1000;right:12px;top:96px;background:#102238;border:1px solid #45627f;border-radius:12px;padding:6px;box-shadow:0 12px 30px #0009}.mobileMoreMenu.open{display:grid;gap:5px}.mobileMoreMenu button{padding:9px 12px;text-align:left}.characterControls{position:sticky!important;top:42px!important}#slotDetailBar{gap:5px;font-size:10px}#slotDetailBar span{padding:3px 6px}}
+</style>
+<script id="uiUpgradeAllJs">
+(()=>{
+ const $=id=>document.getElementById(id);
+ // 2: 盤面/ダンジョン残数 + 6: 特殊効果の発動状況
+ function countOccupied(g,a,b){let n=0;for(let i=a;i<b;i++)if(g[i])n++;return n}
+ function refreshInfo(){
+   const br=$('boardRemain'),dr=$('dungeonRemain'),bar=$('slotDetailBar'),sp=$('specialEffectBar'); if(!br||!dr||!bar)return;
+   if(boardMode==='collapseSpace'){br.textContent=Math.max(0,30-countOccupied(grid,0,30));dr.textContent='—';bar.children[1].style.display='none';}
+   else if(boardMode==='godTrial'){br.textContent=Math.max(0,24-countOccupied(grid,0,24));dr.textContent=Math.max(0,6-countOccupied(grid,24,30));bar.children[1].style.display='';}
+   else{const dend=activeSlots();br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,(dend-18)-countOccupied(grid,18,dend));bar.children[1].style.display='';}
+   if(sp){const bodies=grid.reduce((n,v)=>n+(v&&(v.char===2||v.char===3)?(Number(v.stack)||1):0),0);const hasI=grid.some(v=>v&&v.char===3),hasM=grid.some(v=>v&&v.char===9);let a=[];if(hasI)a.push('イサイ：攻撃 +'+Math.min(bodies,4)*5+'%（イサイ/天使 '+bodies+'体）');if(hasM)a.push('ミカエル：攻撃 +'+Math.min(bodies,5)*5+'%（イサイ/天使 '+bodies+'体）');sp.textContent=a.join(' ｜ ');sp.classList.toggle('show',a.length>0);}
+ }
+ const prevRender=render;render=function(){prevRender();refreshInfo();decorateFavorites();};
+ // 5: お気に入り + 使用回数ベースの「よく使う」
+ let fav=[];try{fav=JSON.parse(localStorage.getItem('favorite_chars_v1')||'[]')}catch(e){};if(!Array.isArray(fav))fav=[];
+ let use={};try{use=JSON.parse(localStorage.getItem('char_use_counts_v1')||'{}')}catch(e){};if(!use||typeof use!=='object')use={};
+ function saveFav(){localStorage.setItem('favorite_chars_v1',JSON.stringify(fav))}
+ function drawFav(){const box=$('favoriteChars');if(!box)return;box.replaceChildren();if(!fav.length)return;const l=document.createElement('span');l.className='favLabel';l.textContent='★ お気に入り';box.appendChild(l);fav.slice(0,8).forEach(i=>{const b=document.createElement('button');b.className='favChar';b.title=charNames[i];b.appendChild(makeImg(chars[i]));b.onclick=()=>document.querySelector('.charCardWrap[data-char-index="'+i+'"] .card')?.click();box.appendChild(b)})}
+ function decorateFavorites(){document.querySelectorAll('.charCardWrap').forEach(w=>{if(w.querySelector('.favToggle')){w.querySelector('.favToggle').classList.toggle('on',fav.includes(Number(w.dataset.charIndex)));return}const i=Number(w.dataset.charIndex),b=document.createElement('button');b.type='button';b.className='favToggle'+(fav.includes(i)?' on':'');b.textContent='★';b.title='お気に入り';b.onclick=e=>{e.stopPropagation();e.preventDefault();fav.includes(i)?fav=fav.filter(x=>x!==i):fav.unshift(i);saveFav();drawFav();decorateFavorites()};w.appendChild(b)})}
+ document.addEventListener('click',e=>{const w=e.target.closest?.('.charCardWrap');if(!w||e.target.closest('.favToggle'))return;const i=Number(w.dataset.charIndex);if(!Number.isInteger(i))return;use[i]=(use[i]||0)+1;try{localStorage.setItem('char_use_counts_v1',JSON.stringify(use))}catch(_){}},true);
+ drawFav();decorateFavorites();
+ // 8: スマホの低頻度操作を「…」へ
+ const more=$('moreToolsBtn');if(more){const menu=document.createElement('div');menu.className='mobileMoreMenu';[['clearBtn','盤面消去'],['resetAllBtn','全部リセット'],['shareBtn','編成URLをコピー']].forEach(([id,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.onclick=()=>{$(id)?.click();menu.classList.remove('open')};menu.appendChild(b)});document.body.appendChild(menu);more.onclick=e=>{e.stopPropagation();menu.classList.toggle('open')};document.addEventListener('click',()=>menu.classList.remove('open'));}
+ refreshInfo();
+})();
+</script>
+
+
+<script>
+(function(){
+  const key='rarity_collapsed_v1';
+  let saved={};
+  try{ saved=JSON.parse(localStorage.getItem(key)||'{}')||{}; }catch(e){}
+  document.querySelectorAll('.roleSection[data-role-section]').forEach(sec=>{
+    const role=sec.dataset.roleSection;
+    const h=sec.querySelector('h3');
+    const pool=sec.querySelector('.pool');
+    if(!h||!pool)return;
+    const label=h.textContent.trim();
+    h.textContent='';
+    const left=document.createElement('span'); left.className='rarityHeadLeft';
+    const name=document.createElement('span'); name.textContent=label;
+    const count=document.createElement('span'); count.className='rarityCount';
+    left.append(name,count);
+    const btn=document.createElement('button'); btn.type='button'; btn.className='rarityToggleBtn';
+    h.append(left,btn);
+    if(saved[role]) sec.classList.add('rarityCollapsed');
+    const refresh=()=>{
+      const n=pool.querySelectorAll('.charCardWrap').length;
+      count.textContent=n+'体';
+      const closed=sec.classList.contains('rarityCollapsed');
+      btn.textContent=closed?'表示する ＋':'しまう −';
+      btn.setAttribute('aria-expanded',String(!closed));
+      btn.setAttribute('aria-label',label+'を'+(closed?'表示する':'しまう'));
+    };
+    const toggle=()=>{
+      sec.classList.toggle('rarityCollapsed');
+      saved[role]=sec.classList.contains('rarityCollapsed');
+      try{localStorage.setItem(key,JSON.stringify(saved));}catch(e){}
+      refresh();
+    };
+    btn.addEventListener('click',e=>{e.stopPropagation();toggle();});
+    h.addEventListener('dblclick',toggle);
+    refresh();
+    requestAnimationFrame(refresh);
+    setTimeout(refresh,100);
+  });
 })();
 </script>
 </body></html>
