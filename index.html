@@ -1,11 +1,12 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>ペタペタペンギン団盤面シミュレーター｜編成・配置作成</title>
-<meta name="description" content="ペタペタペンギン団の盤面・編成を簡単に作成できるシミュレーター。キャラクターを配置して攻撃・速度・パッシブ上昇などを確認できます。">
+<title>ペタペン盤面シュミレーター｜ペタペタペンギン団 編成・配置・ステータス計算</title>
+<meta name="description" content="ペタペン盤面シュミレーター。ペタペタペンギン団の盤面・編成を作成し、キャラクターの攻撃・速度・パッシブ上昇を確認できるシミュレーターです。通常盤面・相手盤面・崩壊空間・神の試練に対応。">
 <meta name="robots" content="index,follow">
+<meta name="keywords" content="ペタペン盤面シュミレーター,ペタペン盤面シミュレーター,ペタペタペンギン団,盤面シミュレーター,編成シミュレーター">
 <style>
 *{box-sizing:border-box}html,body{margin:0;background:#08111f;color:#f5f8fc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1120px;margin:auto;padding:18px 10px 38px}h1{font-size:25px;margin:0 0 5px}.sub{color:#9aadc5;margin:0 0 12px;font-size:14px}
+main{max-width:1120px;margin:auto;padding:18px 10px 38px}h1{font-size:25px;margin:0 0 5px}.sub{color:#9aadc5;margin:0 0 12px;font-size:14px}.seoIntro{color:#8295ad;margin:0 0 8px;font-size:12px}
 .tools{display:flex;gap:8px;margin:10px 0;align-items:center;flex-wrap:wrap}button{background:#19304d;border:1px solid #365574;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700}
 .count{margin-left:auto;background:#132640;border:1px solid #365574;border-radius:10px;padding:9px 13px;font-weight:800;white-space:nowrap}.count b{font-size:20px;margin-left:5px}
 .boardScroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px}
@@ -339,7 +340,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 </style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
-<h1>ペタペタペンギン団盤面シミュレーター</h1>
+<h1>ペタペタペンギン団盤面シミュレーター</h1><p class="seoIntro">ペタペン盤面シュミレーター｜ペタペタペンギン団の盤面・編成作成とステータス計算に対応。</p>
 <div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
 <div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><button type="button" id="moreToolsBtn" aria-label="その他の操作">⋯</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><div id="statsBreakdown" class="statsBreakdown"></div>
