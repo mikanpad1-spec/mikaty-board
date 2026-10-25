@@ -1,7 +1,7 @@
 <!doctype html><html lang="ja"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>ペタペン盤面シュミレーター｜ペタペタペンギン団 編成・配置・ステータス計算</title>
-<meta name="description" content="ペタペン盤面シュミレーター。ペタペタペンギン団の盤面・編成を作成し、キャラクターの攻撃・速度・パッシブ上昇を確認できるシミュレーターです。通常盤面・相手盤面・崩壊空間・神の試練に対応。">
+<meta name="description" content="ペタペン盤面シュミレーター。ペタペタペンギン団の盤面・編成を作成し、キャラクターの攻撃・速度・パッシブ上昇を確認できるシミュレーターです。通常盤面・相手盤面・崩壊空間・神の試練・バトロワ変形1に対応。">
 <meta name="robots" content="index,follow">
 <meta name="keywords" content="ペタペン盤面シュミレーター,ペタペン盤面シミュレーター,ペタペタペンギン団,盤面シミュレーター,編成シミュレーター">
 <style>
@@ -153,7 +153,7 @@ button{transition:.15s ease}button:active{transform:scale(.97)}#shareBtn{backgro
 .skinCharGroup{padding:11px 0;border-top:1px solid #29466a}.skinCharGroup:first-child{border-top:0}.skinCharTitle{margin:0 0 7px;font-size:16px;color:#fff}.skinEffectCompact{margin-top:7px;font-size:12px;color:#c8d8eb;padding:7px 9px}.skinCharGroup .skinChoices{margin-top:0}
 @media(max-width:699px){.skinCharGroup{padding:9px 0}.skinCharTitle{font-size:15px}.skinCharGroup .skinChoices{grid-template-columns:1fr}.skinEffectCompact{font-size:11px;line-height:1.5}}
 
-.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#5a2b31;border-color:#9b5059;color:#fff}.modeBtn.opponentMode.active{background:#873b46;box-shadow:0 0 0 2px rgba(220,90,110,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}.modeBtn.godTrialMode{background:#7a5a18;border-color:#d2a83f;color:#fff}.modeBtn.godTrialMode.active{background:#a77a1f;box-shadow:0 0 0 2px rgba(255,205,80,.22)}
+.modeSwitch{display:flex;gap:8px;justify-content:center;margin:8px 0 12px}.modeBtn{border:1px solid #3b5878;background:#132741;color:#dbe9f8;border-radius:999px;padding:9px 16px;font-weight:800;cursor:pointer}.modeBtn.active{background:#24527d;color:#fff}.modeBtn.opponentMode{background:#5a2b31;border-color:#9b5059;color:#fff}.modeBtn.opponentMode.active{background:#873b46;box-shadow:0 0 0 2px rgba(220,90,110,.22)}.modeBtn.collapseMode{background:#6d35a8;border-color:#a56be0;color:#fff}.modeBtn.collapseMode.active{background:#8d4bd0;box-shadow:0 0 0 2px rgba(180,120,255,.22)}.modeBtn.godTrialMode{background:#7a5a18;border-color:#d2a83f;color:#fff}.modeBtn.godTrialMode.active{background:#a77a1f;box-shadow:0 0 0 2px rgba(255,205,80,.22)}.modeBtn.battleRoyaleMode{background:#28534b;border-color:#4c9a89;color:#fff}.modeBtn.battleRoyaleMode.active{background:#287f6e;box-shadow:0 0 0 2px rgba(90,210,180,.22)}
 .board.collapseBoard{grid-template-rows:repeat(5,105px)}
 .board.godTrialBoard{grid-template-rows:repeat(6,105px);overflow:visible;padding-left:58px;padding-right:58px}
 .board.godTrialBoard>.slot:nth-child(-n+6){transform:translateX(52px)}
@@ -311,7 +311,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 .board.godTrialBoard>.slot{transform:none!important}
 .board.godTrialBoard>.godTrialBlank{visibility:hidden;pointer-events:none;min-width:0}
 @media(min-width:700px){.board.godTrialBoard{grid-template-rows:repeat(6,minmax(0,1fr))!important;aspect-ratio:1/1;max-height:none!important}}
-@media(max-width:699px){.board.godTrialBoard{grid-template-rows:repeat(6,auto)!important;padding-left:3px!important;padding-right:3px!important}.board.godTrialBoard>.godTrialBlank{aspect-ratio:1/1}}
+@media(max-width:699px){.board.godTrialBoard{grid-template-rows:repeat(6,auto)!important;padding-left:3px!important;padding-right:3px!important}.board.godTrialBoard>.godTrialBlank{aspect-ratio:1/1}.board.battleRoyaleBoard{grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,auto)!important}.board.battleRoyaleBoard>.battleRoyaleBlank{aspect-ratio:1/1;visibility:hidden;pointer-events:none;min-width:0}}
 </style>
 
 <style>
@@ -368,11 +368,12 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   #favoriteChars{width:100%!important}
   .skinPanel{width:100%!important;box-sizing:border-box!important}
 }
+.board.battleRoyaleBoard{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:4px!important;aspect-ratio:2/1;overflow:visible!important}.board.battleRoyaleBoard>.battleRoyaleBlank{visibility:hidden;pointer-events:none;min-width:0;aspect-ratio:1/1}@media(min-width:700px){.board.battleRoyaleBoard>.slot{min-width:0;aspect-ratio:1/1;height:auto!important}}
 </style>
 </head><body>
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <h1>ペタペタペンギン団盤面シミュレーター</h1><p class="seoIntro">ペタペン盤面シュミレーター｜ペタペタペンギン団の盤面・編成作成とステータス計算に対応。</p>
-<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button></div>
+<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button><button type="button" id="battleRoyale1Btn" class="modeBtn battleRoyaleMode">バトロワ変形1</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
 <div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><button type="button" id="moreToolsBtn" aria-label="その他の操作">⋯</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><div id="statsBreakdown" class="statsBreakdown"></div>
 <div class="debuff"><strong>デバフ選択</strong>
@@ -544,7 +545,7 @@ function saveSkins(){try{localStorage.setItem("skin_selections_v1",JSON.stringif
 
 let boardMode="normal";
 let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
-let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null);
+let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null), battleRoyale1Grid=Array.from({length:24},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_opponent_24_v1")||"null");if(Array.isArray(x)&&x.length===24)opponentGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_collapse_space_30_v1")||"null");if(Array.isArray(x)&&x.length===30)collapseSpaceGrid=x}catch(e){}
@@ -556,6 +557,7 @@ try{
    if(Array.isArray(old42)&&old42.length===42) godTrialGrid=[...old42.slice(0,24),...old42.slice(36,42)];
  }
 }catch(e){}
+try{const x=JSON.parse(localStorage.getItem("grid_battle_royale_1_v1")||"null");if(Array.isArray(x)&&x.length===24)battleRoyale1Grid=x;else if(Array.isArray(x)&&x.length===18)battleRoyale1Grid=[...x,...Array.from({length:6},()=>null)]}catch(e){}
 let grid=normalGrid, selected=-1, dragData=null;
 const board=document.getElementById("board"),extras=document.getElementById("extras"),poolImmortal=document.getElementById("poolImmortal"),
 poolMyth=document.getElementById("poolMyth"),
@@ -570,7 +572,7 @@ function targetPool(i){
 }
 
 function debuffState(){
- if(boardMode==="collapseSpace" || boardMode==="godTrial") return {collapse:false,forbidden:false};
+ if(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1") return {collapse:false,forbidden:false};
  return boardMode==="opponent" ? opponentDebuffs : normalDebuffs;
 }
 function syncDebuffUI(){
@@ -578,7 +580,7 @@ function syncDebuffUI(){
  document.getElementById("debuffCollapse").checked=!!d.collapse;
  document.getElementById("debuffForbidden").checked=!!d.forbidden;
  const box=document.querySelector(".debuff");
- if(box) box.style.display=(boardMode==="collapseSpace" || boardMode==="godTrial")?"none":"";
+ if(box) box.style.display=(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1")?"none":"";
 }
 function maxCopies(charIndex){
  const role=roleByIndex[charIndex], d=debuffState();
@@ -597,10 +599,10 @@ function canStack(charIndex){
 function canAdd(charIndex,amount=1,excludeSlot=-1){
  return charCount(charIndex,excludeSlot)+amount<=maxCopies(charIndex);
 }
-function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(debuffState().forbidden?21:24))}
+function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(debuffState().forbidden?21:24)))}
 function normalizeRules(){
  // 禁制領域ON時は使えない後半3マスを空にする
- if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
+ if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && boardMode!=="battleRoyale1" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
  for(let i=0;i<grid.length;i++){
    const v=grid[i];
@@ -623,7 +625,7 @@ function makeImg(src){const im=new Image();im.src=src;im.decoding="async";im.dra
 function totalCount(){return grid.reduce((n,v)=>n+(v?v.stack:0),0)}
 function updateTotal(){
  // 通常盤面と相手盤面では両方を合算。崩壊空間は従来どおり単独計算。
- const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:(boardMode==="godTrial"?[godTrialGrid]:[normalGrid,opponentGrid]);
+ const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:(boardMode==="godTrial"?[godTrialGrid]:(boardMode==="battleRoyale1"?[battleRoyale1Grid]:[normalGrid,opponentGrid]));
  const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1):0),0),0);
  document.getElementById("total").textContent=n;
  document.getElementById("topTotal").textContent=n;
@@ -660,6 +662,7 @@ function updateTotal(){
  if(breakdown){
    if(boardMode==="collapseSpace") breakdown.innerHTML="崩壊空間のみの合計";
    else if(boardMode==="godTrial") breakdown.innerHTML="神の試練のみの合計";
+   else if(boardMode==="battleRoyale1") breakdown.innerHTML="バトロワ変形1のみの合計";
    else{
      const a=calcGridStats(normalGrid), b=calcGridStats(opponentGrid);
      breakdown.innerHTML='<b>自分</b>　攻撃 '+fmt(a.atk)+'% ｜ 速度 '+fmt(a.spd)+'% ｜ パッシブ '+fmt(a.pas)+'%<br><span class="opp"><b>相手</b>　攻撃 '+fmt(b.atk)+'% ｜ 速度 '+fmt(b.spd)+'% ｜ パッシブ '+fmt(b.pas)+'%</span>';
@@ -725,11 +728,13 @@ function render(){
  board.replaceChildren();extras.replaceChildren();
  const collapseSpace=boardMode==="collapseSpace";
  const godTrial=boardMode==="godTrial";
+ const battleRoyale1=boardMode==="battleRoyale1";
  board.classList.toggle("collapseBoard",collapseSpace);
  board.classList.toggle("godTrialBoard",godTrial);
+ board.classList.toggle("battleRoyaleBoard",battleRoyale1);
  document.getElementById("dungeonTitle").style.display=collapseSpace?"none":"";
  document.getElementById("dungeonRow").style.display=collapseSpace?"none":"";
- document.querySelector(".debuff").style.display=(collapseSpace||godTrial)?"none":"";
+ document.querySelector(".debuff").style.display=(collapseSpace||godTrial||battleRoyale1)?"none":"";
  const titleEl=document.querySelector(".sectionTitle"); if(titleEl) titleEl.textContent=boardMode==="opponent"?"相手の盤面":"盤面";
  if(collapseSpace){
    for(let i=0;i<30;i++)board.appendChild(makeSlot(i));
@@ -742,6 +747,11 @@ function render(){
      else{const blank=document.createElement("div");blank.className="godTrialBlank";board.appendChild(blank);}
    });
    for(let i=24;i<30;i++)extras.appendChild(makeSlot(i,true));
+ }else if(battleRoyale1){
+   const shape=[[1,1,0,1,1,0,1,1],[1,0,0,1,1,0,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1]];
+   let slotIndex=0;
+   shape.flat().forEach(on=>{if(on)board.appendChild(makeSlot(slotIndex++));else{const blank=document.createElement("div");blank.className="battleRoyaleBlank";board.appendChild(blank);}});
+   for(let i=18;i<24;i++)extras.appendChild(makeSlot(i,true));
  }else{
    for(let i=0;i<18;i++)board.appendChild(makeSlot(i));
    const end=activeSlots();
@@ -751,7 +761,7 @@ function render(){
  const ready=selected>=0 && selected<activeSlots() && !grid[selected];
  document.querySelectorAll(".charCardWrap").forEach(el=>el.classList.toggle("placeReady",ready));
  const ph=document.getElementById("placeHint"); if(ph) ph.classList.toggle("show",ready);
- const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="opponent"?"🔴 相手の盤面":(boardMode==="collapseSpace"?"🟣 崩壊空間":(boardMode==="godTrial"?"🟡 神の試練":"🔵 自分の盤面"));
+ const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="opponent"?"🔴 相手の盤面":(boardMode==="collapseSpace"?"🟣 崩壊空間":(boardMode==="godTrial"?"🟡 神の試練":(boardMode==="battleRoyale1"?"🟢 バトロワ変形1":"🔵 自分の盤面")));
  const selBar=document.getElementById("selectedCharBar"); if(selBar) selBar.classList.toggle("show",ready);
 }
 
@@ -842,22 +852,24 @@ function renderSkinUI(){
 renderSkinUI();
 
 document.getElementById("clearBtn").addEventListener("click",()=>{
- const boardLabel=boardMode==="collapseSpace"?"崩壊空間":(boardMode==="godTrial"?"神の試練":(boardMode==="opponent"?"相手の盤面":"通常盤面"));
+ const boardLabel=boardMode==="collapseSpace"?"崩壊空間":(boardMode==="godTrial"?"神の試練":(boardMode==="battleRoyale1"?"バトロワ変形1":(boardMode==="opponent"?"相手の盤面":"通常盤面")));
  if(!confirm(boardLabel+"を全消去しますか？"))return;
  if(boardMode==="collapseSpace"){collapseSpaceGrid=Array.from({length:30},()=>null);grid=collapseSpaceGrid;localStorage.removeItem("grid_collapse_space_30_v1");}
  else if(boardMode==="godTrial"){godTrialGrid=Array.from({length:30},()=>null);grid=godTrialGrid;localStorage.removeItem("grid_god_trial_30_v2");localStorage.removeItem("grid_god_trial_42_v1");localStorage.removeItem("grid_god_trial_36_v1");}
+ else if(boardMode==="battleRoyale1"){battleRoyale1Grid=Array.from({length:24},()=>null);grid=battleRoyale1Grid;localStorage.removeItem("grid_battle_royale_1_v1");}
  else if(boardMode==="opponent"){opponentGrid=Array.from({length:24},()=>null);grid=opponentGrid;localStorage.removeItem("grid_opponent_24_v1");}
  else{normalGrid=Array.from({length:24},()=>null);grid=normalGrid;localStorage.removeItem("grid_stack_drag_24_v1");}
  selected=-1;render();
 });
-function saveCurrentBoard(){try{if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="godTrial"){godTrialGrid=grid;localStorage.setItem("grid_god_trial_30_v2",JSON.stringify(godTrialGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
+function saveCurrentBoard(){try{if(boardMode==="battleRoyale1"){battleRoyale1Grid=grid;localStorage.setItem("grid_battle_royale_1_v1",JSON.stringify(battleRoyale1Grid));}else if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="godTrial"){godTrialGrid=grid;localStorage.setItem("grid_god_trial_30_v2",JSON.stringify(godTrialGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
 function switchBoardMode(mode){
- saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="opponent"?opponentGrid:normalGrid));selected=-1;dragData=null;
+ saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="battleRoyale1"?battleRoyale1Grid:(mode==="opponent"?opponentGrid:normalGrid)));selected=-1;dragData=null;
  document.body.classList.toggle("opponent-board",mode==="opponent");
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("opponentModeBtn").classList.toggle("active",mode==="opponent");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
  document.getElementById("godTrialBtn").classList.toggle("active",mode==="godTrial");
+ document.getElementById("battleRoyale1Btn").classList.toggle("active",mode==="battleRoyale1");
  syncDebuffUI();
  render();
 }
@@ -865,6 +877,7 @@ document.getElementById("normalModeBtn").addEventListener("click",()=>switchBoar
 document.getElementById("opponentModeBtn").addEventListener("click",()=>switchBoardMode("opponent"));
 document.getElementById("collapseSpaceBtn").addEventListener("click",()=>switchBoardMode("collapseSpace"));
 document.getElementById("godTrialBtn").addEventListener("click",()=>switchBoardMode("godTrial"));
+document.getElementById("battleRoyale1Btn").addEventListener("click",()=>switchBoardMode("battleRoyale1"));
 
 
 try{
@@ -895,11 +908,12 @@ normalizeRules();render();
 (function(){
 async function exportFormationImage(){
   const collapseSpace=boardMode==="collapseSpace";
+  const battleRoyale1=boardMode==="battleRoyale1";
   const hasNormal=normalGrid.some(Boolean), hasOpponent=opponentGrid.some(Boolean);
-  const versusExport=!collapseSpace && hasNormal && hasOpponent;
+  const versusExport=!collapseSpace && !battleRoyale1 && hasNormal && hasOpponent;
   const cell=versusExport?125:150, gap=versusExport?10:14, startX=versusExport?170:65;
   const boardBlockH=versusExport?610:0;
-  const W=1200,H=versusExport?1510:(collapseSpace?1040:940);
+  const W=1200,H=versusExport?1510:(collapseSpace?1040:(battleRoyale1?1080:940));
   const c=document.createElement("canvas"); c.width=W;c.height=H;
   const ctx=c.getContext("2d");
   ctx.fillStyle="#f5f5f7";ctx.fillRect(0,0,W,H);ctx.fillStyle="#111";ctx.font="bold 34px sans-serif";ctx.textAlign="center";ctx.fillText("ペタペタペンギン団 編成",W/2,42);ctx.textAlign="left";
@@ -930,6 +944,12 @@ async function exportFormationImage(){
   }else if(collapseSpace){
     ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("崩壊空間",65,90);
     for(let i=0;i<30;i++)drawCell(grid,i,65+(i%6)*(cell+gap),130+Math.floor(i/6)*(cell+gap));
+  }else if(battleRoyale1){
+    ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("バトロワ変形1",65,90);
+    const shape=[[1,1,0,1,1,0,1,1],[1,0,0,1,1,0,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1]];
+    let si=0;const bc=82,bg=12,bx=140,by=150;shape.forEach((row,r)=>row.forEach((on,c)=>{if(!on)return;const x=bx+c*(bc+bg),y=by+r*(bc+bg);ctx.fillStyle="#fff";ctx.strokeStyle="#cfcfd6";ctx.lineWidth=2;ctx.fillRect(x,y,bc,bc);ctx.strokeRect(x,y,bc,bc);const v=grid[si++];if(!v)return;const im=map.get(v.char);if(im){const sc=Math.min((bc-8)/im.width,(bc-8)/im.height),iw=im.width*sc,ih=im.height*sc;ctx.drawImage(im,x+(bc-iw)/2,y+(bc-ih)/2,iw,ih)}if(v.stack>1){ctx.fillStyle="#111";ctx.font="bold 15px sans-serif";ctx.fillText("×"+v.stack,x+4,y+17)}}));
+    ctx.fillStyle="#111";ctx.font="bold 25px sans-serif";ctx.fillText("ダンジョン",140,660);
+    for(let j=0;j<6;j++)drawCell(grid,18+j,140+j*(bc+bg),680);
   }else{
     ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText(boardMode==="godTrial"?"神の試練":(boardMode==="opponent"?"相手の盤面":"自分の盤面"),65,90);
     for(let i=0;i<18;i++)drawCell(grid,i,65+(i%6)*(cell+gap),130+Math.floor(i/6)*(cell+gap));
@@ -1099,7 +1119,7 @@ document.addEventListener("DOMContentLoaded",()=>{
   function persist(){saveCurrentBoard();}
   const oldRender=render;
   render=function(){oldRender();persist();};
-  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':(st.mode==='godTrial'?'godTrial':(st.mode==='opponent'?'opponent':'normal'));grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else if(boardMode==='godTrial')godTrialGrid=grid;else if(boardMode==='opponent')opponentGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('opponentModeBtn').classList.toggle('active',boardMode==='opponent');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');document.getElementById('godTrialBtn').classList.toggle('active',boardMode==='godTrial');saveDebuffs();normalizeRules();render();historyLock=false}
+  function apply(st){historyLock=true;boardMode=st.mode==='collapseSpace'?'collapseSpace':(st.mode==='godTrial'?'godTrial':(st.mode==='battleRoyale1'?'battleRoyale1':(st.mode==='opponent'?'opponent':'normal')));grid=st.grid.map(v=>v?{...v}:null);if(boardMode==='collapseSpace')collapseSpaceGrid=grid;else if(boardMode==='godTrial')godTrialGrid=grid;else if(boardMode==='battleRoyale1')battleRoyale1Grid=grid;else if(boardMode==='opponent')opponentGrid=grid;else normalGrid=grid;debuffCollapseEl.checked=!!st.collapse;debuffForbiddenEl.checked=!!st.forbidden;selected=-1;dragData=null;document.getElementById('normalModeBtn').classList.toggle('active',boardMode==='normal');document.getElementById('opponentModeBtn').classList.toggle('active',boardMode==='opponent');document.getElementById('collapseSpaceBtn').classList.toggle('active',boardMode==='collapseSpace');document.getElementById('godTrialBtn').classList.toggle('active',boardMode==='godTrial');document.getElementById('battleRoyale1Btn').classList.toggle('active',boardMode==='battleRoyale1');saveDebuffs();normalizeRules();render();historyLock=false}
   function startHistory(e){if(historyLock||e.target.closest?.('#undoBtn,#redoBtn,#shareBtn,#exportImageBtn,.admin'))return;before=state()}
   function endHistory(){if(historyLock||!before)return;setTimeout(()=>{const after=state();if(!same(before,after)){undo.push(before);if(undo.length>50)undo.shift();redo=[];updateHistoryButtons()}before=null},0)}
   ['pointerdown','touchstart','dragstart'].forEach(n=>document.addEventListener(n,startHistory,{capture:true,passive:true}));
@@ -1173,7 +1193,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  // ショートカット
  document.addEventListener('keydown',e=>{if(e.target.matches?.('input,textarea'))return;if(e.key==='Escape'){selected=-1;render();return;}if((e.ctrlKey||e.metaKey)&&e.key.toLowerCase()==='z'){e.preventDefault();document.getElementById('undoBtn')?.click();}if((e.ctrlKey||e.metaKey)&&(e.key.toLowerCase()==='y'||(e.shiftKey&&e.key.toLowerCase()==='z'))){e.preventDefault();document.getElementById('redoBtn')?.click();}});
  // 全盤面リセット
- document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間・神の試練をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);godTrialGrid=Array.from({length:30},()=>null);localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');localStorage.removeItem('grid_god_trial_30_v2');localStorage.removeItem('grid_god_trial_42_v1');localStorage.removeItem('grid_god_trial_36_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='godTrial'?godTrialGrid:(boardMode==='opponent'?opponentGrid:normalGrid));selected=-1;render();});
+ document.getElementById('resetAllBtn')?.addEventListener('click',()=>{if(!confirm('通常盤面・相手の盤面・崩壊空間・神の試練・バトロワ変形1をすべてリセットしますか？'))return;normalGrid=Array.from({length:24},()=>null);opponentGrid=Array.from({length:24},()=>null);collapseSpaceGrid=Array.from({length:30},()=>null);godTrialGrid=Array.from({length:30},()=>null);battleRoyale1Grid=Array.from({length:24},()=>null);localStorage.removeItem('grid_battle_royale_1_v1');localStorage.removeItem('grid_stack_drag_24_v1');localStorage.removeItem('grid_opponent_24_v1');localStorage.removeItem('grid_collapse_space_30_v1');localStorage.removeItem('grid_god_trial_30_v2');localStorage.removeItem('grid_god_trial_42_v1');localStorage.removeItem('grid_god_trial_36_v1');grid=boardMode==='collapseSpace'?collapseSpaceGrid:(boardMode==='godTrial'?godTrialGrid:(boardMode==='battleRoyale1'?battleRoyale1Grid:(boardMode==='opponent'?opponentGrid:normalGrid)));selected=-1;render();});
  // 長押しで詳細
  const pop=document.createElement('div');pop.id='charDetailPopup';document.body.appendChild(pop);let timer=null,sx=0,sy=0;
  function hidePop(){clearTimeout(timer);timer=null;pop.classList.remove('show')}
@@ -1186,7 +1206,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
 <style id="uiUpgradeAllCss">
 /* 1: モードを同幅タブ化 */
-.modeSwitch{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr));gap:5px!important;max-width:760px;margin-left:auto!important;margin-right:auto!important}.modeBtn{border-radius:10px!important;padding:8px 6px!important;white-space:nowrap}
+.modeSwitch{display:grid!important;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px!important;max-width:760px;margin-left:auto!important;margin-right:auto!important}.modeBtn{border-radius:10px!important;padding:8px 6px!important;white-space:nowrap}
 /* 2,3,6: 盤面情報 */
 #slotDetailBar{display:flex;justify-content:center;gap:14px;font-size:11px;color:#9fb3c9;margin:-2px 0 5px}#slotDetailBar span{background:#0d1d30;border:1px solid #29435f;border-radius:999px;padding:3px 8px}#slotDetailBar b{color:#fff}
 #specialEffectBar{display:none;max-width:620px;margin:0 auto 6px;padding:6px 9px;border:1px solid #365574;border-radius:9px;background:#0d1d30;color:#c9daec;font-size:11px;text-align:center}#specialEffectBar.show{display:block}
@@ -1198,7 +1218,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 #moreToolsBtn{display:none}.mobileMoreMenu{display:none}
 /* 9: PC盤面を主役に。固定はしない */
 @media(min-width:700px){main{grid-template-columns:minmax(0,1.85fr) minmax(300px,1fr)!important}main>.boardScroll{position:relative!important;top:auto!important;align-self:start}.boardIdentity{font-size:13px!important}.characterControls{position:sticky!important;top:0!important}.board{width:100%!important;max-width:100%!important}.bottomRow{max-width:100%!important}}
-@media(max-width:699px){.modeSwitch{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:3px!important}.modeBtn{font-size:10px!important;padding:7px 2px!important}.modeBtn:nth-child(3){font-size:0!important}.modeBtn:nth-child(3)::after{content:'崩壊';font-size:10px}.tools>#clearBtn,.tools>#resetAllBtn,.tools>#shareBtn{display:none!important}#moreToolsBtn{display:inline-flex!important}.mobileMoreMenu{position:fixed;z-index:1000;right:12px;top:96px;background:#102238;border:1px solid #45627f;border-radius:12px;padding:6px;box-shadow:0 12px 30px #0009}.mobileMoreMenu.open{display:grid;gap:5px}.mobileMoreMenu button{padding:9px 12px;text-align:left}.characterControls{position:sticky!important;top:42px!important}#slotDetailBar{gap:5px;font-size:10px}#slotDetailBar span{padding:3px 6px}}
+@media(max-width:699px){.modeSwitch{grid-template-columns:repeat(5,minmax(0,1fr))!important;gap:3px!important}.modeBtn{font-size:10px!important;padding:7px 2px!important}.modeBtn:nth-child(3){font-size:0!important}.modeBtn:nth-child(3)::after{content:'崩壊';font-size:10px}.tools>#clearBtn,.tools>#resetAllBtn,.tools>#shareBtn{display:none!important}#moreToolsBtn{display:inline-flex!important}.mobileMoreMenu{position:fixed;z-index:1000;right:12px;top:96px;background:#102238;border:1px solid #45627f;border-radius:12px;padding:6px;box-shadow:0 12px 30px #0009}.mobileMoreMenu.open{display:grid;gap:5px}.mobileMoreMenu button{padding:9px 12px;text-align:left}.characterControls{position:sticky!important;top:42px!important}#slotDetailBar{gap:5px;font-size:10px}#slotDetailBar span{padding:3px 6px}}
 </style>
 <script id="uiUpgradeAllJs">
 (()=>{
@@ -1208,6 +1228,7 @@ document.addEventListener("DOMContentLoaded",()=>{
  function refreshInfo(){
    const br=$('boardRemain'),dr=$('dungeonRemain'),bar=$('slotDetailBar'),sp=$('specialEffectBar'); if(!br||!dr||!bar)return;
    if(boardMode==='collapseSpace'){br.textContent=Math.max(0,30-countOccupied(grid,0,30));dr.textContent='—';bar.children[1].style.display='none';}
+   else if(boardMode==='battleRoyale1'){br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,6-countOccupied(grid,18,24));bar.children[1].style.display='';}
    else if(boardMode==='godTrial'){br.textContent=Math.max(0,24-countOccupied(grid,0,24));dr.textContent=Math.max(0,6-countOccupied(grid,24,30));bar.children[1].style.display='';}
    else{const dend=activeSlots();br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,(dend-18)-countOccupied(grid,18,dend));bar.children[1].style.display='';}
    if(sp){const bodies=grid.reduce((n,v)=>n+(v&&(v.char===2||v.char===3)?(Number(v.stack)||1):0),0);const hasI=grid.some(v=>v&&v.char===3),hasM=grid.some(v=>v&&v.char===9);let a=[];if(hasI)a.push('イサイ：攻撃 +'+Math.min(bodies,4)*5+'%（イサイ/天使 '+bodies+'体）');if(hasM)a.push('ミカエル：攻撃 +'+Math.min(bodies,5)*5+'%（イサイ/天使 '+bodies+'体）');sp.textContent=a.join(' ｜ ');sp.classList.toggle('show',a.length>0);}
