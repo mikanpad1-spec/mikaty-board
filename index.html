@@ -2613,4 +2613,43 @@ window.uiConfirm=function(msg){return new Promise(res=>{
   bar.append(lord,title,trash);
 })();
 </script>
+<style id="museUiStyle">
+/* === UI readability pass (appended overrides) === */
+.charName{font-size:11px!important}
+.statsBox .statItem{font-size:11.5px!important}
+.statsBreakdown{font-size:11px!important}
+.ctag{font-size:10px!important}
+.modeBtn{font-size:11px!important}
+.rarityCount{font-size:11px!important}
+#slotDetailBar{font-size:11px!important}
+#supportOverlay .spCell .bd,#supportOverlay .spSep{font-size:11px!important}
+#quickBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:900;display:flex;gap:8px;background:rgba(13,22,40,.88);border:1px solid rgba(120,160,220,.45);border-radius:999px;padding:8px 10px;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);box-shadow:0 8px 24px rgba(0,0,0,.35);max-width:calc(100vw - 16px);overflow-x:auto}
+#quickBar button{font:inherit;font-size:13px;font-weight:700;border:1px solid rgba(120,160,220,.35);background:rgba(38,58,94,.9);color:#eaf2ff;border-radius:999px;padding:9px 13px;white-space:nowrap;cursor:pointer}
+#quickBar button:disabled{opacity:.38;cursor:default}
+#quickBar button:active{transform:translateY(1px)}
+</style>
+<script>
+(function(){
+  function ready(fn){if(document.readyState!=="loading")fn();else document.addEventListener("DOMContentLoaded",fn)}
+  ready(function(){
+    if(document.getElementById("quickBar"))return;
+    var defs=[["undoBtn","↶ 元に戻す"],["redoBtn","↷ やり直す"],["exportImageBtn","画像保存"],["shareBtn","🔗 編成URLコピー"]];
+    var bar=document.createElement("div");bar.id="quickBar";
+    var btns={};
+    defs.forEach(function(d){
+      var src=document.getElementById(d[0]);if(!src)return;
+      var b=document.createElement("button");b.type="button";b.textContent=d[1];
+      (function(id){b.addEventListener("click",function(){var s=document.getElementById(id);if(s&&!s.disabled)s.click()})})(d[0]);
+      bar.appendChild(b);btns[d[0]]=b;
+    });
+    if(!bar.children.length)return;
+    document.body.appendChild(bar);
+    document.body.style.paddingBottom="76px";
+    function sync(){defs.forEach(function(d){var s=document.getElementById(d[0]),b=btns[d[0]];if(s&&b)b.disabled=!!s.disabled})}
+    sync();
+    if(window.MutationObserver){var mo=new MutationObserver(sync);defs.forEach(function(d){var s=document.getElementById(d[0]);if(s)mo.observe(s,{attributes:true,attributeFilter:["disabled","class"]})})}
+    setInterval(sync,1500);
+  });
+})();
+</script>
 </body></html>
