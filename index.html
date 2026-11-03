@@ -1266,6 +1266,7 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   function show(i,x,y){
     if(!Number.isInteger(i) || i<0 || i>=chars.length) return;
+    if(statValue(i,"attack")===0&&statValue(i,"speed")===0&&statValue(i,"passive")===0){hide();return}
     badge.innerHTML=
       "攻撃 "+statValue(i,"attack")+"<br>"+
       "速度 "+statValue(i,"speed")+"<br>"+
@@ -2646,6 +2647,8 @@ window.uiConfirm=function(msg){return new Promise(res=>{
     function update(i){
       if(!Number.isInteger(i)||i<0){span.textContent="";lastIdx=-1;return}
       lastIdx=i;
+      var a2=val(i,"attack"),s2=val(i,"speed"),pv2=val(i,"passive");
+      if(a2===0&&s2===0&&pv2===0){span.textContent="";return}
       span.textContent="\u2694攻撃 "+fmt(val(i,"attack"))+"\u3000\u26a1速度 "+fmt(val(i,"speed"))+"\u3000\u2726パッシブ "+fmt(val(i,"passive"));
     }
     document.addEventListener("click",function(e){
@@ -2681,14 +2684,17 @@ window.uiConfirm=function(msg){return new Promise(res=>{
       }catch(e){}
       return null;
     }
-    var shownFor=null;
+    var shownFor=null,shownHas=false;
     function show(i,x,y){
       if(!Number.isInteger(i)||i<0)return;
       if(typeof chars!=="undefined"&&i>=chars.length)return;
       if(shownFor!==i){
-        badge.innerHTML="攻撃 "+val(i,"attack")+"<br>速度 "+val(i,"speed")+"<br>パッシブ上昇 "+val(i,"passive");
+        var a=val(i,"attack"),s=val(i,"speed"),pv=val(i,"passive");
+        shownHas=!(a===0&&s===0&&pv===0);
+        if(shownHas)badge.innerHTML="攻撃 "+a+"<br>速度 "+s+"<br>パッシブ上昇 "+pv;
         shownFor=i;
       }
+      if(!shownHas){badge.style.display="none";return}
       badge.style.left=x+"px";badge.style.top=y+"px";
       badge.style.transform=y<120?"translate(-50%,26px)":"translate(-50%,calc(-100% - 16px))";
       badge.style.display="block";
