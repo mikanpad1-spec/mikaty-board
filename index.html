@@ -2625,6 +2625,7 @@ window.uiConfirm=function(msg){return new Promise(res=>{
 #supportOverlay .spCell .bd,#supportOverlay .spSep{font-size:11px!important}
 #selectedCharBar{flex-wrap:wrap}
 #selectedCharStats{font-size:12px;font-weight:700;color:#cfe3ff;white-space:nowrap}
+#museDragStats{position:fixed;z-index:99999;pointer-events:none;display:none;padding:7px 11px;border-radius:11px;background:rgba(8,18,36,.94);border:1px solid rgba(120,160,220,.45);color:#fff;font-size:14px;font-weight:800;line-height:1.55;white-space:nowrap;box-shadow:0 14px 40px rgba(0,0,0,.55)}
 </style>
 <script id="museSelStatsScript">
 (function(){
@@ -2658,6 +2659,52 @@ window.uiConfirm=function(msg){return new Promise(res=>{
       });
       mo.observe(img,{attributes:true,attributeFilter:["src"]});
     }
+  });
+})();
+</script>
+<script id="museDragStatsScript">
+(function(){
+  function ready(fn){if(document.readyState!=="loading")fn();else document.addEventListener("DOMContentLoaded",fn)}
+  ready(function(){
+    if(document.getElementById("museDragStats"))return;
+    var badge=document.createElement("div");badge.id="museDragStats";document.body.appendChild(badge);
+    function val(i,key){
+      try{if(typeof effectiveStats==="function"){var s=effectiveStats(i);if(s)return Number(s[key])||0}}catch(e){}
+      try{if(typeof charStats!=="undefined"&&charStats[i])return Number(charStats[i][key])||0}catch(e){}
+      return 0;
+    }
+    function draggedChar(){
+      try{
+        if(typeof dragData==="undefined"||!dragData)return null;
+        if(dragData.type==="char")return Number(dragData.char);
+        if(dragData.type==="slot"&&typeof grid!=="undefined"&&grid){var v=grid[Number(dragData.from)];return v?Number(v.char):null}
+      }catch(e){}
+      return null;
+    }
+    var shownFor=null;
+    function show(i,x,y){
+      if(!Number.isInteger(i)||i<0)return;
+      if(typeof chars!=="undefined"&&i>=chars.length)return;
+      if(shownFor!==i){
+        badge.innerHTML="攻撃 "+val(i,"attack")+"<br>速度 "+val(i,"speed")+"<br>パッシブ上昇 "+val(i,"passive");
+        shownFor=i;
+      }
+      badge.style.left=x+"px";badge.style.top=y+"px";
+      badge.style.transform=y<120?"translate(-50%,26px)":"translate(-50%,calc(-100% - 16px))";
+      badge.style.display="block";
+    }
+    function hide(){badge.style.display="none";shownFor=null}
+    function onMove(x,y){
+      if(Number.isInteger(window.__dragStatsChar)){hide();return}
+      var i=draggedChar();
+      if(i===null||!Number.isInteger(i)){hide();return}
+      show(i,x,y);
+    }
+    document.addEventListener("pointermove",function(e){onMove(e.clientX,e.clientY)},true);
+    document.addEventListener("touchmove",function(e){var t=e.touches&&e.touches[0];if(t)onMove(t.clientX,t.clientY)},{capture:true,passive:true});
+    ["pointerup","pointercancel","touchend","touchcancel","dragend","drop"].forEach(function(n){
+      document.addEventListener(n,function(){hide()},true);
+    });
   });
 })();
 </script>
