@@ -410,6 +410,20 @@ html body .board .slot .ultNum{position:absolute;left:2px;top:2px;min-width:16px
 html body .board.ultActive .slot:not(.ultRange):not(.ultCenter){opacity:.4}
 html body .board .slot.ultCenter{outline:3px solid #c98cff;outline-offset:-3px}
 #ultRangeLabel{display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:999px;background:rgba(150,80,225,.35);border:1px solid #b983ff;color:#ecd8ff;font-size:13px;font-weight:800}
+/* 砂漠範囲（領主をタップ） */
+html body .board .slot.desertRange{position:relative;--desertc:#d9a441}
+html body .board .slot.desertRange[data-desert="2"]{--desertc:#c47f17}
+html body .board .slot.desertRange[data-desert="3"]{--desertc:#a85b08}
+html body .board .slot.desertRange[data-desert="4"]{--desertc:#8a3d05}
+html body .board .slot.desertRange::before{content:"";position:absolute;inset:0;background:rgba(217,164,65,.28);box-shadow:inset 0 0 0 3px var(--desertc);border-radius:inherit;pointer-events:none;z-index:0}
+html body .board .slot.desertRange[data-desert="2"]::before{background:rgba(196,127,23,.34)}
+html body .board .slot.desertRange[data-desert="3"]::before{background:rgba(168,91,8,.38)}
+html body .board .slot.desertRange[data-desert="4"]::before{background:rgba(138,61,5,.42)}
+html body .board .slot.desertRange>img,html body .board .slot.desertCenter>img{position:relative;z-index:1}
+html body .board .slot .desertNum{position:absolute;left:2px;top:2px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--desertc,#d9a441);color:#fff;font-size:11px;font-weight:900;line-height:16px;text-align:center;z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:none}
+html body .board.desertActive .slot:not(.desertRange):not(.desertCenter){opacity:.4}
+html body .board .slot.desertCenter{outline:3px solid #e8b95a;outline-offset:-3px}
+#desertRangeLabel{display:inline-block;margin:0 0 6px;padding:3px 10px;border-radius:999px;background:rgba(217,164,65,.3);border:1px solid #d9a441;color:#ffe9b8;font-size:13px;font-weight:800}
 /* 盤面プリセット */
 .ultHint{font-size:12px;color:#cdb6f2;margin:0 0 6px;line-height:1.5}
 #presetBtn{display:none;align-items:center;background:#4a3a78!important;border-color:#8f78d6!important;color:#eadfff!important;box-shadow:none!important}
@@ -464,7 +478,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <h1>ペタペタペンギン団盤面シミュレーター</h1><p class="seoIntro">ペタペン盤面シュミレーター｜ペタペタペンギン団の盤面・編成作成とステータス計算に対応。</p>
 <div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="opponentModeBtn" class="modeBtn opponentMode">相手の盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button><button type="button" id="battleRoyale1Btn" class="modeBtn battleRoyaleMode">バトロワ変形1</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
-<p class="sub" id="ultHint">シンガー・かぐや姫をタップすると「究極範囲」が紫色で表示されます（複数タップ可・左上の数字が重なっている数で、数が多いほど色が濃く／もう一度タップで解除）。</p>
+<p class="sub" id="ultHint">シンガー・かぐや姫をタップすると「究極範囲」が紫色で表示されます（複数タップ可・左上の数字が重なっている数で、数が多いほど色が濃く／もう一度タップで解除）。領主をタップすると「砂漠範囲」（周囲2マス）が黄色で表示されます。</p>
 <div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><button type="button" id="honorHelBtn" aria-pressed="false" title="ON：パッシブ低下を詳細設定の値（初期-60%）で開始し、攻撃・速度に ×(1＋パッシブ%) をかけます">栄誉ヘル</button><button type="button" id="presetBtn" title="通常盤面：自分の盤面を3セットまで登録・呼び出し">盤面プリセット</button><button type="button" id="supportBtn" title="通常盤面のみ：条件から一番数値が盛れる編成を提案します">サポート提案</button><button type="button" id="moreToolsBtn" aria-label="その他の操作">⋯</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><span class="statItem" id="attrKindsItem"><b id="attrKinds">0</b>属性</span><span class="statItem" id="raceKindsItem"><b id="raceKinds">0</b>種族</span><div id="statsBreakdown" class="statsBreakdown"></div>
 <div class="debuff"><strong>デバフ選択</strong>
 <label><input type="checkbox" id="debuffCollapse"> 総崩れ</label>
@@ -785,7 +799,7 @@ try{
  }
 }catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_battle_royale_1_v1")||"null");if(Array.isArray(x)&&x.length===24)battleRoyale1Grid=x;else if(Array.isArray(x)&&x.length===18)battleRoyale1Grid=[...x,...Array.from({length:6},()=>null)]}catch(e){}
-let grid=normalGrid, selected=-1, dragData=null, rangeSet=[];
+let grid=normalGrid, selected=-1, dragData=null, rangeSet=[], desertSet=[];
 const board=document.getElementById("board"),extras=document.getElementById("extras"),poolImmortal=document.getElementById("poolImmortal"),
 poolMyth=document.getElementById("poolMyth"),
 poolLegend=document.getElementById("poolLegend"),
@@ -947,6 +961,13 @@ function makeSlot(i,extra=false){
    if(rangeSet.includes(i))s.classList.add("ultCenter");
    if(n>0){s.classList.add("ultRange");s.dataset.ult=String(Math.min(n,4));const u=document.createElement("span");u.className="ultNum";u.textContent=String(n);s.appendChild(u)}
  }
+ if(!extra&&desertSet.length&&i<18){
+   // 砂漠範囲：領主を中心に周囲2マス（5×5）。重なった数が多いほど濃く表示。ダンジョンは対象外
+   const r=Math.floor(i/6),c=i%6;let n=0;
+   desertSet.forEach(ix=>{if(ix===i)return;const dr=Math.abs(r-Math.floor(ix/6)),dc=Math.abs(c-ix%6);if(dr<=2&&dc<=2)n++});
+   if(desertSet.includes(i))s.classList.add("desertCenter");
+   if(n>0){s.classList.add("desertRange");s.dataset.desert=String(Math.min(n,4));const u=document.createElement("span");u.className="desertNum";u.textContent=String(n);s.appendChild(u)}
+ }
  if(v){
    s.appendChild(makeImg(chars[v.char]));
    if(v.stack>1){const b=document.createElement("span");b.className="badge";b.textContent="×"+v.stack;s.appendChild(b)}
@@ -961,9 +982,17 @@ function makeSlot(i,extra=false){
      // シンガー/かぐや姫をタップ：究極範囲を表示（複数可。もう一度タップで解除）
      const k=rangeSet.indexOf(i);
      if(k>=0)rangeSet.splice(k,1);else rangeSet.push(i);
+     desertSet=[];
      render();return;
    }
-   rangeSet=[];
+   if(grid[i]&&grid[i].char===7&&!extra&&i<18&&(boardMode==="normal"||boardMode==="opponent")){
+     // 領主をタップ：砂漠範囲を表示（複数可。もう一度タップで解除）
+     const k=desertSet.indexOf(i);
+     if(k>=0)desertSet.splice(k,1);else desertSet.push(i);
+     rangeSet=[];
+     render();return;
+   }
+   rangeSet=[];desertSet=[];
    if(grid[i]){
      const ci=grid[i].char;
      if(canStack(ci)){
@@ -985,7 +1014,9 @@ function makeSlot(i,extra=false){
 function render(){
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=(boardMode==="normal"||boardMode==="opponent")?"":"none"}
  if(rangeSet.length)rangeSet=(boardMode==="normal"||boardMode==="opponent")?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
+ if(desertSet.length)desertSet=(boardMode==="normal"||boardMode==="opponent")?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
  board.classList.toggle("ultActive",rangeSet.length>0);
+ board.classList.toggle("desertActive",desertSet.length>0);
  board.replaceChildren();extras.replaceChildren();
  const collapseSpace=boardMode==="collapseSpace";
  const godTrial=boardMode==="godTrial";
@@ -1024,6 +1055,14 @@ function render(){
     if(!lab){lab=document.createElement("div");lab.id="ultRangeLabel";board.parentNode.insertBefore(lab,board)}
     const cnt={};rangeSet.forEach(ix=>{const nm=charNames[grid[ix].char];cnt[nm]=(cnt[nm]||0)+1});
     lab.textContent="究極範囲（"+Object.entries(cnt).map(([k,v])=>k+(v>1?"×"+v:"")).join("、")+"）";
+  }else if(lab)lab.remove();
+ }
+ {
+  let lab=document.getElementById("desertRangeLabel");
+  if(desertSet.length){
+    if(!lab){lab=document.createElement("div");lab.id="desertRangeLabel";board.parentNode.insertBefore(lab,board)}
+    const cnt={};desertSet.forEach(ix=>{const nm=charNames[grid[ix].char];cnt[nm]=(cnt[nm]||0)+1});
+    lab.textContent="砂漠範囲（"+Object.entries(cnt).map(([k,v])=>k+(v>1?"\u00d7"+v:"")).join("、")+"）";
   }else if(lab)lab.remove();
  }
  updateTotal();
