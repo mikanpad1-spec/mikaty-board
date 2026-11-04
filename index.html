@@ -784,7 +784,7 @@ try{const t=Number(localStorage.getItem("honor_hel_tier_v1"));if(HONOR_TIERS.som
 function honorPenalty(){return honorTier+6*honorKyoubou}
 let steamEra=0,otherPassive=0;
 try{const a=Number(localStorage.getItem("steam_era_v1"));if([0,8,10,12,14,16].includes(a))steamEra=a;const b=Number(localStorage.getItem("other_passive_v1"));if(Number.isFinite(b))otherPassive=b}catch(e){}
-function extraPassive(){return steamEra+otherPassive}
+function extraPassive(){return ((boardMode==="collapseSpace"||boardMode==="godTrial")?0:steamEra)+otherPassive}
 let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
 let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null), battleRoyale1Grid=Array.from({length:24},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
@@ -2324,9 +2324,16 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     const popc=x=>{let n=0;while(x){n+=x&1;x>>=1}return n};
     if(popc(forcedMask)+forcedS>Math.min(N,C)){forcedMask=0;forcedS=0}
     const forcedIds=imm.filter((id,ix)=>(forcedMask>>ix)&1).concat(forcedS?[1]:[]);
+    // 両盛りではイサイ（攻撃）をなるべく優先して入れる（効果が乗る上限の5体まで）
+    let isaiTarget=0;
+    if(prefs.goal==='both'){
+      const t5=Math.min(5,maxA);
+      if(t5>0&&t5+popc(forcedMask)+forcedS<=Math.min(N,C))isaiTarget=t5;
+    }
     let top=null;
     for(let mask=0;mask<16;mask++)for(let s=0;s<=1;s++)for(let a=0;a<=maxA;a++)for(let b=0;b<=maxB;b++){
       if((mask&forcedMask)!==forcedMask||(forcedS&&!s))continue;
+      if(isaiTarget&&a!==isaiTarget)continue;
       const spec=[];
       imm.forEach((id,ix)=>{if((mask>>ix)&1)spec.push({char:id,stack:1})});
       if(s)spec.push({char:1,stack:1});
