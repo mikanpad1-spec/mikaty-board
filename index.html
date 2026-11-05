@@ -1101,7 +1101,7 @@ function buildCard(i){
  c.addEventListener("dragstart",e=>{dragData={type:"char",char:i};e.dataTransfer.effectAllowed="copy"});
  c.addEventListener("touchstart",()=>{dragData={type:"char",char:i}},{passive:true});
  c.addEventListener("touchend",e=>{
-   const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,t.clientY),target=el&&el.closest(".slot,.extra");
+   const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,Math.max(4,t.clientY-76)),target=el&&el.closest(".slot,.extra");
    if(target){dropOn(Number(target.dataset.index));e.preventDefault()}
  },{passive:false});
  c.addEventListener("click",()=>{
@@ -1381,6 +1381,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   const ghost=document.createElement('div'); ghost.id='touchGhost'; document.body.appendChild(ghost);
   let touch=null, moved=false, startX=0, startY=0;
+  // ドラッグ中のキャラと判定位置は指の76px上に出す（指で隠れて狙えない問題の対策。カード側touchendの判定も同じ76px）
+  const aimY=y=>Math.max(4,y-76);
   const showGhost=(ci,x,y)=>{ghost.replaceChildren(makeImg(chars[ci]));ghost.style.display='flex';ghost.style.left=x+'px';ghost.style.top=y+'px'};
   const hideGhost=()=>{ghost.style.display='none';document.querySelectorAll('.touchMoving').forEach(e=>e.classList.remove('touchMoving'))};
   document.addEventListener('touchstart',e=>{
@@ -1397,16 +1399,16 @@ document.addEventListener("DOMContentLoaded",()=>{
   document.addEventListener('touchmove',e=>{
     if(!touch||e.touches.length!==1)return; const t=e.touches[0];
     if(!moved && Math.hypot(t.clientX-startX,t.clientY-startY)>7){moved=true;touch.el.classList.add('touchMoving')}
-    if(!moved)return; e.preventDefault(); showGhost(touch.char,t.clientX,t.clientY);
+    if(!moved)return; e.preventDefault(); showGhost(touch.char,t.clientX,aimY(t.clientY));
     document.querySelectorAll('.slot,.extra').forEach(x=>x.style.outline='');
-    ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY); ghost.style.display='flex';
+    ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,aimY(t.clientY)); ghost.style.display='flex';
     const target=under&&under.closest('.slot,.extra'); if(target)target.style.outline='3px solid #6eb7ff'; const trash=under&&under.closest('#mobileTrash'); document.getElementById('mobileTrash')?.classList.toggle('trashHover',!!trash && touch.type==='slot');
   },{passive:false});
   document.addEventListener('touchend',e=>{
     if(!touch)return;
     document.querySelectorAll('.slot,.extra').forEach(x=>x.style.outline='');
     if(moved){
-      const t=e.changedTouches[0]; ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,t.clientY);
+      const t=e.changedTouches[0]; ghost.style.display='none'; const under=document.elementFromPoint(t.clientX,aimY(t.clientY));
       const target=under&&under.closest('.slot,.extra');
       const trash=under&&under.closest('#mobileTrash');
       if(trash && touch.type==='slot'){grid[touch.from]=null;selected=-1;dragData=null;normalizeRules();render();}
