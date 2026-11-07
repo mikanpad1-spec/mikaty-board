@@ -502,7 +502,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <h2>スキン設定</h2>
 <div class="skinLimit">各キャラのスキン効果は最大3つまで選択できます。</div>
 <style>.skinModeRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}.skinModeRow span{font-size:13px;color:#a9bdd5}.skinModeRow button{min-height:38px;background:#1d3a60;color:#fff;border:1px solid #49698f;border-radius:10px;padding:7px 12px;font-size:14px;cursor:pointer}</style>
-<div class="skinModeRow"><span id="skinModeLabel">設定先：通常盤面（盤面ごとに個別保存）</span><button id="copyNormalSkinBtn" type="button" style="display:none">通常盤面の設定をコピー</button></div>
+<div class="skinModeRow"><span id="skinModeLabel">設定先：通常盤面（盤面ごとに個別保存）</span><button id="copyNormalSkinBtn" type="button" style="display:none">通常盤面の設定をコピー</button><button id="resetSkinDefaultBtn" type="button">初期値に戻す</button></div>
 <div id="skinList"></div>
 <div id="skinExtra" class="skinExtra">
 <div class="skinCharGroup"><h3 class="skinCharTitle" style="cursor:default">蒸気時代(防衛台)</h3>
@@ -2305,6 +2305,12 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     const src=skinStore.normal,copied={};
     Object.keys(src.selections).forEach(k=>{copied[k]=[...src.selections[k]];});
     skinStore[boardMode].selections=copied;skinStore[boardMode].steamEra=src.steamEra;skinStore[boardMode].otherPassive=src.otherPassive;
+    applySkinMode(boardMode);persistSkinStore();refreshSkinModeUI();updateTotal();
+  });
+  const resetBtn=document.getElementById('resetSkinDefaultBtn');
+  if(resetBtn)resetBtn.addEventListener('click',async()=>{
+    if(!(await uiConfirm("「"+SKIN_MODE_LABELS[boardMode]+"」のスキン設定（スキン選択・蒸気時代・その他パッシブ）を初期値に戻しますか？")))return;
+    skinStore[boardMode]={selections:normalizeSkinSelections(null),steamEra:0,otherPassive:0};
     applySkinMode(boardMode);persistSkinStore();refreshSkinModeUI();updateTotal();
   });
   refreshSkinModeUI();
