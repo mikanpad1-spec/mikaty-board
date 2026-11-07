@@ -501,6 +501,8 @@ main>.honorPanel{grid-column:1/-1!important}
 <section class="skinPanel" id="skinPanel">
 <h2>スキン設定</h2>
 <div class="skinLimit">各キャラのスキン効果は最大3つまで選択できます。</div>
+<style>.skinModeRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}.skinModeRow span{font-size:13px;color:#a9bdd5}.skinModeRow button{min-height:38px;background:#1d3a60;color:#fff;border:1px solid #49698f;border-radius:10px;padding:7px 12px;font-size:14px;cursor:pointer}</style>
+<div class="skinModeRow"><span id="skinModeLabel">設定先：通常盤面（盤面ごとに個別保存）</span><button id="copyNormalSkinBtn" type="button" style="display:none">通常盤面の設定をコピー</button></div>
 <div id="skinList"></div>
 <div id="skinExtra" class="skinExtra">
 <div class="skinCharGroup"><h3 class="skinCharTitle" style="cursor:default">蒸気時代(防衛台)</h3>
@@ -702,11 +704,13 @@ const SKIN_DATA={
   ]
 };
 const DEFAULT_SKINS={4:["hell_reward"],5:["greatsword_penguin"],1:[],2:[],44:[],9:[]};
-let skinSelections={};
+let legacySkinSelections=null;
 try{
   const saved=JSON.parse(localStorage.getItem("skin_selections_v1")||"null");
-  if(saved && typeof saved==="object") skinSelections=saved;
+  if(saved && typeof saved==="object") legacySkinSelections=saved;
 }catch(e){}
+let legacySteamEra=0,legacyOtherPassive=0;
+try{const a=Number(localStorage.getItem("steam_era_v1"));if([0,8,10,12,14,16].includes(a))legacySteamEra=a;const b=Number(localStorage.getItem("other_passive_v1"));if(Number.isFinite(b))legacyOtherPassive=b}catch(e){}
 // 同時選択できないスキンの組み合わせ
 const EXCLUSIVE_SKIN_GROUPS={
   9:[["sentai_base","sentai_color"]],
@@ -724,34 +728,59 @@ function normalizeExclusiveSkins(i,arr,preferredId=null){
   });
   return out;
 }
-Object.keys(SKIN_DATA).forEach(k=>{
-  if(!Array.isArray(skinSelections[k])) skinSelections[k]=[...(DEFAULT_SKINS[k]||[])];
-  skinSelections[k]=skinSelections[k].filter(id=>SKIN_DATA[k].some(x=>x.id===id)).slice(0,3);
-  skinSelections[k]=normalizeExclusiveSkins(Number(k),skinSelections[k]);
-});
-// 聖使者（神格前）と聖使者はスキン選択を共通にする
-{const u=[...new Set([...(skinSelections[2]||[]),...(skinSelections[44]||[])])];skinSelections[2]=u;skinSelections[44]=[...u];}
-function skinBonus(i){
+function normalizeSkinSelections(raw){
+  const out={};
+  Object.keys(SKIN_DATA).forEach(k=>{
+    let arr=(raw && Array.isArray(raw[k]))?[...raw[k]]:[...(DEFAULT_SKINS[k]||[])];
+    arr=arr.filter(id=>SKIN_DATA[k].some(x=>x.id===id)).slice(0,3);
+    out[k]=normalizeExclusiveSkins(Number(k),arr);
+  });
+  // 聖使者（神格前）と聖使者はスキン選択を共通にする
+  const u=[...new Set([...(out[2]||[]),...(out[44]||[])])];out[2]=u;out[44]=[...u];
+  return out;
+}
+// スキン設定は盤面モードごとに個別保存する（旧・共通設定は全モードの初期値として引き継ぐ）
+const SKIN_MODES=["normal","opponent","collapseSpace","godTrial","battleRoyale1"];
+const SKIN_MODE_LABELS={normal:"通常盤面",opponent:"相手の盤面",collapseSpace:"崩壊空間",godTrial:"神の試練",battleRoyale1:"バトロワ変形1"};
+function loadSkinModeData(d){
+  const has=(d && typeof d==="object");
+  return {
+    selections:normalizeSkinSelections(has && d.selections && typeof d.selections==="object" ? d.selections : legacySkinSelections),
+    steamEra:(has && [0,8,10,12,14,16].includes(d.steamEra)) ? d.steamEra : legacySteamEra,
+    otherPassive:(has && Number.isFinite(d.otherPassive)) ? d.otherPassive : legacyOtherPassive
+  };
+}
+let skinStore={};
+try{const s=JSON.parse(localStorage.getItem("skin_settings_by_mode_v1")||"null");if(s && typeof s==="object") skinStore=s;}catch(e){}
+SKIN_MODES.forEach(m=>{skinStore[m]=loadSkinModeData(skinStore[m]);});
+let skinSelections=skinStore.normal.selections;
+function persistSkinStore(){try{localStorage.setItem("skin_settings_by_mode_v1",JSON.stringify(skinStore));}catch(e){}}
+function syncSkinGlobalsToStore(){skinStore[boardMode].selections=skinSelections;skinStore[boardMode].steamEra=steamEra;skinStore[boardMode].otherPassive=otherPassive;}
+function applySkinMode(m){skinSelections=skinStore[m].selections;steamEra=skinStore[m].steamEra;otherPassive=skinStore[m].otherPassive;}
+function modeOfGrid(g){if(g===opponentGrid)return "opponent";if(g===collapseSpaceGrid)return "collapseSpace";if(g===godTrialGrid)return "godTrial";if(g===battleRoyale1Grid)return "battleRoyale1";if(g===normalGrid)return "normal";return boardMode;}
+function selectionsForGrid(g){return skinStore[modeOfGrid(g)].selections;}
+function extraPassiveFor(mode){const d=skinStore[mode]||skinStore.normal;return ((mode==="collapseSpace"||mode==="godTrial")?0:d.steamEra)+d.otherPassive;}
+function skinBonus(i,sel){
   const out={attack:0,speed:0,passive:0};
-  const selectedSkins=skinSelections[i]||[];
+  const selectedSkins=(sel||skinSelections)[i]||[];
   (SKIN_DATA[i]||[]).forEach(sk=>{if(selectedSkins.includes(sk.id)){out.attack+=sk.attack||0;out.speed+=sk.speed||0;out.passive+=sk.passive||0;}});
   return out;
 }
 // 一部スキン効果は対応キャラにも共有される
 // シンガーの選択スキン → かぐや姫 / 天使の選択スキン → ミカエル
-function linkedSkinBonus(i){
+function linkedSkinBonus(i,sel){
   const out={attack:0,speed:0,passive:0};
   let sources=[];
   if(i===0) sources=[1];          // かぐや姫 ← シンガー
   else if(i===9) sources=[2,44];  // ミカエル ← 天使（神格前）・天使（重複して数えないよう大きい方を採用）
   sources.forEach(src=>{
-    const b=skinBonus(src);
+    const b=skinBonus(src,sel);
     out.attack=Math.max(out.attack,b.attack);out.speed=Math.max(out.speed,b.speed);out.passive=Math.max(out.passive,b.passive);
   });
   return out;
 }
-function totalSkinBonus(i){
-  const own=skinBonus(i), linked=linkedSkinBonus(i);
+function totalSkinBonus(i,sel){
+  const own=skinBonus(i,sel), linked=linkedSkinBonus(i,sel);
   return {attack:own.attack+linked.attack,speed:own.speed+linked.speed,passive:own.passive+linked.passive};
 }
 // 「神聖属性」かつ「神話」のキャラか
@@ -769,12 +798,12 @@ function michaelAttackBuff(sourceGrid=grid){
   return Math.min(holyMythBodies(sourceGrid),5)*5;
 }
 function effectiveStats(i,sourceGrid=grid){
-  const base=charStats[i]||{attack:0,speed:0,passive:0}, bonus=totalSkinBonus(i);
+  const base=charStats[i]||{attack:0,speed:0,passive:0}, bonus=totalSkinBonus(i,selectionsForGrid(sourceGrid));
   // イサイ・ミカエルは「自分側」「相手側」を混ぜず、それぞれの盤面内だけで算出
   const attackBase=(i===3 ? isaiAttackBuff(sourceGrid) : (i===9 ? (Number(base.attack)||0)+michaelAttackBuff(sourceGrid) : (Number(base.attack)||0)));
   return {attack:attackBase+bonus.attack,speed:(Number(base.speed)||0)+bonus.speed,passive:(Number(base.passive)||0)+bonus.passive};
 }
-function saveSkins(){try{localStorage.setItem("skin_selections_v1",JSON.stringify(skinSelections));}catch(e){} updateTotal();}
+function saveSkins(){syncSkinGlobalsToStore();persistSkinStore(); updateTotal();}
 
 let boardMode="normal";
 let honorHel=false;try{honorHel=localStorage.getItem("honor_hel_v1")==="1"}catch(e){}
@@ -782,9 +811,8 @@ const HONOR_TIERS=[{v:40,label:"1w〜80w"},{v:50,label:"81w〜90w"},{v:60,label:
 let honorTier=60,honorKyoubou=0,honorKyFlags=[false,false];
 try{const t=Number(localStorage.getItem("honor_hel_tier_v1"));if(HONOR_TIERS.some(x=>x.v===t))honorTier=t;const kf=localStorage.getItem("honor_hel_kyflags_v1");if(kf&&/^[01]{2}$/.test(kf))honorKyFlags=[kf[0]==="1",kf[1]==="1"];honorKyoubou=honorKyFlags.filter(Boolean).length}catch(e){}
 function honorPenalty(){return honorTier+6*honorKyoubou}
-let steamEra=0,otherPassive=0;
-try{const a=Number(localStorage.getItem("steam_era_v1"));if([0,8,10,12,14,16].includes(a))steamEra=a;const b=Number(localStorage.getItem("other_passive_v1"));if(Number.isFinite(b))otherPassive=b}catch(e){}
-function extraPassive(){return ((boardMode==="collapseSpace"||boardMode==="godTrial")?0:steamEra)+otherPassive}
+let steamEra=skinStore.normal.steamEra,otherPassive=skinStore.normal.otherPassive;
+function extraPassive(){return extraPassiveFor(boardMode)}
 let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
 let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null), battleRoyale1Grid=Array.from({length:24},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
@@ -921,7 +949,7 @@ function updateTotal(){
    else if(boardMode==="godTrial") breakdown.innerHTML="神の試練のみの合計";
    else if(boardMode==="battleRoyale1") breakdown.innerHTML="バトロワ変形1のみの合計";
    else{
-     const a=calcGridStats(normalGrid), b=calcGridStats(opponentGrid);a.pas+=extraPassive();
+     const a=calcGridStats(normalGrid), b=calcGridStats(opponentGrid);a.pas+=extraPassiveFor("normal");
      const both=boardMode==="opponent"||(normalGrid.some(Boolean)&&opponentGrid.some(Boolean));const ha=honorAdj(a),hb=honorAdj(b);
      breakdown.innerHTML=both?'<b>自分＋相手 合計</b>　攻撃 '+fmt(ha.atk+hb.atk)+'% ｜ 速度 '+fmt(ha.spd+hb.spd)+'% ｜ パッシブ '+fmt(ha.pas+hb.pas)+'%':'';
    }
@@ -1178,8 +1206,15 @@ document.getElementById("clearBtn").addEventListener("click",async()=>{
  selected=-1;render();
 });
 function saveCurrentBoard(){try{if(boardMode==="battleRoyale1"){battleRoyale1Grid=grid;localStorage.setItem("grid_battle_royale_1_v1",JSON.stringify(battleRoyale1Grid));}else if(boardMode==="collapseSpace"){collapseSpaceGrid=grid;localStorage.setItem("grid_collapse_space_30_v1",JSON.stringify(collapseSpaceGrid));}else if(boardMode==="godTrial"){godTrialGrid=grid;localStorage.setItem("grid_god_trial_30_v2",JSON.stringify(godTrialGrid));}else if(boardMode==="opponent"){opponentGrid=grid;localStorage.setItem("grid_opponent_24_v1",JSON.stringify(opponentGrid));}else{normalGrid=grid;localStorage.setItem("grid_stack_drag_24_v1",JSON.stringify(normalGrid));}}catch(e){}}
+function refreshSkinModeUI(){
+ const lab=document.getElementById("skinModeLabel");if(lab)lab.textContent="設定先："+SKIN_MODE_LABELS[boardMode]+"（盤面ごとに個別保存）";
+ const btn=document.getElementById("copyNormalSkinBtn");if(btn)btn.style.display=boardMode==="normal"?"none":"";
+ const sel=document.getElementById("steamEraSel");if(sel)sel.value=String(steamEra);
+ const inp=document.getElementById("otherPassiveInput");if(inp)inp.value=otherPassive?String(otherPassive):"";
+ renderSkinUI();
+}
 function switchBoardMode(mode){
- saveCurrentBoard();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="battleRoyale1"?battleRoyale1Grid:(mode==="opponent"?opponentGrid:normalGrid)));selected=-1;dragData=null;
+ saveCurrentBoard();syncSkinGlobalsToStore();persistSkinStore();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="battleRoyale1"?battleRoyale1Grid:(mode==="opponent"?opponentGrid:normalGrid)));selected=-1;dragData=null;applySkinMode(mode);
  document.body.classList.toggle("opponent-board",mode==="opponent");
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("opponentModeBtn").classList.toggle("active",mode==="opponent");
@@ -1187,6 +1222,7 @@ function switchBoardMode(mode){
  document.getElementById("godTrialBtn").classList.toggle("active",mode==="godTrial");
  document.getElementById("battleRoyale1Btn").classList.toggle("active",mode==="battleRoyale1");
  syncDebuffUI();
+ refreshSkinModeUI();
  render();
 }
 document.getElementById("normalModeBtn").addEventListener("click",()=>switchBoardMode("normal"));
@@ -2260,8 +2296,18 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
   const sel=document.getElementById('steamEraSel'),inp=document.getElementById('otherPassiveInput');
   if(!sel||!inp)return;
   sel.value=String(steamEra);inp.value=otherPassive?String(otherPassive):'';
-  sel.addEventListener('change',()=>{steamEra=Number(sel.value)||0;try{localStorage.setItem('steam_era_v1',String(steamEra))}catch(e){}updateTotal()});
-  inp.addEventListener('input',()=>{const n=parseFloat(inp.value);otherPassive=Number.isFinite(n)?n:0;try{localStorage.setItem('other_passive_v1',String(otherPassive))}catch(e){}updateTotal()});
+  sel.addEventListener('change',()=>{steamEra=Number(sel.value)||0;syncSkinGlobalsToStore();persistSkinStore();updateTotal()});
+  inp.addEventListener('input',()=>{const n=parseFloat(inp.value);otherPassive=Number.isFinite(n)?n:0;syncSkinGlobalsToStore();persistSkinStore();updateTotal()});
+  const copyBtn=document.getElementById('copyNormalSkinBtn');
+  if(copyBtn)copyBtn.addEventListener('click',async()=>{
+    if(boardMode==="normal")return;
+    if(!(await uiConfirm("通常盤面のスキン設定（スキン選択・蒸気時代・その他パッシブ）を「"+SKIN_MODE_LABELS[boardMode]+"」にコピーしますか？")))return;
+    const src=skinStore.normal,copied={};
+    Object.keys(src.selections).forEach(k=>{copied[k]=[...src.selections[k]];});
+    skinStore[boardMode].selections=copied;skinStore[boardMode].steamEra=src.steamEra;skinStore[boardMode].otherPassive=src.otherPassive;
+    applySkinMode(boardMode);persistSkinStore();refreshSkinModeUI();updateTotal();
+  });
+  refreshSkinModeUI();
 })();
 
 (()=>{
@@ -2288,7 +2334,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     return {atk,spd,pas};
   }
   function finalStats(g){
-    const r=rawStats(g),pas=r.pas+extraPassive();
+    const r=rawStats(g),pas=r.pas+extraPassiveFor(modeOfGrid(g));
     if(!honorHel)return {atk:r.atk,spd:r.spd,pas};
     const p=pas-honorPenalty(),f=Math.max(0,1+p/100);
     return {atk:r.atk*f,spd:r.spd*f,pas:p};
