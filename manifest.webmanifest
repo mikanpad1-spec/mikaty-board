@@ -1,6 +1,6 @@
 {
-  "name": "盤面シミュレーター・氷晶ログ・中国イベントカレンダー",
-  "short_name": "盤面・氷晶・中国イベント",
+  "name": "ぺんぎんなび！（ペタペタペンギン団ツール集）",
+  "short_name": "ぺんぎんなび！",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
