@@ -1136,7 +1136,7 @@ function buildCard(i){
  c.addEventListener("dragstart",e=>{dragData={type:"char",char:i};e.dataTransfer.effectAllowed="copy"});
  c.addEventListener("touchstart",()=>{dragData={type:"char",char:i}},{passive:true});
  c.addEventListener("touchend",e=>{
-   const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,Math.max(4,t.clientY-76)),target=el&&el.closest(".slot,.extra");
+   const t=e.changedTouches[0],el=document.elementFromPoint(t.clientX,t.clientY),target=el&&el.closest(".slot,.extra");
    if(target){dropOn(Number(target.dataset.index));e.preventDefault()}
  },{passive:false});
  c.addEventListener("click",()=>{
@@ -1424,8 +1424,8 @@ document.addEventListener("DOMContentLoaded",()=>{
 
   const ghost=document.createElement('div'); ghost.id='touchGhost'; document.body.appendChild(ghost);
   let touch=null, moved=false, startX=0, startY=0;
-  // ドラッグ中のキャラと判定位置は指の76px上に出す（指で隠れて狙えない問題の対策。カード側touchendの判定も同じ76px）
-  const aimY=y=>Math.max(4,y-76);
+  // ドラッグ中のキャラと判定位置は指の位置そのもの（2026-11-10 本人の希望で76px上オフセットを廃止。カード側touchendの判定も同じ）
+  const aimY=y=>y;
   const showGhost=(ci,x,y)=>{ghost.replaceChildren(makeImg(chars[ci]));ghost.style.display='flex';ghost.style.left=x+'px';ghost.style.top=y+'px'};
   const hideGhost=()=>{ghost.style.display='none';document.querySelectorAll('.touchMoving').forEach(e=>e.classList.remove('touchMoving'))};
   document.addEventListener('touchstart',e=>{
