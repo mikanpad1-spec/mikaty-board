@@ -5,42 +5,46 @@
 <meta name="robots" content="index,follow">
 <meta name="keywords" content="ペタペン盤面シュミレーター,ペタペン盤面シミュレーター,ペタペタペンギン団,盤面シミュレーター,編成シミュレーター">
 <style>
-*{box-sizing:border-box}html,body{margin:0;background:#08111f;color:#f5f8fc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
-main{max-width:1120px;margin:auto;padding:18px 10px 38px}h1{font-size:25px;margin:0 0 5px}.sub{color:#9aadc5;margin:0 0 12px;font-size:14px}.seoIntro{color:#8295ad;margin:0 0 8px;font-size:12px}
-.tools{display:flex;gap:8px;margin:10px 0;align-items:center;flex-wrap:wrap}button{background:#19304d;border:1px solid #365574;color:#fff;border-radius:9px;padding:9px 12px;font-weight:700}
-.count{margin-left:auto;background:#132640;border:1px solid #365574;border-radius:10px;padding:9px 13px;font-weight:800;white-space:nowrap}.count b{font-size:20px;margin-left:5px}
+:root{--bg:#f4f8fd;--card:#ffffff;--tx:#1d2b45;--sub:#6b7a93;--line:#dbe4f0;--ac:#2f6fd0;--dn:#d6453d;--sel:#e3eeff;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161d;--card:#1b2230;--tx:#e6ecf7;--sub:#93a0b8;--line:#2c3649;--ac:#6aa3ff;--dn:#ff7b73;--sel:#26344d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12161d;--card:#1b2230;--tx:#e6ecf7;--sub:#93a0b8;--line:#2c3649;--ac:#6aa3ff;--dn:#ff7b73;--sel:#26344d;color-scheme:dark}
+
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--tx);font-family:"Zen Kaku Gothic New",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+main{max-width:1120px;margin:auto;padding:18px 10px 38px}h1{font-size:25px;margin:0 0 5px}.sub{color:var(--sub);margin:0 0 12px;font-size:14px}.seoIntro{color:var(--sub);margin:0 0 8px;font-size:12px}
+.tools{display:flex;gap:8px;margin:10px 0;align-items:center;flex-wrap:wrap}button{background:var(--sel);border:1px solid var(--line);color:var(--tx);border-radius:10px;padding:9px 12px;font-weight:700}
+.count{margin-left:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 13px;font-weight:800;white-space:nowrap}.count b{font-size:20px;margin-left:5px}
 .boardScroll{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:5px}
-.board{display:grid;grid-template-columns:repeat(6,105px);grid-template-rows:repeat(3,105px);gap:5px;background:#102039;padding:7px;border-radius:13px;width:max-content}
-.slot,.extra{background:#1a304e;border:1px solid #36516f;border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
-.slot.empty:after,.extra.empty:after{content:"＋";font-size:27px;color:#547397}.slot.selected,.extra.selected{outline:3px solid #f1ca52;outline-offset:-3px}
+.board{display:grid;grid-template-columns:repeat(6,105px);grid-template-rows:repeat(3,105px);gap:5px;background:var(--sel);padding:7px;border-radius:13px;width:max-content}
+.slot,.extra{background:var(--card);border:1px solid var(--line);border-radius:8px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative;cursor:pointer}
+.slot.empty:after,.extra.empty:after{content:"＋";font-size:27px;color:var(--sub)}.slot.selected,.extra.selected{outline:3px solid #f1ca52;outline-offset:-3px}
 .slot img,.extra img,.card img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain;filter:drop-shadow(2px 0 0 #fff) drop-shadow(-2px 0 0 #fff) drop-shadow(0 2px 0 #fff) drop-shadow(0 -2px 0 #fff)}
 .badge{position:absolute;right:5px;bottom:5px;background:#08111fe8;border:1px solid #d9e5f5;border-radius:7px;padding:2px 6px;font-weight:900;font-size:16px;line-height:1.2;text-shadow:0 1px 2px #000}
-.bottomRow{display:flex;align-items:center;gap:8px;margin-top:10px;width:max-content}.extra{width:105px;height:105px}.bottomCount{margin-left:10px;background:#132640;border:1px solid #365574;border-radius:10px;padding:10px 14px;font-weight:800;white-space:nowrap}.bottomCount b{font-size:22px;margin-left:5px}
-h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.card{aspect-ratio:1;background:#172b46;border:1px solid #35506d;border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;cursor:pointer}
-.tip{font-size:12px;line-height:1.55;color:#91a6c0}
+.bottomRow{display:flex;align-items:center;gap:8px;margin-top:10px;width:max-content}.extra{width:105px;height:105px}.bottomCount{margin-left:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 14px;font-weight:800;white-space:nowrap}.bottomCount b{font-size:22px;margin-left:5px}
+h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:7px}.card{aspect-ratio:1;background:var(--card);border:1px solid var(--line);border-radius:9px;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:4px;cursor:pointer}
+.tip{font-size:12px;line-height:1.55;color:var(--sub)}
 @media(min-width:700px){main{padding:22px 14px 40px}.board{grid-template-columns:repeat(6,130px);grid-template-rows:repeat(3,130px);gap:6px}.extra{width:130px;height:130px}.pool{display:flex;flex-wrap:wrap}.card{width:110px;height:110px;aspect-ratio:auto}}
 
-.statsBox{margin-left:auto;background:#132640;border:1px solid #365574;border-radius:10px;padding:8px 13px;line-height:1.5;min-width:155px}
-.statsBox b{font-size:18px}.admin{margin-top:24px;background:#101d30;border:1px solid #29435f;border-radius:14px;padding:14px}
-.admin h2{margin:0 0 6px}.adminNote{font-size:12px;color:#91a6c0;margin:0 0 10px}
-.adminGrid{display:grid;gap:8px}.adminRow{display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;align-items:center;background:#152842;padding:7px;border-radius:9px}
-.adminRow img{width:56px;height:56px;object-fit:contain}.adminRow label{font-size:12px;color:#aabbd0}.adminRow input{width:100%;margin-top:3px;background:#081421;color:white;border:1px solid #3a5573;border-radius:7px;padding:8px;font-size:16px}
+.statsBox{margin-left:auto;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 13px;line-height:1.5;min-width:155px}
+.statsBox b{font-size:18px}.admin{margin-top:24px;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px}
+.admin h2{margin:0 0 6px}.adminNote{font-size:12px;color:var(--sub);margin:0 0 10px}
+.adminGrid{display:grid;gap:8px}.adminRow{display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;align-items:center;background:var(--bg);padding:7px;border-radius:9px}
+.adminRow img{width:56px;height:56px;object-fit:contain}.adminRow label{font-size:12px;color:var(--sub)}.adminRow input{width:100%;margin-top:3px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:7px;padding:8px;font-size:16px}
 @media(min-width:700px){.adminGrid{grid-template-columns:repeat(2,1fr)}}
 
-.charCardWrap{display:flex;flex-direction:column;align-items:center;gap:4px}.charName{font-size:12px;font-weight:800;text-align:center;color:#eaf2ff;line-height:1.2}
-.adminName{font-size:12px;font-weight:800;text-align:center;color:#eaf2ff}
+.charCardWrap{display:flex;flex-direction:column;align-items:center;gap:4px}.charName{font-size:12px;font-weight:800;text-align:center;color:var(--tx);line-height:1.2}
+.adminName{font-size:12px;font-weight:800;text-align:center;color:var(--tx)}
 
-.sectionTitle{font-size:17px;font-weight:900;margin:12px 0 7px;color:#eef5ff}.dungeonTitle{margin-top:15px}
-.debuff{border-top:1px solid #365574;margin-top:8px;padding-top:8px;font-size:13px}
+.sectionTitle{font-size:17px;font-weight:900;margin:12px 0 7px;color:var(--tx)}.dungeonTitle{margin-top:15px}
+.debuff{border-top:1px solid var(--line);margin-top:8px;padding-top:8px;font-size:13px}
 .debuff strong{display:block;margin-bottom:5px}.debuff label{display:block;margin:4px 0;cursor:pointer}.debuff input{width:17px;height:17px;vertical-align:-3px;margin-right:4px}
 
-.roleSection{margin:14px 0}.roleSection h3{font-size:15px;margin:0 0 7px;padding-left:8px;border-left:4px solid #6787ad;color:#eaf2ff}
+.roleSection{margin:14px 0}.roleSection h3{font-size:15px;margin:0 0 7px;padding-left:8px;border-left:4px solid var(--ac);color:var(--tx)}
 
 /* スキン設定 */
-.skinPanel{margin:14px 0;padding:12px;background:#10223a;border:1px solid #29466a;border-radius:14px;color:#fff}
+.skinPanel{margin:14px 0;padding:12px;background:var(--card);border:1px solid var(--line);border-radius:14px;color:var(--tx)}
 .skinPanel h2{margin:0 0 10px;font-size:18px}.skinTop{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-.skinTop select{min-height:42px;background:#0b1728;color:#fff;border:1px solid #49698f;border-radius:10px;padding:8px 10px;font-size:16px;flex:1;min-width:180px}
-.skinChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}.skinChoice{display:flex;align-items:center;gap:7px;background:#152842;border:1px solid #2b4566;border-radius:10px;padding:9px;font-size:14px}.skinChoice input{width:20px;height:20px;flex:none}.skinEffect{margin-top:10px;background:#0b1728;border-radius:10px;padding:10px;line-height:1.7;font-size:14px}.skinLimit{color:#a9bdd5;font-size:12px;margin-top:7px}.skinError{color:#ff9b9b;font-size:12px;min-height:1.2em;margin-top:4px}
+.skinTop select{min-height:42px;background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:16px;flex:1;min-width:180px}
+.skinChoices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px;margin-top:10px}.skinChoice{display:flex;align-items:center;gap:7px;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:14px}.skinChoice input{width:20px;height:20px;flex:none}.skinEffect{margin-top:10px;background:var(--bg);border-radius:10px;padding:10px;line-height:1.7;font-size:14px}.skinLimit{color:var(--sub);font-size:12px;margin-top:7px}.skinError{color:var(--dn);font-size:12px;min-height:1.2em;margin-top:4px}
 @media(max-width:699px){.skinPanel{margin:10px 0;padding:10px}.skinChoices{grid-template-columns:1fr}.skinChoice{padding:7px 9px}.skinEffect{padding:8px}}
 
 /* rarity section individual collapse */
@@ -49,7 +53,7 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
 .roleSection.rarityCollapsed h3::after{content:"▼"}
 .roleSection.rarityCollapsed .pool{display:none!important}
 @media(max-width:699px){
-  .roleSection.activeRole h3{display:flex!important;background:#10243d;border-radius:8px;padding:7px 9px;margin:0 0 4px;border-left:4px solid #6787ad}
+  .roleSection.activeRole h3{display:flex!important;background:var(--sel);border-radius:8px;padding:7px 9px;margin:0 0 4px;border-left:4px solid var(--ac)}
 }
 </style>
 <style>
@@ -118,8 +122,8 @@ h2{font-size:18px;margin:20px 0 8px}.pool{display:grid;grid-template-columns:rep
   .card{padding:1px;border-radius:6px}.card img{max-width:100%;max-height:100%}
   .card,.slot,.extra{touch-action:none;-webkit-user-select:none;user-select:none}
 }
-.touchMoving{outline:3px solid #6eb7ff!important;outline-offset:-3px}
-#touchGhost{position:fixed;z-index:100000;pointer-events:none;width:64px;height:64px;display:none;align-items:center;justify-content:center;background:#172b46dd;border:2px solid #6eb7ff;border-radius:10px;transform:translate(-50%,-50%)}
+.touchMoving{outline:3px solid var(--ac)!important;outline-offset:-3px}
+#touchGhost{position:fixed;z-index:100000;pointer-events:none;width:64px;height:64px;display:none;align-items:center;justify-content:center;background:var(--sel);border:2px solid var(--ac);border-radius:10px;transform:translate(-50%,-50%)}
 #touchGhost img{max-width:100%;max-height:100%;object-fit:contain}
 </style>
 
@@ -319,11 +323,11 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 .roleSection h3::after{content:none!important}
 .roleSection h3{cursor:default!important}
 .rarityHeadLeft{display:flex;align-items:center;gap:7px;min-width:0}
-.rarityCount{font-size:11px;font-weight:700;color:#9fb4cc;background:#0a1728;border:1px solid #294866;border-radius:999px;padding:2px 7px;white-space:nowrap}
-.rarityToggleBtn{margin-left:auto;flex:none;border:1px solid #4d6f94;background:#183451;color:#f2f7ff;border-radius:8px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;line-height:1.2}
-.rarityToggleBtn:hover{background:#21476d}
+.rarityCount{font-size:11px;font-weight:700;color:var(--sub);background:var(--bg);border:1px solid var(--line);border-radius:999px;padding:2px 7px;white-space:nowrap}
+.rarityToggleBtn{margin-left:auto;flex:none;border:1px solid var(--line);background:var(--sel);color:var(--tx);border-radius:8px;padding:5px 10px;font-size:12px;font-weight:800;cursor:pointer;line-height:1.2}
+.rarityToggleBtn:hover{background:var(--ac);color:#fff}
 .roleSection.rarityCollapsed h3{opacity:.78}
-.roleSection.rarityCollapsed .rarityToggleBtn{background:#24527d;border-color:#6c9ac8;color:#fff;opacity:1}
+.roleSection.rarityCollapsed .rarityToggleBtn{background:var(--ac);border-color:var(--ac);color:#fff;opacity:1}
 @media(max-width:699px){.rarityToggleBtn{padding:6px 9px;font-size:11px}.rarityCount{font-size:10px;padding:2px 6px}}
 </style>
 
@@ -472,8 +476,9 @@ main>.honorPanel{grid-column:1/-1!important}
 #attrKindsItem b,#raceKindsItem b{color:#fff}
 @media(max-width:699px){.charTags{max-width:58px;gap:1px}.ctag{font-size:8px;padding:0 3px}.rosterKinds{font-size:11px}}
 </style>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
 </head><body>
-<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:#16233c;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:rgba(255,255,255,.10);color:#cfd9ea;text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:#2f6fd0;color:#fff}</style><nav class="hubnav"><a href="./index.html" class="on">盤面</a><a href="./ice.html">氷晶</a><a href="./events.html">イベント</a></nav>
+<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:#16233c;font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:rgba(255,255,255,.10);color:#cfd9ea;text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:#2f6fd0;color:#fff}</style><nav class="hubnav"><a href="./index.html" class="on">盤面</a><a href="./ice.html">氷晶</a><a href="./events.html">イベント</a></nav>
 
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <div class="jumpLinks"><a href="#skinPanel">↓ スキン設定へ</a><a href="#honorHelPanel">↓ 栄誉ヘル詳細設定</a></div>
@@ -503,7 +508,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <section class="skinPanel" id="skinPanel">
 <h2>スキン設定</h2>
 <div class="skinLimit">各キャラのスキン効果は最大3つまで選択できます。</div>
-<style>.skinModeRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}.skinModeRow span{font-size:13px;color:#a9bdd5}.skinModeRow button{min-height:38px;background:#1d3a60;color:#fff;border:1px solid #49698f;border-radius:10px;padding:7px 12px;font-size:14px;cursor:pointer}</style>
+<style>.skinModeRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:4px 0 2px}.skinModeRow span{font-size:13px;color:var(--sub)}.skinModeRow button{min-height:38px;background:var(--sel);color:var(--tx);border:1px solid var(--line);border-radius:10px;padding:7px 12px;font-size:14px;cursor:pointer}</style>
 <div class="skinModeRow"><span id="skinModeLabel">設定先：通常盤面（盤面ごとに個別保存）</span><button id="copyNormalSkinBtn" type="button" style="display:none">通常盤面の設定をコピー</button><button id="resetSkinDefaultBtn" type="button">初期値に戻す</button></div>
 <div id="skinList"></div>
 <div id="skinExtra" class="skinExtra">
