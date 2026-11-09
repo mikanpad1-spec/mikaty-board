@@ -1,0 +1,360 @@
+<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>イベントカレンダー</title>
+<meta name="description" content="ゲームイベントの開催期間を月カレンダーで確認できるイベントカレンダー。実装済みイベントや詳細画像もチェックできます。">
+<meta name="theme-color" media="(prefers-color-scheme:light)" content="#f4f8fd">
+<meta name="theme-color" media="(prefers-color-scheme:dark)" content="#12161d">
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+/* 氷晶ログと同じ氷色の月カレンダー。イベントは日をまたぐ帯で描き、実装済みには赤い丸を付ける */
+:root{--bg:#f4f8fd;--card:#ffffff;--tx:#1d2b45;--sub:#6b7a93;--line:#dbe4f0;--ac:#2f6fd0;--red:#d6453d;--redbg:#fdeceb;--sel:#e3eeff;
+--b1:#dce9fb;--t1:#1d3a6b;--b2:#d3efec;--t2:#14524d;--b3:#e6e1fa;--t3:#3f3487;--b4:#fbebca;--t4:#6b4a0f;
+--scrim:rgba(14,22,38,.55);--scrim2:rgba(8,12,22,.92);
+--font:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#12161d;--card:#1b2230;--tx:#e6ecf7;--sub:#93a0b8;--line:#2c3649;--ac:#6aa3ff;--red:#ff7b73;--redbg:#3a2224;--sel:#26344d;
+--b1:#243a5c;--t1:#bcd4ff;--b2:#1d4440;--t2:#a8e6df;--b3:#38336a;--t3:#cfc8ff;--b4:#55431f;--t4:#f2d79b;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#12161d;--card:#1b2230;--tx:#e6ecf7;--sub:#93a0b8;--line:#2c3649;--ac:#6aa3ff;--red:#ff7b73;--redbg:#3a2224;--sel:#26344d;
+--b1:#243a5c;--t1:#bcd4ff;--b2:#1d4440;--t2:#a8e6df;--b3:#38336a;--t3:#cfc8ff;--b4:#55431f;--t4:#f2d79b;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:var(--font);font-size:14px;line-height:1.5;
+padding-block:14px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:560px;margin:0 auto;display:grid;gap:12px}
+h1{font-size:20px;margin:4px 0 0;font-weight:700}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;min-width:0}
+button{font:inherit;border:1px solid var(--line);border-radius:10px;padding:8px 14px;background:var(--bg);color:var(--tx);font-weight:700;cursor:pointer}
+button:disabled{opacity:.35;cursor:default}
+button:focus-visible,.day:focus-visible,.item:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.mk{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--red);flex:none;box-shadow:0 0 0 1.5px var(--card)}
+.legend{display:flex;align-items:center;gap:8px;font-size:13px;background:var(--redbg);border-radius:10px;padding:8px 12px}
+.legend.l2{background:var(--sel)}
+.pic{width:13px;height:13px;flex:none;color:var(--ac);display:inline-block;vertical-align:-2px}
+.bar .pic{width:11px;height:11px;color:inherit;opacity:.85}
+.foot{display:grid;gap:10px;margin-top:4px;text-align:center}
+.foot .lead{font-size:13px;font-weight:700;color:var(--tx)}
+.foot a.dc{display:flex;align-items:center;gap:12px;text-align:left;background:#5865f2;color:#fff;font-weight:700;text-decoration:none;border-radius:14px;padding:14px 16px;box-shadow:0 4px 0 #3c46b8,0 8px 18px rgba(88,101,242,.35);line-height:1.45}
+.foot a.dc:active{transform:translateY(2px);box-shadow:0 2px 0 #3c46b8}
+.foot a.dc .tx{flex:1;min-width:0}
+.foot a.dc .go{display:block;font-size:12px;font-weight:500;opacity:.9;margin-top:2px}
+.foot a.dc svg{width:30px;height:30px;flex:none}
+.foot a.dc .ar{width:22px;height:22px}
+.foot a.dc:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.credit{font-size:12px;color:var(--sub);line-height:1.8;user-select:text}
+.credit b{color:var(--tx)}
+.legend .mk{width:11px;height:11px;box-shadow:none}
+.nav{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.nav strong{font-size:17px}
+.dows,.days{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.dows div{text-align:center;font-size:12px;color:var(--sub);padding:2px 0 4px}
+.week{border-top:1px solid var(--line)}
+.day{text-align:left;border:0;border-radius:0;background:none;padding:3px 0 2px 4px;font-size:12px;font-weight:500;color:var(--tx);height:26px;font-family:inherit}
+.day span{display:inline-block;min-width:19px;height:19px;line-height:19px;text-align:center;border-radius:10px}
+.day.out{color:var(--sub);opacity:.55}
+.day.we{color:var(--sub)}
+.day.today span{background:var(--ac);color:var(--card);font-weight:700}
+.day.sel span{box-shadow:0 0 0 2px var(--ac)}
+.bars{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));grid-auto-rows:22px;row-gap:2px;padding-bottom:4px;min-height:52px;
+background-image:repeating-linear-gradient(to right,var(--line) 0,var(--line) 1px,transparent 1px,transparent calc(100% / 7))}
+.bar{display:flex;align-items:center;gap:3px;min-width:0;margin:0 1px;padding:0 4px;font-size:11px;font-weight:700;line-height:22px;white-space:nowrap;overflow:hidden;border-radius:4px}
+.bar span.n{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.bar.cl{border-top-left-radius:0;border-bottom-left-radius:0;margin-left:0}
+.bar.cr{border-top-right-radius:0;border-bottom-right-radius:0;margin-right:0}
+.c0{background:var(--b1);color:var(--t1)}.c1{background:var(--b2);color:var(--t2)}.c2{background:var(--b3);color:var(--t3)}.c3{background:var(--b4);color:var(--t4)}
+.hd{display:flex;justify-content:space-between;align-items:baseline;gap:8px;margin-bottom:8px}
+.hd strong{font-size:15px}
+.hd small{color:var(--sub);font-size:12px}
+.list{display:grid;gap:0}
+.item{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:2px 8px;padding:9px 6px;border-top:1px solid var(--line);align-items:center;border-radius:0}
+.item:first-child{border-top:0}
+.item .nm{display:flex;align-items:center;gap:7px;font-weight:700;min-width:0}
+.item .nm span.t{overflow-wrap:anywhere}
+.item .dt{grid-column:1;font-size:13px;color:var(--sub);font-variant-numeric:tabular-nums}
+.pill{font-size:11px;font-weight:700;border-radius:999px;padding:1px 9px;white-space:nowrap;border:1px solid var(--line);color:var(--sub);grid-column:2;grid-row:1}
+.pill.on{background:var(--ac);color:var(--card);border-color:var(--ac)}
+.pill.soon{color:var(--ac);border-color:var(--ac)}
+.tag{grid-column:2;grid-row:2;justify-self:end;font-size:11px;color:var(--red);font-weight:700}
+.item.hl{background:var(--sel)}
+.empty{color:var(--sub);font-size:13px;padding:6px 2px}
+.note{font-size:12px;color:var(--sub)}
+.bar,.item{cursor:pointer}
+.bar:focus-visible{outline:2px solid var(--ac);outline-offset:1px}
+.ov{position:fixed;inset:0;z-index:20;background:var(--scrim);display:flex;align-items:flex-end;justify-content:center}
+.ov[hidden]{display:none}
+.sheet{background:var(--card);color:var(--tx);width:100%;max-width:560px;max-height:90%;overflow-y:auto;border-radius:18px 18px 0 0;border:1px solid var(--line);border-bottom:0;
+padding:16px max(16px,env(safe-area-inset-right,0px)) calc(20px + env(safe-area-inset-bottom,0px)) max(16px,env(safe-area-inset-left,0px))}
+.sh{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
+.sh h2{margin:0;font-size:19px;line-height:1.35;display:flex;align-items:center;gap:8px;min-width:0;overflow-wrap:anywhere}
+.sh h2 .mk{width:12px;height:12px}
+.sh button{flex:none;padding:6px 12px}
+.meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 8px;margin:8px 0 12px;font-size:13px;color:var(--sub)}
+.meta .tag{grid-column:auto;grid-row:auto;font-size:12px}
+.meta .pill{grid-column:auto;grid-row:auto}
+.imgs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.imgs button{padding:0;border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--bg);display:block;cursor:zoom-in}
+.imgs img{display:block;width:100%;height:auto}
+.lb{position:fixed;inset:0;z-index:30;background:var(--scrim2);display:flex;align-items:center;justify-content:center;cursor:zoom-out;
+padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-area-inset-bottom,0px) env(safe-area-inset-left,0px)}
+.lb[hidden]{display:none}
+.lb img{max-width:100%;max-height:100%;object-fit:contain}
+.nav .grp{display:flex;gap:8px;align-items:center}
+.jumpRow{display:flex;align-items:center;gap:8px;margin-bottom:10px;font-size:13px;color:var(--sub)}
+.jumpRow select{flex:1;font:inherit;font-size:14px;font-weight:700;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx)}
+.fmtRow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}
+.fmtRow select{flex:1;font:inherit;font-size:14px;font-weight:700;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx)}
+#selCard{scroll-margin-top:14px}
+@media (prefers-reduced-motion:no-preference){.bar{transition:filter .15s}.bar:hover{filter:brightness(.96)}.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
+</style>
+
+</head><body>
+<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:#16233c;font-family:-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:rgba(255,255,255,.10);color:#cfd9ea;text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:#2f6fd0;color:#fff}</style><nav class="hubnav"><a href="./index.html">盤面</a><a href="./ice.html">氷晶</a><a href="./events.html" class="on">イベント</a></nav>
+<div class="wrap">
+<h1>イベントカレンダー</h1>
+<div class="legend"><span class="mk"></span><span>赤いマークは実装済みのイベントです</span></div>
+<div class="legend l2"><span id="lgPic"></span><span>画像マークは、詳細に画像があるイベントです</span></div>
+
+<div class="card" id="searchCard">
+<div class="hd"><strong>イベント形式</strong><small id="qCount"></small></div>
+<div class="fmtRow"><select id="fmt" aria-label="イベント形式で絞り込む"><option value="all">すべての形式</option></select></div>
+<div class="list" id="qList" style="margin-top:6px"></div>
+</div>
+
+<div class="card" id="selCard">
+<div class="hd"><strong id="selTitle"></strong><small id="selSub"></small></div>
+<div class="list" id="selList"></div>
+</div>
+
+<div class="card">
+<div class="nav"><button id="prev" aria-label="前の月">◀</button><strong id="title"></strong><span class="grp"><button id="todayBtn" type="button">今日</button><button id="next" aria-label="次の月">▶</button></span></div>
+<div class="jumpRow"><label for="jump">月ジャンプ</label><select id="jump" aria-label="表示する月を選ぶ"></select></div>
+<div class="dows" id="dows"></div>
+<div id="cal"></div>
+<div class="note" style="margin-top:8px">日付をタップすると、その日のイベントが上に表示されます。</div>
+</div>
+
+<div class="card">
+<div class="hd"><strong id="mTitle"></strong><small id="mCount"></small></div>
+<div class="list" id="mList"></div>
+</div>
+
+<div class="foot">
+<div class="lead">▼ スキン性能・イベントの詳しい情報はこちら ▼</div>
+<a class="dc" href="https://discord.gg/t7RQAK38hw" target="_blank" rel="noopener noreferrer"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 4h16a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/></svg><span class="tx">もっと詳しいスキン性能やイベントについて知りたい人はこちらに<span class="go">タップしてDiscordを開く</span></span><svg class="ar" viewBox="0 0 24 24" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"/></svg></a>
+<div class="credit"><div>製作者:<b>みかてぃ</b></div><div>お問い合わせ discord <b>@m10k4_</b></div></div>
+</div>
+</div>
+
+<div class="ov" id="ov" hidden>
+<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="dName">
+<div class="sh"><h2 id="dName"></h2><button type="button" id="dClose">閉じる</button></div>
+<div class="meta" id="dMeta"></div>
+<div class="imgs" id="dImgs"></div>
+</div>
+</div>
+<div class="lb" id="lb" hidden><img id="lbImg" alt=""></div>
+
+<script src="imgdata1.js"></script>
+<script src="imgdata2.js"></script>
+<script src="imgdata3.js"></script>
+<script src="imgdata4.js"></script>
+<script src="imgdata5.js"></script>
+<script>
+var FMT=["化身イベ","狩人","コラボ","滑り台","コラボ","幸運ガチャ","遺跡","ドライべ","花イベ","コラボ","滑り台","狩人","特殊","特殊","滑り台","コラボ","ドライべ","遺跡","滑り台","コラボ","花イベ","狩人","特殊","滑り台","特殊"];
+var EV=[
+["2026-05-02","2026-05-09","キキララ",0],
+["2026-05-10","2026-05-18","ミカエル実装",1],
+["2026-05-19","2026-05-28","豚復刻",1],
+["2026-05-29","2026-06-04","極上防衛台鯨",1],
+["2026-06-05","2026-06-14","戦隊2弾",1],
+["2026-06-15","2026-06-21","鏡玄実装",0],
+["2026-06-21","2026-06-28","ブッダ実装",0],
+["2026-06-29","2026-07-05","ルンバ",1],
+["2026-07-06","2026-07-12","コインカラー",0],
+["2026-07-13","2026-07-23","西遊記1弾",0],
+["2026-07-24","2026-07-30","世界樹",1],
+["2026-07-31","2026-08-07","イサイカラー",0],
+["2026-08-08","2026-08-23","2周年前半",0],
+["2026-08-16","2026-08-23","2周年後半",0],
+["2026-08-24","2026-08-31","ゲート",0],
+["2026-09-01","2026-09-10","西遊記2弾",0],
+["2026-09-11","2026-09-17","鏡玄カラー",0],
+["2026-09-17","2026-09-23","ウンディーネ実装",0],
+["2026-09-24","2026-09-30","白澤",0],
+["2026-10-01","2026-10-10","西遊記3弾",0],
+["2026-10-11","2026-10-18","魔砲猫",0],
+["2026-10-19","2026-10-25","イグニスカラー",1],
+["2026-10-23","2026-10-25","溶鉱炉",0],
+["2026-10-26","2026-11-01","Joker滑り台",0],
+["2026-11-01","2026-11-09","ハロウィン",1]
+].map(function(e,i){return{id:i,s:e[0],e:e[1],n:e[2],done:!!e[3],c:i%4,f:FMT[i]}});
+/* イベント番号(上の並び順で0から)ごとの詳細画像。画像は img/ に置いて相対パスで指定する */
+var IMG=window.IMG||{};
+var W="日月火水木金土".split("");
+function $(i){return document.getElementById(i)}
+function pic(){var n="http://www.w3.org/2000/svg",s=document.createElementNS(n,"svg");s.setAttribute("viewBox","0 0 16 16");s.setAttribute("class","pic");s.setAttribute("aria-hidden","true");
+  var r=document.createElementNS(n,"rect");r.setAttribute("x","1.5");r.setAttribute("y","2.5");r.setAttribute("width","13");r.setAttribute("height","11");r.setAttribute("rx","2");r.setAttribute("fill","none");r.setAttribute("stroke","currentColor");r.setAttribute("stroke-width","1.5");
+  var c=document.createElementNS(n,"circle");c.setAttribute("cx","5.5");c.setAttribute("cy","6.5");c.setAttribute("r","1.3");c.setAttribute("fill","currentColor");
+  var p=document.createElementNS(n,"path");p.setAttribute("d","M2.5 12l3.5-3.5 2.5 2.5 2-2 3 3");p.setAttribute("fill","none");p.setAttribute("stroke","currentColor");p.setAttribute("stroke-width","1.4");p.setAttribute("stroke-linejoin","round");
+  s.appendChild(r);s.appendChild(c);s.appendChild(p);return s}
+function press(node,fn){
+  node.setAttribute("role","button");node.tabIndex=0;node.onclick=fn;
+  node.onkeydown=function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();fn()}};
+}
+var lastFocus=null;
+function openDetail(ev){
+  lastFocus=document.activeElement;
+  $("dName").innerHTML="";
+  if(ev.done){var m=el("span","mk");m.setAttribute("aria-hidden","true");$("dName").appendChild(m)}
+  $("dName").appendChild(el("span","",ev.n));
+  if(ni0(ev))$("dName").appendChild(pic());
+  var meta=$("dMeta");meta.innerHTML="";
+  var st=status(ev),days=Math.round((D(ev.e)-D(ev.s))/864e5)+1;
+  meta.appendChild(el("span","pill "+st.k,st.t));
+  meta.appendChild(el("span","pill",catOf(ev)));
+  if(ev.done)meta.appendChild(el("span","tag","実装済み"));
+  meta.appendChild(el("span","",md(ev.s)+"("+wd(ev.s)+") 〜 "+md(ev.e)+"("+wd(ev.e)+")・"+days+"日間"));
+  var box=$("dImgs");box.innerHTML="";
+  var list=IMG[ev.id]||[];
+  if(!list.length){box.style.display="block";box.appendChild(el("div","empty","このイベントの画像はまだありません。"))}
+  else{
+    box.style.display="";
+    list.forEach(function(src,i){
+      var b=el("button","");b.type="button";b.setAttribute("aria-label",ev.n+"の画像"+(i+1)+"を拡大");
+      var im=document.createElement("img");im.src=src;im.alt=ev.n+"の画像"+(i+1);im.loading="lazy";
+      b.appendChild(im);b.onclick=function(){$("lbImg").src=src;$("lbImg").alt=im.alt;$("lb").hidden=false};
+      box.appendChild(b);
+    });
+  }
+  $("ov").hidden=false;document.body.style.overflow="hidden";
+  $("dClose").focus();
+}
+function closeDetail(){
+  if(!$("lb").hidden){$("lb").hidden=true;return}
+  $("ov").hidden=true;document.body.style.overflow="";
+  if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}
+}
+function D(k){var p=k.split("-");return Date.UTC(+p[0],+p[1]-1,+p[2])}
+function iso(t){var d=new Date(t);return d.getUTCFullYear()+"-"+String(d.getUTCMonth()+1).padStart(2,"0")+"-"+String(d.getUTCDate()).padStart(2,"0")}
+function md(k){return(+k.slice(5,7))+"/"+(+k.slice(8))}
+function wd(k){return W[new Date(D(k)).getUTCDay()]}
+var now=new Date(),today=now.getFullYear()+"-"+String(now.getMonth()+1).padStart(2,"0")+"-"+String(now.getDate()).padStart(2,"0");
+var MIN="2026-05",MAX="2026-11";
+var ym=today.slice(0,7);if(ym<MIN)ym=MIN;if(ym>MAX)ym=MAX;
+var sel=today;
+function el(tag,cls,txt){var e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=txt;return e}
+function status(ev){
+  var t=D(today);
+  if(t<D(ev.s)){var n=Math.round((D(ev.s)-t)/864e5);return{k:"soon",t:"あと"+n+"日で開始"}}
+  if(t>D(ev.e))return{k:"end",t:"終了"};
+  return{k:"on",t:"開催中"};
+}
+var fmt="all";
+function catOf(ev){return ev.f||"その他"}
+function matchFmt(ev){return fmt==="all"||catOf(ev)===fmt}
+function ni0(ev){return(IMG[ev.id]||[]).length}
+function item(ev,extra){
+  var li=el("div","item"+(extra||""));
+  var nm=el("div","nm");
+  if(ev.done){var m=el("span","mk");m.setAttribute("aria-hidden","true");nm.appendChild(m)}
+  nm.appendChild(el("span","t",ev.n));
+  if(ni0(ev)){var pi=pic();pi.setAttribute("role","img");pi.setAttribute("aria-label","画像あり");nm.appendChild(pi)}
+  li.appendChild(nm);
+  var st=status(ev);li.appendChild(el("span","pill "+st.k,st.t));
+  var days=Math.round((D(ev.e)-D(ev.s))/864e5)+1;
+  var ni=(IMG[ev.id]||[]).length;
+  li.appendChild(el("div","dt",md(ev.s)+"("+wd(ev.s)+") 〜 "+md(ev.e)+"("+wd(ev.e)+")・"+days+"日間"+(ni?"・画像"+ni+"枚":"")+"・"+catOf(ev)));
+  if(ev.done)li.appendChild(el("span","tag","実装済み"));
+  press(li,function(){openDetail(ev)});
+  return li;
+}
+function onDay(k){return EV.filter(function(e){return matchFmt(e)&&D(e.s)<=D(k)&&D(k)<=D(e.e)})}
+function renderSel(){
+  var list=$("selList");list.innerHTML="";
+  var evs=onDay(sel);
+  $("selTitle").textContent=(sel===today?"今日 ":"")+md(sel)+"("+wd(sel)+")のイベント";
+  $("selSub").textContent=evs.length?evs.length+"件":"";
+  if(evs.length){evs.forEach(function(e){list.appendChild(item(e))});return}
+  var nx=EV.filter(function(e){return matchFmt(e)&&D(e.s)>D(sel)}).sort(function(a,b){return D(a.s)-D(b.s)})[0];
+  list.appendChild(el("div","empty","この日に開催中のイベントはありません。"));
+  if(nx){list.appendChild(item(nx))}
+}
+function renderMonth(){
+  var y=+ym.slice(0,4),m=+ym.slice(5);
+  $("title").textContent=y+"年"+m+"月";
+  $("jump").value=ym;
+  $("prev").disabled=ym<=MIN;$("next").disabled=ym>=MAX;
+  var first=Date.UTC(y,m-1,1),last=Date.UTC(y,m,0);
+  var start=first-new Date(first).getUTCDay()*864e5;
+  var weeks=Math.ceil((last-start)/864e5/7+1/7);
+  var cal=$("cal");cal.innerHTML="";
+  for(var w=0;w<weeks;w++){
+    var ws=start+w*7*864e5,we=ws+6*864e5;
+    var wk=el("div","week"),days=el("div","days");
+    for(var c=0;c<7;c++){
+      var t=ws+c*864e5,k=iso(t),d=new Date(t);
+      var b=el("button","day"+(d.getUTCMonth()!==m-1?" out":"")+(c==0||c==6?" we":"")+(k===today?" today":"")+(k===sel?" sel":""));
+      b.type="button";b.appendChild(el("span","",String(d.getUTCDate())));
+      b.setAttribute("aria-label",md(k)+"("+wd(k)+")");
+      (function(kk){b.onclick=function(){sel=kk;renderSel();renderMonth();var c=$("selCard");if(c){var r=c.getBoundingClientRect();if(r.bottom<0||r.top>window.innerHeight)c.scrollIntoView({behavior:"smooth",block:"start"})}}})(k);
+      days.appendChild(b);
+    }
+    wk.appendChild(days);
+    var segs=[];
+    EV.forEach(function(ev){
+      if(!matchFmt(ev))return;
+      var s=D(ev.s),e=D(ev.e);
+      if(e<ws||s>we)return;
+      var cs=Math.max(s,ws),ce=Math.min(e,we);
+      segs.push({ev:ev,a:Math.round((cs-ws)/864e5),b:Math.round((ce-ws)/864e5),cl:s<ws,cr:e>we});
+    });
+    segs.sort(function(x,y){return x.a-y.a||(y.b-y.a)-(x.b-x.a)||x.ev.id-y.ev.id});
+    var lanes=[];
+    segs.forEach(function(sg){
+      var l=0;while(lanes[l]!==undefined&&lanes[l]>=sg.a)l++;
+      lanes[l]=sg.b;sg.l=l;
+    });
+    var bars=el("div","bars");
+    segs.forEach(function(sg){
+      var bar=el("div","bar c"+sg.ev.c+(sg.cl?" cl":"")+(sg.cr?" cr":""));
+      bar.style.gridColumn=(sg.a+1)+" / "+(sg.b+2);bar.style.gridRow=String(sg.l+1);
+      bar.title=sg.ev.n+(sg.ev.done?"(実装済み)":"");
+      if(sg.ev.done){var mk=el("span","mk");mk.setAttribute("aria-hidden","true");bar.appendChild(mk)}
+      bar.appendChild(el("span","n",sg.ev.n));
+      if(ni0(sg.ev))bar.appendChild(pic());
+      (function(ev){press(bar,function(){openDetail(ev)})})(sg.ev);
+      bars.appendChild(bar);
+    });
+    wk.appendChild(bars);cal.appendChild(wk);
+  }
+  var ms=iso(first),me=iso(last);
+  var evs=EV.filter(function(e){return matchFmt(e)&&e.s<=me&&e.e>=ms}).sort(function(a,b){return D(a.s)-D(b.s)||D(a.e)-D(b.e)});
+  $("mTitle").textContent=m+"月のイベント";
+  $("mCount").textContent=evs.length+"件・実装済み "+evs.filter(function(e){return e.done}).length+"件";
+  var ml=$("mList");ml.innerHTML="";
+  if(!evs.length)ml.appendChild(el("div","empty","条件に合うイベントはありません。"));
+  evs.forEach(function(e){ml.appendChild(item(e))});
+}
+var dw=$("dows");W.forEach(function(w){dw.appendChild(el("div","",w))});
+$("prev").onclick=function(){var y=+ym.slice(0,4),m=+ym.slice(5)-1;if(m<1){m=12;y--}ym=y+"-"+String(m).padStart(2,"0");renderMonth()};
+$("next").onclick=function(){var y=+ym.slice(0,4),m=+ym.slice(5)+1;if(m>12){m=1;y++}ym=y+"-"+String(m).padStart(2,"0");renderMonth()};
+$("dClose").onclick=closeDetail;
+$("lb").onclick=function(){$("lb").hidden=true};
+$("ov").onclick=function(e){if(e.target===$("ov"))closeDetail()};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"&&!$("ov").hidden)closeDetail()});
+var jEl=$("jump");
+(function(){var yy=+MIN.slice(0,4),mm=+MIN.slice(5);for(;;){var v=yy+"-"+String(mm).padStart(2,"0");var o=el("option","",yy+"年"+mm+"月");o.value=v;jEl.appendChild(o);if(v===MAX)break;mm++;if(mm>12){mm=1;yy++}}})();
+jEl.onchange=function(){ym=jEl.value;renderMonth()};
+$("todayBtn").onclick=function(){ym=today.slice(0,7);if(ym<MIN)ym=MIN;if(ym>MAX)ym=MAX;sel=today;renderSel();renderMonth()};
+$("lgPic").appendChild(pic());
+function renderSearch(){
+  var list=$("qList");list.innerHTML="";
+  if(fmt==="all"){$("qCount").textContent="";list.appendChild(el("div","empty","形式を選ぶと、期間を問わずその形式のイベントがここに出ます。カレンダーや月のイベントも連動して絞られます。"));return}
+  var hits=EV.filter(function(e){return matchFmt(e)}).sort(function(a,b){return D(a.s)-D(b.s)});
+  $("qCount").textContent=hits.length+"件";
+  if(!hits.length){list.appendChild(el("div","empty","その形式のイベントはありません。"));return}
+  hits.forEach(function(e){list.appendChild(item(e))});
+}
+(function(){var seen={};EV.forEach(function(ev){var f=catOf(ev);if(seen[f])return;seen[f]=1;var o=el("option","",f);o.value=f;$("fmt").appendChild(o)})})();
+$("fmt").addEventListener("change",function(){fmt=this.value;renderSearch();renderSel();renderMonth()});
+renderSearch();
+renderSel();renderMonth();
+</script>
+</body></html>
