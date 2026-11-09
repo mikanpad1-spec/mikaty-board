@@ -1,4 +1,4 @@
-<!doctype html><html lang="ja"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>中国イベントカレンダー</title>
+<!doctype html><html lang="ja"><head><script>try{var _t=localStorage.getItem("ui-theme");if(_t)document.documentElement.setAttribute("data-theme",_t)}catch(e){}</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>中国イベントカレンダー</title>
 <meta name="description" content="ゲームイベントの開催期間を月カレンダーで確認できる中国イベントカレンダー。実装済みイベントや詳細画像もチェックできます。">
 <meta name="theme-color" media="(prefers-color-scheme:light)" content="#f4f8fd">
 <meta name="theme-color" media="(prefers-color-scheme:dark)" content="#12161d">
@@ -104,8 +104,16 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 @media (prefers-reduced-motion:no-preference){.bar{transition:filter .15s}.bar:hover{filter:brightness(.96)}.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
 </style>
 
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="盤面ツール">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161d" media="(prefers-color-scheme: dark)">
 </head><body>
-<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--line);font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:var(--sel);color:var(--sub);text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:var(--ac);color:#fff}</style><nav class="hubnav"><a href="./index.html">盤面</a><a href="./ice.html">氷晶</a><a href="./events.html" class="on">中国イベント</a></nav>
+<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--line);font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:var(--sel);color:var(--sub);text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:var(--ac);color:#fff}.hubtheme{flex:none;margin-left:8px;background:var(--sel);color:var(--sub);border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:15px;cursor:pointer}</style><nav class="hubnav"><a href="./index.html">盤面</a><a href="./ice.html">氷晶</a><a href="./events.html" class="on">中国イベント</a><button type="button" id="themeBtn" class="hubtheme" aria-label="テーマ切り替え"></button></nav>
 <div class="wrap">
 <h1>中国イベントカレンダー</h1>
 <div class="legend"><span class="mk"></span><span>赤いマークは実装済みのイベントです</span></div>
@@ -151,11 +159,11 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 </div>
 <div class="lb" id="lb" hidden><img id="lbImg" alt=""></div>
 
-<script src="imgdata1.js"></script>
-<script src="imgdata2.js"></script>
-<script src="imgdata3.js"></script>
-<script src="imgdata4.js"></script>
-<script src="imgdata5.js"></script>
+
+
+
+
+
 <script>
 var FMT=["化身イベ","狩人","コラボ","滑り台","コラボ","幸運ガチャ","遺跡","ドライべ","花イベ","コラボ","滑り台","狩人","特殊","特殊","滑り台","コラボ","ドライべ","遺跡","滑り台","コラボ","花イベ","狩人","特殊","滑り台","特殊","狩人"];
 var EV=[
@@ -201,6 +209,7 @@ function press(node,fn){
 }
 var lastFocus=null;
 function openDetail(ev){
+  _curEv=ev;
   lastFocus=document.activeElement;
   $("dName").innerHTML="";
   if(ev.done){var m=el("span","mk");m.setAttribute("aria-hidden","true");$("dName").appendChild(m)}
@@ -214,7 +223,7 @@ function openDetail(ev){
   meta.appendChild(el("span","",md(ev.s)+"("+wd(ev.s)+") 〜 "+md(ev.e)+"("+wd(ev.e)+")・"+days+"日間"));
   var box=$("dImgs");box.innerHTML="";
   var list=IMG[ev.id]||[];
-  if(!list.length){box.style.display="block";box.appendChild(el("div","empty","このイベントの画像はまだありません。"))}
+  if(!list.length){box.style.display="block";box.appendChild(el("div","empty",_imgReady?"このイベントの画像はまだありません。":"画像を読み込み中…"));if(!_imgReady)loadIMG()}
   else{
     box.style.display="";
     list.forEach(function(src,i){
@@ -228,6 +237,7 @@ function openDetail(ev){
   $("dClose").focus();
 }
 function closeDetail(){
+  _curEv=null;
   if(!$("lb").hidden){$("lb").hidden=true;return}
   $("ov").hidden=true;document.body.style.overflow="";
   if(lastFocus&&lastFocus.focus)try{lastFocus.focus()}catch(e){}
@@ -355,7 +365,11 @@ function renderSearch(){
 }
 (function(){var seen={};EV.forEach(function(ev){var f=catOf(ev);if(seen[f])return;seen[f]=1;var o=el("option","",f);o.value=f;$("fmt").appendChild(o)})})();
 $("fmt").addEventListener("change",function(){fmt=this.value;renderSearch();renderSel();renderMonth()});
+var IMG={},_imgReady=false,_imgP=null,_curEv=null;
+function loadIMG(){if(_imgP)return _imgP;_imgP=Promise.all([1,2,3,4,5].map(function(n){return new Promise(function(res){var s=document.createElement("script");s.src="imgdata"+n+".js";s.onload=s.onerror=function(){res()};document.head.appendChild(s)})})).then(function(){_imgReady=true;renderSearch();renderSel();renderMonth();if(_curEv&&!$("ov").hidden)openDetail(_curEv)});return _imgP}
 renderSearch();
 renderSel();renderMonth();
+if(window.requestIdleCallback)requestIdleCallback(function(){loadIMG()},{timeout:3000});else setTimeout(loadIMG,1800);
 </script>
+<script>(function(){var b=document.getElementById("themeBtn");if(!b)return;function st(){try{return localStorage.getItem("ui-theme")||"auto"}catch(e){return "auto"}}function paint(){var s=st();b.textContent=s==="dark"?"\u{1F319}":s==="light"?"\u2600\uFE0F":"\u{1F313}";b.title=s==="dark"?"テーマ：ダーク（タップでライト）":s==="light"?"テーマ：ライト（タップで端末に合わせる）":"テーマ：端末に合わせる（タップでダーク）"}b.addEventListener("click",function(){var s=st(),n=s==="auto"?"dark":s==="dark"?"light":"auto";try{if(n==="auto"){localStorage.removeItem("ui-theme");document.documentElement.removeAttribute("data-theme")}else{localStorage.setItem("ui-theme",n);document.documentElement.setAttribute("data-theme",n)}}catch(e){}paint()});paint()})();</script>
 </body></html>

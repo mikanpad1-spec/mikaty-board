@@ -1,4 +1,12 @@
-<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<!doctype html><html><head><script>try{var _t=localStorage.getItem("ui-theme");if(_t)document.documentElement.setAttribute("data-theme",_t)}catch(e){}</script><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style><link rel="manifest" href="./manifest.webmanifest">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="盤面ツール">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<meta name="theme-color" content="#f4f8fd" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#12161d" media="(prefers-color-scheme: dark)">
+</head><body>
 <!DOCTYPE html>
 <html lang="ja">
 <head>
@@ -61,7 +69,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 </style>
 </head>
 <body>
-<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--line);font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:var(--sel);color:var(--sub);text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:var(--ac);color:#fff}</style><nav class="hubnav"><a href="./index.html">盤面</a><a href="./ice.html" class="on">氷晶</a><a href="./events.html">中国イベント</a></nav>
+<style>.hubnav{position:sticky;top:0;z-index:5000;display:flex;gap:6px;padding:8px 10px;background:var(--card);border-bottom:1px solid var(--line);font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif}.hubnav a{flex:1;text-align:center;padding:9px 4px;border-radius:9px;background:var(--sel);color:var(--sub);text-decoration:none;font-size:14px;font-weight:700;line-height:1.2}.hubnav a.on{background:var(--ac);color:#fff}.hubtheme{flex:none;margin-left:8px;background:var(--sel);color:var(--sub);border:1px solid var(--line);border-radius:10px;padding:0 12px;font:inherit;font-size:15px;cursor:pointer}</style><nav class="hubnav"><a href="./index.html">盤面</a><a href="./ice.html" class="on">氷晶</a><a href="./events.html">中国イベント</a><button type="button" id="themeBtn" class="hubtheme" aria-label="テーマ切り替え"></button></nav>
 
 <div class="wrap">
 <h1>❄️ 氷晶ログ</h1>
@@ -351,6 +359,7 @@ $("kdSave").onclick=function(){
 };
 showRes();render();drawKd();
 </script>
+<script>(function(){var b=document.getElementById("themeBtn");if(!b)return;function st(){try{return localStorage.getItem("ui-theme")||"auto"}catch(e){return "auto"}}function paint(){var s=st();b.textContent=s==="dark"?"\u{1F319}":s==="light"?"\u2600\uFE0F":"\u{1F313}";b.title=s==="dark"?"テーマ：ダーク（タップでライト）":s==="light"?"テーマ：ライト（タップで端末に合わせる）":"テーマ：端末に合わせる（タップでダーク）"}b.addEventListener("click",function(){var s=st(),n=s==="auto"?"dark":s==="dark"?"light":"auto";try{if(n==="auto"){localStorage.removeItem("ui-theme");document.documentElement.removeAttribute("data-theme")}else{localStorage.setItem("ui-theme",n);document.documentElement.setAttribute("data-theme",n)}}catch(e){}paint()});paint()})();</script>
 </body>
 </html>
 
