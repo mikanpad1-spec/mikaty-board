@@ -97,6 +97,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 <div style="grid-column:1/-1"><div class="pbar"><i id="pFill" style="width:0%"></i></div><div id="pTxt" style="font-size:12px;margin-top:4px"></div></div>
 <div>今月の増減<b id="sMonth">-</b></div>
 <div>貯蓄ペース(今月)<b id="sAvg">-</b></div>
+<div>このペースなら月(30日)<b id="sMonthEst">-</b></div>
 <div id="sBreak" class="inl" style="grid-column:1/-1;font-size:12px"></div>
 <div id="need" class="inl" style="grid-column:1/-1;font-size:12px"></div>
 <div id="proj" class="inl" style="grid-column:1/-1;font-size:12px"></div>
@@ -248,6 +249,7 @@ function render(){
   }
   $("sMonth").innerHTML=mCnt?"<span class='"+cls(mSum)+"'>"+sg(mSum)+"</span>":"-";
   $("sAvg").innerHTML=(mCnt&&mDays>0)?"<span class='"+cls(mGain/mDays)+"'>"+sg(Math.round(mGain/mDays))+"</span>":"-";
+  $("sMonthEst").innerHTML=(mCnt&&mDays>0)?"<span class='"+cls(mGain/mDays)+"'>"+sg(Math.round(mGain/mDays*30))+"</span>":"-";
   var sb=$("sBreak");
   if(mCnt&&(mGain>0||mSpend<0)){var parts=[];if(mGain>0)parts.push("貯めた量 <b class='up'>"+sg(mGain)+"</b>");if(mSpend<0)parts.push("使った量 <b class='dn'>"+sg(mSpend)+"</b>");sb.innerHTML="今月の内訳："+parts.join(" / ")}else{sb.innerHTML=""}
   $("gLabel").textContent="目標("+short(GOAL)+")まで";drawChart();proj();needRate();
