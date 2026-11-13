@@ -360,6 +360,28 @@ $("kdSave").onclick=function(){
 };
 showRes();render();drawKd();
 </script>
+<style>
+#installBar{position:fixed;left:10px;right:10px;bottom:calc(10px + env(safe-area-inset-bottom,0px));z-index:6000;max-width:560px;margin:0 auto;background:var(--card);color:var(--tx);border:1px solid var(--line);border-radius:14px;box-shadow:0 6px 24px rgba(0,0,0,.18);padding:10px 12px;font-family:"Zen Kaku Gothic New",-apple-system,"Hiragino Sans","Noto Sans JP",sans-serif;transform:translateY(16px);opacity:0;transition:transform .25s ease,opacity .25s ease}
+#installBar.show{transform:none;opacity:1}
+#installBar .hd{display:flex;align-items:center;gap:8px}
+#installBar .ttl{font-size:14px;font-weight:700;line-height:1.3}
+#installBar .sub{font-size:12px;color:var(--sub);line-height:1.3}
+#installBar .how{flex:none;background:none;border:0;color:var(--ac);font:inherit;font-size:13px;font-weight:700;padding:6px 4px;cursor:pointer}
+#installBar .x{flex:none;width:30px;height:30px;border-radius:999px;background:var(--sel);color:var(--sub);border:0;font-size:16px;line-height:1;padding:0;cursor:pointer}
+#installSteps{margin-top:8px;border-top:1px solid var(--line);padding-top:8px}
+#installSteps ol{margin:0;padding-left:20px;font-size:12.5px;color:var(--sub);line-height:1.7}
+#installSteps svg{vertical-align:-3px}
+</style>
+<div id="installBar" hidden>
+<div class="hd"><span aria-hidden="true" style="font-size:18px">📱</span><div style="flex:1;min-width:0"><div class="ttl">アプリとして追加</div><div class="sub">ホーム画面からすぐ開けます</div></div><button type="button" class="how" id="installHow">手順</button><button type="button" class="x" id="installClose" aria-label="閉じる">×</button></div>
+<div id="installSteps" hidden><ol>
+<li id="installStep1">画面下部の「共有」ボタン <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12"/><path d="M7 8l5-5 5 5"/><path d="M5 13v7a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-7"/></svg> をタップ</li>
+<li>「ホーム画面に追加」を選択</li>
+<li>「追加」をタップ</li>
+<li>ホーム画面から開く</li>
+</ol></div>
+</div>
+<script>(function(){var KEY="penguinnavi-install-dismissed-v1";try{if(localStorage.getItem(KEY)==="1")return}catch(e){}var standalone=false;try{standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true}catch(e){}if(standalone)return;var bar=document.getElementById("installBar");if(!bar)return;if(/Android/i.test(navigator.userAgent||"")){var s1=document.getElementById("installStep1");if(s1)s1.textContent="右上の「︙」メニューをタップ"}document.getElementById("installClose").addEventListener("click",function(){try{localStorage.setItem(KEY,"1")}catch(e){}bar.classList.remove("show");setTimeout(function(){bar.hidden=true},260)});var how=document.getElementById("installHow"),steps=document.getElementById("installSteps");how.addEventListener("click",function(){var open=steps.hidden;steps.hidden=!open;how.textContent=open?"たたむ":"手順"});setTimeout(function(){bar.hidden=false;requestAnimationFrame(function(){requestAnimationFrame(function(){bar.classList.add("show")})})},700)})();</script>
 <script>(function(){var b=document.getElementById("themeBtn");if(!b)return;function st(){try{return localStorage.getItem("ui-theme")||"auto"}catch(e){return "auto"}}function paint(){var s=st();b.textContent=s==="dark"?"\u{1F319}":s==="light"?"\u2600\uFE0F":"\u{1F313}";b.title=s==="dark"?"テーマ：ダーク（タップでライト）":s==="light"?"テーマ：ライト（タップで端末に合わせる）":"テーマ：端末に合わせる（タップでダーク）"}b.addEventListener("click",function(){var s=st(),n=s==="auto"?"dark":s==="dark"?"light":"auto";try{if(n==="auto"){localStorage.removeItem("ui-theme");document.documentElement.removeAttribute("data-theme")}else{localStorage.setItem("ui-theme",n);document.documentElement.setAttribute("data-theme",n)}}catch(e){}paint()});paint()})();</script>
 </body>
 </html>
