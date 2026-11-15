@@ -78,6 +78,8 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 <div class="card" id="inputCard">
 <div class="row"><label class="fld"><span>日付</span><input type="date" id="date"></label><label class="fld grow"><span>現在の氷晶数</span><input type="number" id="val" inputmode="numeric" placeholder="例：57963"></label></div>
 <label class="fld" style="margin-top:8px"><span>メモ（何に使った？）</span><input type="text" id="memo" maxlength="100" style="width:100%"></label>
+<div class="row" style="margin-top:8px"><label class="fld grow"><span>使用量（任意）</span><input type="number" id="use" inputmode="numeric" min="0" placeholder="例：20000"></label></div>
+<div class="note" style="margin-top:4px">使用量を入れると、その日の獲得は「前回比＋使用量」で計算され、貯蓄ペースにも周回で貯めた分が入ります。未入力の日は今までどおりです。</div>
 <div class="row" style="margin-top:8px"><button id="save">記録する</button><button class="g" id="del">この日を削除</button></div>
 <div class="res" id="res"></div>
 <details style="margin-top:8px;font-size:12px;color:var(--sub)"><summary>目標を変更</summary>
@@ -88,7 +90,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 </div></details>
 <details style="margin-top:8px;font-size:12px;color:var(--sub)"><summary>データのバックアップ</summary>
 <div class="row" style="margin-top:8px"><button class="g" id="exp" style="padding:6px 10px;font-size:12px">書き出し（JSON）</button><button class="g" id="impBtn" style="padding:6px 10px;font-size:12px">読み込み</button><input type="file" id="imp" accept="application/json,.json" hidden></div>
-<div class="note">記録・メモ・目標・鍵引き記録をJSONファイルに保存／復元できます。復元すると今のデータに上書きされます。ブラウザのデータ消去に備えて、ときどき書き出しをおすすめします。</div></details>
+<div class="note">記録・メモ・使用量・目標・鍵引き記録をJSONファイルに保存／復元できます。復元すると今のデータに上書きされます。ブラウザのデータ消去に備えて、ときどき書き出しをおすすめします。</div></details>
 </div>
 
 <div class="card stats">
@@ -106,7 +108,7 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 <div class="card">
 <div class="nav"><button class="g" id="prev">◀</button><strong id="title"></strong><span style="display:flex;gap:8px"><button class="g" id="todayBtn">今日</button><button class="g" id="next">▶</button></span></div>
 <div class="grid" id="grid"></div>
-<div class="note">日付をタップすると入力欄に呼び出せます。📝はメモのある日、🏁は目標の期日です。増減は直前の記録日との差です。データはこの端末のブラウザに保存されます。</div>
+<div class="note">日付をタップすると入力欄に呼び出せます。📝はメモのある日、🏁は目標の期日です。増減は直前の記録日との差です。使用量を入れた日は、獲得と使用を分けて表示します。データはこの端末のブラウザに保存されます。</div>
 <div id="memos" style="margin-top:10px"></div>
 </div>
 <div class="card"><div class="row" style="justify-content:space-between"><strong>推移</strong><span style="display:flex;gap:6px"><button class="g" id="cr0" style="padding:4px 10px;font-size:12px">全部</button><button class="g" id="cr90" style="padding:4px 10px;font-size:12px">90日</button><button class="g" id="cr30" style="padding:4px 10px;font-size:12px">30日</button></span></div><div id="chart" style="margin-top:8px"></div>
@@ -134,12 +136,13 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 </div>
 
 <script>
-var KEY="ice-log-v1",MKEY="ice-memo-v1",GKEY="ice-goal-v1",GDKEY="ice-goaldate-v1",GOAL=610000,GDATE="",data={},memo={};
+var KEY="ice-log-v1",MKEY="ice-memo-v1",UKEY="ice-use-v1",GKEY="ice-goal-v1",GDKEY="ice-goaldate-v1",GOAL=610000,GDATE="",data={},memo={},use={};
 try{data=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){data={}}
 try{memo=JSON.parse(localStorage.getItem(MKEY)||"{}")}catch(e){memo={}}
+try{use=JSON.parse(localStorage.getItem(UKEY)||"{}")}catch(e){use={}}
 try{var g0=parseInt(localStorage.getItem(GKEY),10);if(g0>0)GOAL=g0}catch(e){}
 try{var gd0=localStorage.getItem(GDKEY);if(gd0&&/^\d{4}-\d\d-\d\d$/.test(gd0))GDATE=gd0}catch(e){}
-function save(){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(MKEY,JSON.stringify(memo))}catch(e){}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(MKEY,JSON.stringify(memo));localStorage.setItem(UKEY,JSON.stringify(use))}catch(e){}}
 function iso(d){return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0")}
 var today=iso(new Date()),sel=today,view=new Date();view.setDate(1);
 var chartRange=0;
@@ -152,12 +155,17 @@ function tm(k){return new Date(k+"T00:00:00").getTime()}
 function daysLeft(){return GDATE?Math.round((tm(GDATE)-tm(today))/86400000):null}
 function prevKey(k){var ks=Object.keys(data).filter(function(x){return x<k}).sort();return ks.length?ks[ks.length-1]:null}
 function diff(k){var p=prevKey(k);return p===null?null:data[k]-data[p]}
+function flow(k){var d=diff(k);if(d===null)return null;var u=use[k];if(u===undefined)return{gain:Math.max(d,0),spend:Math.max(-d,0)};var g=d+u;if(g<0)g=0;return{gain:g,spend:u}}
 function short(n){return Math.abs(n)>=10000?(n/10000).toFixed(2).replace(/\.?0+$/,"")+"万":fmt(n)}
 function showRes(){
   var k=$("date").value;
   if(data[k]===undefined){$("res").innerHTML="";return}
   var d=diff(k),p=prevKey(k);
-  $("res").innerHTML=d===null?"初回の記録です":"前回("+p.slice(5).replace("-","/")+")比 <b class='"+cls(d)+"'>"+sg(d)+"</b>";
+  if(d===null){$("res").innerHTML="初回の記録です";return}
+  var h="前回("+p.slice(5).replace("-","/")+")比 <b class='"+cls(d)+"'>"+sg(d)+"</b>";
+  var fl=flow(k);
+  if(use[k]!==undefined&&fl)h+=" → 獲得 <b class='up'>"+sg(fl.gain)+"</b> ／ 使用 <b class='dn'>"+sg(-fl.spend)+"</b>";
+  $("res").innerHTML=h;
 }
 function drawChart(){
   [0,90,30].forEach(function(r){var b=$("cr"+r);if(b){var on=chartRange===r;b.style.background=on?"var(--ac)":"";b.style.color=on?"#fff":""}});
@@ -195,7 +203,7 @@ function calcRate(){
   var f=rec[0],days=(lt-tm(f))/86400000;
   if(days<=0)return null;
   var gain=0;
-  for(var i=1;i<rec.length;i++){var df=data[rec[i]]-data[rec[i-1]];if(df>0)gain+=df}
+  for(var i=1;i<rec.length;i++){var fl=flow(rec[i]);if(fl)gain+=fl.gain}
   return {rate:gain/days,days:days,last:last,lt:lt};
 }
 function proj(){
@@ -238,13 +246,15 @@ function render(){
     var h="<div class='d'>"+d+"</div>";
     if(data[k]!==undefined){
       h+="<div class='v'>"+short(data[k])+"</div>";
-      var df=diff(k);
-      if(df!==null){h+="<div class='df "+cls(df)+"'>"+sg(df)+"</div>";mSum+=df;mCnt++;if(df>0)mGain+=df;else if(df<0)mSpend+=df;var pk2=prevKey(k);if(pk2)mDays+=(tm(k)-tm(pk2))/86400000}
+      var df=diff(k),fl=flow(k);
+      if(df!==null){mSum+=df;mCnt++;if(fl){mGain+=fl.gain;mSpend-=fl.spend}var pk2=prevKey(k);if(pk2)mDays+=(tm(k)-tm(pk2))/86400000;
+        if(use[k]!==undefined&&fl){h+="<div class='df up'>"+sg(fl.gain)+"</div><div class='df dn' style='font-size:10px'>使 "+sg(-fl.spend)+"</div>"}
+        else{h+="<div class='df "+cls(df)+"'>"+sg(df)+"</div>"}}
     }
     if(memo[k])h+="<div>📝</div>";
     if(k===GDATE)h+="<div>🏁</div>";
     c.innerHTML=h;
-    (function(kk){c.onclick=function(){sel=kk;$("date").value=kk;$("val").value=data[kk]!==undefined?data[kk]:"";$("memo").value=memo[kk]||"";showRes();render();var ic=$("inputCard");if(ic){var r=ic.getBoundingClientRect();if(r.bottom<0||r.top>window.innerHeight)ic.scrollIntoView({behavior:"smooth",block:"start"})}}})(k);
+    (function(kk){c.onclick=function(){sel=kk;$("date").value=kk;$("val").value=data[kk]!==undefined?data[kk]:"";$("memo").value=memo[kk]||"";$("use").value=use[kk]!==undefined?use[kk]:"";showRes();render();var ic=$("inputCard");if(ic){var r=ic.getBoundingClientRect();if(r.bottom<0||r.top>window.innerHeight)ic.scrollIntoView({behavior:"smooth",block:"start"})}}})(k);
     g.appendChild(c);
   }
   $("sMonth").innerHTML=mCnt?"<span class='"+cls(mSum)+"'>"+sg(mSum)+"</span>":"-";
@@ -283,16 +293,19 @@ $("gset").onclick=function(){
 };
 $("gclr").onclick=function(){GDATE="";try{localStorage.removeItem(GDKEY)}catch(e){}syncDays();render()};
 $("date").value=today;
-$("date").onchange=function(){sel=$("date").value;var k=sel;$("val").value=data[k]!==undefined?data[k]:"";$("memo").value=memo[k]||"";var dt=new Date(k+"T00:00:00");if(!isNaN(dt)){view=new Date(dt.getFullYear(),dt.getMonth(),1)}showRes();render()};
+$("date").onchange=function(){sel=$("date").value;var k=sel;$("val").value=data[k]!==undefined?data[k]:"";$("memo").value=memo[k]||"";$("use").value=use[k]!==undefined?use[k]:"";var dt=new Date(k+"T00:00:00");if(!isNaN(dt)){view=new Date(dt.getFullYear(),dt.getMonth(),1)}showRes();render()};
 $("save").onclick=function(){
   var k=$("date").value,v=parseInt($("val").value,10);
-  var mt=$("memo").value.trim();if(!k||(isNaN(v)&&!mt)){$("res").textContent="日付と、氷晶数かメモを入力してください";return}if(mt)memo[k]=mt;else delete memo[k];
+  var mt=$("memo").value.trim(),uv=$("use").value.trim(),un=parseInt(uv,10);
+  if(!k||(isNaN(v)&&!mt&&uv==="")){$("res").textContent="日付と、氷晶数かメモを入力してください";return}
+  if(mt)memo[k]=mt;else delete memo[k];
+  if(uv!==""&&!isNaN(un)&&un>=0)use[k]=un;else delete use[k];
   if(!isNaN(v))data[k]=v;save();sel=k;showRes();render();
 };
-$("del").onclick=function(){var k=$("date").value;if(data[k]!==undefined||memo[k]){if(!window.confirm(k+" の記録を削除しますか？"))return;delete data[k];delete memo[k];save();$("val").value="";$("memo").value="";showRes();render()}};
+$("del").onclick=function(){var k=$("date").value;if(data[k]!==undefined||memo[k]||use[k]!==undefined){if(!window.confirm(k+" の記録を削除しますか？"))return;delete data[k];delete memo[k];delete use[k];save();$("val").value="";$("memo").value="";$("use").value="";showRes();render()}};
 $("todayBtn").onclick=function(){view=new Date();view.setDate(1);render()};
 $("exp").onclick=function(){
-  var payload={app:"ice-log",version:1,data:data,memo:memo,goal:GOAL,gdate:GDATE,keydraws:kd};
+  var payload={app:"ice-log",version:1,data:data,memo:memo,use:use,goal:GOAL,gdate:GDATE,keydraws:kd};
   var blob=new Blob([JSON.stringify(payload,null,1)],{type:"application/json"});
   var a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="ice-log-backup-"+today+".json";document.body.appendChild(a);a.click();a.remove();
   setTimeout(function(){URL.revokeObjectURL(a.href)},1000);
@@ -310,10 +323,12 @@ $("imp").onchange=function(){
       if(!window.confirm("バックアップを読み込みますか？今の記録は上書きされます。"))return;
       data=clean;
       if(j.memo&&typeof j.memo==="object")memo=j.memo;
+      use={};
+      if(j.use&&typeof j.use==="object"){Object.keys(j.use).forEach(function(k){if(/^\d{4}-\d{2}-\d{2}$/.test(k)&&isFinite(+j.use[k])&&+j.use[k]>=0)use[k]=+j.use[k]})}
       if(+j.goal>0){GOAL=+j.goal;try{localStorage.setItem(GKEY,String(GOAL))}catch(e){}}
       if(typeof j.gdate==="string"&&/^\d{4}-\d{2}-\d{2}$/.test(j.gdate)){GDATE=j.gdate;try{localStorage.setItem(GDKEY,GDATE)}catch(e){}}
       if(Array.isArray(j.keydraws)){kd=j.keydraws.filter(validKd).map(normKd);saveKd()}
-      save();$("goal").value=GOAL;syncDays();sel=today;$("date").value=today;$("val").value=data[today]!==undefined?data[today]:"";$("memo").value=memo[today]||"";showRes();render();drawKd();
+      save();$("goal").value=GOAL;syncDays();sel=today;$("date").value=today;$("val").value=data[today]!==undefined?data[today]:"";$("memo").value=memo[today]||"";$("use").value=use[today]!==undefined?use[today]:"";showRes();render();drawKd();
       $("res").textContent="バックアップを読み込みました";
     }catch(e){$("res").textContent="読み込みに失敗しました。JSONファイルを確認してください"}
   };
@@ -323,6 +338,7 @@ $("prev").onclick=function(){view=new Date(view.getFullYear(),view.getMonth()-1,
 $("next").onclick=function(){view=new Date(view.getFullYear(),view.getMonth()+1,1);render()};
 if(data[today]!==undefined)$("val").value=data[today];
 $("memo").value=memo[today]||"";
+$("use").value=use[today]!==undefined?use[today]:"";
 ["cr0","cr90","cr30"].forEach(function(id){$(id).onclick=function(){chartRange=id==="cr0"?0:id==="cr90"?90:30;drawChart()}});
 var KDKEY="ice-keydraw-v1",kd=[];
 function validKd(r){return !!r&&/^\d{4}-\d{2}-\d{2}$/.test(r.d)&&isFinite(+r.g)&&+r.g>=0&&isFinite(+r.k)&&+r.k>0}
