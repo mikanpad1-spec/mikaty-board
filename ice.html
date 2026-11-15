@@ -108,7 +108,8 @@ input:focus-visible,button:focus-visible{outline:2px solid var(--ac);outline-off
 <div class="card">
 <div class="nav"><button class="g" id="prev">◀</button><strong id="title"></strong><span style="display:flex;gap:8px"><button class="g" id="todayBtn">今日</button><button class="g" id="next">▶</button></span></div>
 <div class="grid" id="grid"></div>
-<div class="note">日付をタップすると入力欄に呼び出せます。📝はメモのある日、🏁は目標の期日です。増減は直前の記録日との差です。使用量を入れた日は、獲得と使用を分けて表示します。データはこの端末のブラウザに保存されます。</div>
+<div id="dayDetail" style="margin-top:8px;font-size:13px"></div>
+<div class="note">日付をタップすると入力欄に呼び出せます。📝はメモのある日、🏁は目標の期日です。増減は直前の記録日との差です。タップした日の獲得・使用の内訳は、カレンダーのすぐ下に表示します。データはこの端末のブラウザに保存されます。</div>
 <div id="memos" style="margin-top:10px"></div>
 </div>
 <div class="card"><div class="row" style="justify-content:space-between"><strong>推移</strong><span style="display:flex;gap:6px"><button class="g" id="cr0" style="padding:4px 10px;font-size:12px">全部</button><button class="g" id="cr90" style="padding:4px 10px;font-size:12px">90日</button><button class="g" id="cr30" style="padding:4px 10px;font-size:12px">30日</button></span></div><div id="chart" style="margin-top:8px"></div>
@@ -248,8 +249,7 @@ function render(){
       h+="<div class='v'>"+short(data[k])+"</div>";
       var df=diff(k),fl=flow(k);
       if(df!==null){mSum+=df;mCnt++;if(fl){mGain+=fl.gain;mSpend-=fl.spend}var pk2=prevKey(k);if(pk2)mDays+=(tm(k)-tm(pk2))/86400000;
-        if(use[k]!==undefined&&fl){h+="<div class='df up'>"+sg(fl.gain)+"</div><div class='df dn' style='font-size:10px'>使 "+sg(-fl.spend)+"</div>"}
-        else{h+="<div class='df "+cls(df)+"'>"+sg(df)+"</div>"}}
+        h+="<div class='df "+cls(df)+"'>"+sg(df)+"</div>"}
     }
     if(memo[k])h+="<div>📝</div>";
     if(k===GDATE)h+="<div>🏁</div>";
@@ -262,6 +262,15 @@ function render(){
   $("sMonthEst").innerHTML=(mCnt&&mDays>0)?"<span class='"+cls(mGain/mDays)+"'>"+sg(Math.round(mGain/mDays*30))+"</span>":"-";
   var sb=$("sBreak");
   if(mCnt&&(mGain>0||mSpend<0)){var parts=[];if(mGain>0)parts.push("貯めた量 <b class='up'>"+sg(mGain)+"</b>");if(mSpend<0)parts.push("使った量 <b class='dn'>"+sg(mSpend)+"</b>");sb.innerHTML="今月の内訳："+parts.join(" / ")}else{sb.innerHTML=""}
+  var dd=$("dayDetail");
+  if(data[sel]!==undefined){
+    var sdf=diff(sel),sfl=flow(sel),sh=parseInt(sel.slice(5,7),10)+"/"+parseInt(sel.slice(8),10)+"：残高 <b>"+fmt(data[sel])+"</b>";
+    if(sdf!==null){sh+=" ／ 前回比 <b class='"+cls(sdf)+"'>"+sg(sdf)+"</b>";
+      if(use[sel]!==undefined&&sfl)sh+=" ／ 獲得 <b class='up'>"+sg(sfl.gain)+"</b> ／ 使用 <b class='dn'>"+fmt(sfl.spend)+"</b>"}
+    dd.innerHTML=sh;
+  }else{
+    dd.innerHTML=parseInt(sel.slice(5,7),10)+"/"+parseInt(sel.slice(8),10)+"：記録なし";
+  }
   $("gLabel").textContent="目標("+short(GOAL)+")まで";drawChart();proj();needRate();
   var ml=$("memos");ml.innerHTML="";
   var pre=y+"-"+String(m+1).padStart(2,"0")+"-";

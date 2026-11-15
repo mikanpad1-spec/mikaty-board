@@ -2315,7 +2315,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
   }
 
   function solve(){
-    const A=prefs.forbidden?21:24,E=prefs.rage?8:5,N=Math.max(0,A-E);
+    const A=prefs.forbidden?21:24,E=prefs.rage?5:8,N=Math.max(0,A-E);
     const mc=i=>{const role=roleByIndex[i];if(role==='immortal'||i===7)return 1;if(prefs.collapse&&role==='myth')return 3;if(prefs.collapse&&role==='legend')return 9;return Infinity};
     const C=Math.min(Math.max(0,Math.floor(prefs.cap)),N*3);
     if(N<1||C<1)return {error:'キャラ上限が小さすぎるか、空けるマス数が多すぎて配置できません。'};
@@ -2426,7 +2426,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     const r3=document.createElement('div');r3.className='spRow';
     r3.innerHTML='<div class="spLabel">暴怒</div>';
     const seg3=document.createElement('div');seg3.className='spSeg';
-    [[false,'OFF（5マス空け）'],[true,'ON（8マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
+    [[false,'OFF（8マス空け）'],[true,'ON（5マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
     r3.appendChild(seg3);card.appendChild(r3);
 
     const mkToggle=(title,key)=>{
