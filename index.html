@@ -539,11 +539,12 @@ main>.honorPanel{grid-column:1/-1!important}
 <script src="charimg1.js"></script><script src="charimg2.js"></script><script>
 const chars=window.CHARS_DATA;
 
-const charNames=["かぐや姫","妖精シンガー","聖使者（神格前）","イサイ","牛","大剣ペンギン","白梟投手","領主","玄武","ミカエル","アレス","イグニス","コイン式機械","ブラストネコ","炎の魔竜（孵化前）","死霊術の魔女","グリフィン","ロン","剣霊","ワニキング","パルス装置","ハンター","破壊装置","暗影ハンター","ブードゥー祭祀","厳冬の心","終結者","緋色の鎌","悟空","閃光","ホタル","爆破兵","元素霊","レンジャー","戦士","鬼武者","ファンネル","シスター","弓術士","十字軍","銃士","演奏家","嵐の魔道士","時空砲兵","聖使者","炎の魔竜"];
+const charNames=["かぐや姫","妖精シンガー","聖使者（神格前）","イサイ","牛","大剣ペンギン","白梟投手","領主","玄武","ミカエル","アレス","イグニス","コイン式機械","ブラストネコ","炎の魔竜（孵化前）","死霊術の魔女","グリフィン","ロン","剣霊","ワニキング","パルス装置","ハンター","破壊装置","暗影ハンター","ブードゥー祭祀","厳冬の心","終結者","緋色の鎌","悟空","閃光","ホタル","爆破兵","元素霊","レンジャー","戦士","鬼武者","ファンネル","シスター","弓術士","十字軍","銃士","演奏家","嵐の魔道士","時空砲兵","聖使者","炎の魔竜","闘戦勝仏"];
 
 /* ===== 属性・種族データ（インデックス＝charNamesの番号） =====
    空欄のキャラは未設定。追加したい場合は下の表に書き足すだけで、表示・合計に反映されます。 */
 const CHAR_ATTR={
+  46:["自然"],        // 闘戦勝仏
   0:["氷霜","自然"],  // かぐや姫
   1:["自然"],         // 妖精シンガー
   2:["神聖"],         // 聖使者（神格前）
@@ -596,7 +597,7 @@ const CHAR_RACE={
   23:["人間"],24:["獣族"],25:["エルフ族"],26:["人間"],27:["悪魔族"],28:["神族"],29:["獣族"],30:["悪魔族"],
   4:["獣族"],5:["獣族"],6:["獣族"],20:["機械族"],21:["人間"],22:["機械族"],31:["人間"],32:["エルフ族"],33:["人間"],
   34:["人間"],35:["悪魔族"],36:["機械族"],37:["人間"],38:["人間"],39:["人間"],40:["人間"],41:["エルフ族"],42:["人間"],43:["人間"],
-  44:["神族"],45:["竜族"]
+  44:["神族"],45:["竜族"],46:["神族"]
 };
 const TAG_COLORS={
   "物理":["#cfdbe3","#34566b"],"炎":["#f8d3d0","#b8312a"],"稲妻":["#fbe6a2","#8f6200"],
@@ -805,7 +806,7 @@ poolRare=document.getElementById("poolRare"),
 poolNormal=document.getElementById("poolNormal"),
 poolFav=document.getElementById("poolFav");
 const allPools=[poolImmortal,poolMyth,poolLegend,poolRare,poolOther,poolElite,poolNormal,poolFav];
-const roleByIndex=["immortal","myth","myth","myth","legend","rare","rare","other","myth","immortal","immortal","immortal","myth","myth","myth","myth","myth","myth","myth","myth","rare","normal","legend","myth","myth","myth","myth","myth","myth","myth","myth","normal","normal","normal","normal","elite","elite","elite","elite","elite","rare","rare","legend","legend","myth","myth"];
+const roleByIndex=["immortal","myth","myth","myth","legend","rare","rare","other","myth","immortal","immortal","immortal","myth","myth","myth","myth","myth","myth","myth","myth","rare","normal","legend","myth","myth","myth","myth","myth","myth","myth","myth","normal","normal","normal","normal","elite","elite","elite","elite","elite","rare","rare","legend","legend","myth","myth","immortal"];
 function targetPool(i){
  return roleByIndex[i]==="immortal"?poolImmortal:
         roleByIndex[i]==="myth"?poolMyth:
