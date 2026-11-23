@@ -114,6 +114,7 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 .srow:first-child{border-top:0}
 .srow .sd{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:13px}
 .srow .sn{font-weight:700;overflow-wrap:anywhere;display:flex;align-items:center;gap:6px;min-width:0}
+.srow .ftag{font-size:11px;font-weight:700;background:var(--sel);color:var(--ac);border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none}
 .srow:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .allToggle{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-radius:0;padding:2px 0;font-size:15px;font-weight:700}
 .allToggle .allSum{margin-left:auto;color:var(--sub);font-size:12px;font-weight:500;white-space:nowrap}
@@ -379,6 +380,7 @@ function srow(ev){
   var li=el("div","srow");
   li.appendChild(el("span","sd",rng(ev)));
   var nm=el("span","sn",ev.n);
+  nm.appendChild(el("span","ftag",catOf(ev)));
   if(ni0(ev)){var pi=pic();pi.setAttribute("role","img");pi.setAttribute("aria-label","画像あり");nm.appendChild(pi)}
   li.appendChild(nm);
   press(li,function(){openDetail(ev)});
