@@ -101,6 +101,12 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 .fmtRow{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--sub)}
 .fmtRow select{flex:1;font:inherit;font-size:14px;font-weight:700;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--bg);color:var(--tx)}
 #selCard{scroll-margin-top:14px}
+.srow{display:flex;gap:8px;align-items:baseline;padding:8px 6px;border-top:1px solid var(--line);cursor:pointer;font-size:14px}
+.srow:first-child{border-top:0}
+.srow .sd{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:13px}
+.srow .ss{color:var(--sub);flex:none}
+.srow .sn{font-weight:700;overflow-wrap:anywhere;display:flex;align-items:center;gap:6px;min-width:0}
+.srow:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 @media (prefers-reduced-motion:no-preference){.bar{transition:filter .15s}.bar:hover{filter:brightness(.96)}.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
 </style>
 
@@ -129,6 +135,13 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 <div class="card" id="selCard">
 <div class="hd"><strong id="selTitle"></strong><small id="selSub"></small></div>
 <div class="list" id="selList"></div>
+</div>
+
+<div class="card" id="allCard">
+<div class="hd"><strong>未実装のイベント</strong><small id="todoCount"></small></div>
+<div class="list" id="todoList"></div>
+<div class="hd" style="margin-top:14px"><strong>実装済みのイベント</strong><small id="doneCount"></small></div>
+<div class="list" id="doneList"></div>
 </div>
 
 <div class="card">
@@ -347,6 +360,29 @@ function renderMonth(){
   if(!evs.length)ml.appendChild(el("div","empty","条件に合うイベントはありません。"));
   evs.forEach(function(e){ml.appendChild(item(e))});
 }
+function rng(ev){var a=md(ev.s)+"("+wd(ev.s)+")";var b=ev.s.slice(0,7)===ev.e.slice(0,7)?(+ev.e.slice(8))+"("+wd(ev.e)+")":md(ev.e)+"("+wd(ev.e)+")";return a+"〜"+b}
+function srow(ev){
+  var li=el("div","srow");
+  li.appendChild(el("span","sd",rng(ev)));
+  li.appendChild(el("span","ss","ーー"));
+  var nm=el("span","sn",ev.n);
+  if(ni0(ev)){var pi=pic();pi.setAttribute("role","img");pi.setAttribute("aria-label","画像あり");nm.appendChild(pi)}
+  li.appendChild(nm);
+  press(li,function(){openDetail(ev)});
+  return li;
+}
+function renderAll(){
+  var todo=EV.filter(function(e){return matchFmt(e)&&!e.done}).sort(function(a,b){return D(a.s)-D(b.s)||D(a.e)-D(b.e)});
+  var done=EV.filter(function(e){return matchFmt(e)&&e.done}).sort(function(a,b){return D(a.s)-D(b.s)||D(a.e)-D(b.e)});
+  $("todoCount").textContent=todo.length+"件";
+  $("doneCount").textContent=done.length+"件";
+  var tl=$("todoList");tl.innerHTML="";
+  if(!todo.length)tl.appendChild(el("div","empty","未実装のイベントはありません。"));
+  todo.forEach(function(e){tl.appendChild(srow(e))});
+  var dl=$("doneList");dl.innerHTML="";
+  if(!done.length)dl.appendChild(el("div","empty","実装済みのイベントはありません。"));
+  done.forEach(function(e){dl.appendChild(srow(e))});
+}
 var dw=$("dows");W.forEach(function(w){dw.appendChild(el("div","",w))});
 $("prev").onclick=function(){var y=+ym.slice(0,4),m=+ym.slice(5)-1;if(m<1){m=12;y--}ym=y+"-"+String(m).padStart(2,"0");renderMonth()};
 $("next").onclick=function(){var y=+ym.slice(0,4),m=+ym.slice(5)+1;if(m>12){m=1;y++}ym=y+"-"+String(m).padStart(2,"0");renderMonth()};
@@ -368,11 +404,11 @@ function renderSearch(){
   hits.forEach(function(e){list.appendChild(item(e))});
 }
 (function(){var seen={};EV.forEach(function(ev){var f=catOf(ev);if(seen[f])return;seen[f]=1;var o=el("option","",f);o.value=f;$("fmt").appendChild(o)})})();
-$("fmt").addEventListener("change",function(){fmt=this.value;renderSearch();renderSel();renderMonth()});
+$("fmt").addEventListener("change",function(){fmt=this.value;renderSearch();renderSel();renderMonth();renderAll()});
 var IMG={},_imgReady=false,_imgP=null,_curEv=null;
-function loadIMG(){if(_imgP)return _imgP;_imgP=Promise.all([1,2,3,4,5].map(function(n){return new Promise(function(res){var s=document.createElement("script");s.src="imgdata"+n+".js";s.onload=s.onerror=function(){res()};document.head.appendChild(s)})})).then(function(){_imgReady=true;renderSearch();renderSel();renderMonth();if(_curEv&&!$("ov").hidden)openDetail(_curEv)});return _imgP}
+function loadIMG(){if(_imgP)return _imgP;_imgP=Promise.all([1,2,3,4,5].map(function(n){return new Promise(function(res){var s=document.createElement("script");s.src="imgdata"+n+".js";s.onload=s.onerror=function(){res()};document.head.appendChild(s)})})).then(function(){_imgReady=true;renderSearch();renderSel();renderMonth();renderAll();if(_curEv&&!$("ov").hidden)openDetail(_curEv)});return _imgP}
 renderSearch();
-renderSel();renderMonth();
+renderSel();renderMonth();renderAll();
 if(window.requestIdleCallback)requestIdleCallback(function(){loadIMG()},{timeout:3000});else setTimeout(loadIMG,1800);
 </script>
 <style>
