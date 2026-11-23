@@ -114,36 +114,7 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 .srow:first-child{border-top:0}
 .srow .sd{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:13px}
 .srow .sn{font-weight:700;overflow-wrap:anywhere;display:flex;align-items:center;gap:6px;min-width:0}
-.srow .ftag{font-size:11px;font-weight:700;background:var(--fb,#e3eeff);color:var(--ft,#2f6fd0);border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none}
-.srow .ftag.f0{--fb:#e6e1fa;--ft:#3f3487}
-.srow .ftag.f1{--fb:#fdeceb;--ft:#8f2b24}
-.srow .ftag.f2{--fb:#ffe8d1;--ft:#7a4a12}
-.srow .ftag.f3{--fb:#dce9fb;--ft:#1d3a6b}
-.srow .ftag.f4{--fb:#fbebca;--ft:#6b4a0f}
-.srow .ftag.f5{--fb:#eae4d8;--ft:#5c4a2f}
-.srow .ftag.f6{--fb:#d3efec;--ft:#14524d}
-.srow .ftag.f7{--fb:#fde0ee;--ft:#8a2a5b}
-.srow .ftag.f8{--fb:#e8ebf0;--ft:#44506a}
-@media (prefers-color-scheme:dark){
-:root:not([data-theme="light"]) .srow .ftag.f0{--fb:#38336a;--ft:#cfc8ff}
-:root:not([data-theme="light"]) .srow .ftag.f1{--fb:#4a2326;--ft:#ff9d94}
-:root:not([data-theme="light"]) .srow .ftag.f2{--fb:#503517;--ft:#ffb877}
-:root:not([data-theme="light"]) .srow .ftag.f3{--fb:#243a5c;--ft:#bcd4ff}
-:root:not([data-theme="light"]) .srow .ftag.f4{--fb:#55431f;--ft:#f2d79b}
-:root:not([data-theme="light"]) .srow .ftag.f5{--fb:#3d382c;--ft:#ddd3b8}
-:root:not([data-theme="light"]) .srow .ftag.f6{--fb:#1d4440;--ft:#a8e6df}
-:root:not([data-theme="light"]) .srow .ftag.f7{--fb:#4d2438;--ft:#ffadd2}
-:root:not([data-theme="light"]) .srow .ftag.f8{--fb:#2c3649;--ft:#aebadd}
-}
-:root[data-theme="dark"] .srow .ftag.f0{--fb:#38336a;--ft:#cfc8ff}
-:root[data-theme="dark"] .srow .ftag.f1{--fb:#4a2326;--ft:#ff9d94}
-:root[data-theme="dark"] .srow .ftag.f2{--fb:#503517;--ft:#ffb877}
-:root[data-theme="dark"] .srow .ftag.f3{--fb:#243a5c;--ft:#bcd4ff}
-:root[data-theme="dark"] .srow .ftag.f4{--fb:#55431f;--ft:#f2d79b}
-:root[data-theme="dark"] .srow .ftag.f5{--fb:#3d382c;--ft:#ddd3b8}
-:root[data-theme="dark"] .srow .ftag.f6{--fb:#1d4440;--ft:#a8e6df}
-:root[data-theme="dark"] .srow .ftag.f7{--fb:#4d2438;--ft:#ffadd2}
-:root[data-theme="dark"] .srow .ftag.f8{--fb:#2c3649;--ft:#aebadd}
+.srow .ftag{font-size:11px;font-weight:700;background:var(--sel);color:var(--ac);border-radius:999px;padding:2px 8px;white-space:nowrap;flex:none}
 .srow:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
 .allToggle{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-radius:0;padding:2px 0;font-size:15px;font-weight:700}
 .allToggle .allSum{margin-left:auto;color:var(--sub);font-size:12px;font-weight:500;white-space:nowrap}
@@ -405,12 +376,11 @@ function renderMonth(){
   evs.forEach(function(e){ml.appendChild(item(e))});
 }
 function rng(ev){var a=md(ev.s)+"("+wd(ev.s)+")";var b=ev.s.slice(0,7)===ev.e.slice(0,7)?(+ev.e.slice(8))+"("+wd(ev.e)+")":md(ev.e)+"("+wd(ev.e)+")";return a+"〜"+b}
-var FI={"化身イベ":0,"狩人":1,"コラボ":2,"滑り台":3,"幸運ガチャ":4,"遺跡":5,"ドライべ":6,"花イベ":7,"特殊":8};
 function srow(ev){
   var li=el("div","srow");
   li.appendChild(el("span","sd",rng(ev)));
   var nm=el("span","sn",ev.n);
-  nm.appendChild(el("span","ftag f"+(FI[catOf(ev)]||0),catOf(ev)));
+  nm.appendChild(el("span","ftag",catOf(ev)));
   if(ni0(ev)){var pi=pic();pi.setAttribute("role","img");pi.setAttribute("aria-label","画像あり");nm.appendChild(pi)}
   li.appendChild(nm);
   press(li,function(){openDetail(ev)});
