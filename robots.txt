@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://mikanpad1-spec.github.io/mikaty-board/sitemap.xml

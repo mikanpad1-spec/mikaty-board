@@ -1,5 +1,14 @@
-<!doctype html><html lang="ja"><head><script>try{var _t=localStorage.getItem("ui-theme");if(_t)document.documentElement.setAttribute("data-theme",_t)}catch(e){}</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>中国イベントカレンダー</title>
-<meta name="description" content="ゲームイベントの開催期間を月カレンダーで確認できる中国イベントカレンダー。実装済みイベントや詳細画像もチェックできます。">
+<!doctype html><html lang="ja"><head><script>try{var _t=localStorage.getItem("ui-theme");if(_t)document.documentElement.setAttribute("data-theme",_t)}catch(e){}</script><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>中国イベントカレンダー｜ペタペタペンギン団 中国版イベント日程（ぺんぎんなび！）</title>
+<meta name="description" content="ペタペタペンギン団・中国版のイベント開催日程を月カレンダーで確認できるページ。日本版への実装済みイベントや詳細画像もチェックできます。">
+<meta name="robots" content="index,follow">
+<link rel="canonical" href="https://mikanpad1-spec.github.io/mikaty-board/events.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="ぺんぎんなび！">
+<meta property="og:title" content="中国イベントカレンダー｜ペタペタペンギン団 中国版イベント日程（ぺんぎんなび！）">
+<meta property="og:description" content="ペタペタペンギン団・中国版のイベント開催日程を月カレンダーで確認できます。実装済みイベントや詳細画像もチェックできます。">
+<meta property="og:url" content="https://mikanpad1-spec.github.io/mikaty-board/events.html">
+<meta property="og:image" content="https://mikanpad1-spec.github.io/mikaty-board/icon-512.png">
+<meta name="twitter:card" content="summary">
 <meta name="theme-color" media="(prefers-color-scheme:light)" content="#f4f8fd">
 <meta name="theme-color" media="(prefers-color-scheme:dark)" content="#12161d">
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -440,4 +449,5 @@ if(window.requestIdleCallback)requestIdleCallback(function(){loadIMG()},{timeout
 </div>
 <script>(function(){var KEY="penguinnavi-install-dismissed-v1";try{if(localStorage.getItem(KEY)==="1")return}catch(e){}var standalone=false;try{standalone=window.matchMedia("(display-mode: standalone)").matches||window.navigator.standalone===true}catch(e){}if(standalone)return;var bar=document.getElementById("installBar");if(!bar)return;if(/Android/i.test(navigator.userAgent||"")){var s1=document.getElementById("installStep1");if(s1)s1.textContent="右上の「︙」メニューをタップ"}document.getElementById("installClose").addEventListener("click",function(){try{localStorage.setItem(KEY,"1")}catch(e){}bar.classList.remove("show");setTimeout(function(){bar.hidden=true},260)});var how=document.getElementById("installHow"),steps=document.getElementById("installSteps");how.addEventListener("click",function(){var open=steps.hidden;steps.hidden=!open;how.textContent=open?"たたむ":"手順"});setTimeout(function(){bar.hidden=false;requestAnimationFrame(function(){requestAnimationFrame(function(){bar.classList.add("show")})})},700)})();</script>
 <script>(function(){var b=document.getElementById("themeBtn");if(!b)return;function st(){try{return localStorage.getItem("ui-theme")||"auto"}catch(e){return "auto"}}function paint(){var s=st();b.textContent=s==="dark"?"\u{1F319}":s==="light"?"\u2600\uFE0F":"\u{1F313}";b.title=s==="dark"?"テーマ：ダーク（タップでライト）":s==="light"?"テーマ：ライト（タップで端末に合わせる）":"テーマ：端末に合わせる（タップでダーク）"}b.addEventListener("click",function(){var s=st(),n=s==="auto"?"dark":s==="dark"?"light":"auto";try{if(n==="auto"){localStorage.removeItem("ui-theme");document.documentElement.removeAttribute("data-theme")}else{localStorage.setItem("ui-theme",n);document.documentElement.setAttribute("data-theme",n)}}catch(e){}paint()});paint()})();</script>
+<script data-goatcounter="https://penginnavi.goatcounter.com/count" async src="//gc.zgo.at/count.js"></script>
 </body></html>
