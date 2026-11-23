@@ -104,9 +104,11 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 .srow{display:flex;gap:8px;align-items:baseline;padding:8px 6px;border-top:1px solid var(--line);cursor:pointer;font-size:14px}
 .srow:first-child{border-top:0}
 .srow .sd{color:var(--sub);white-space:nowrap;font-variant-numeric:tabular-nums;font-size:13px}
-.srow .ss{color:var(--sub);flex:none}
 .srow .sn{font-weight:700;overflow-wrap:anywhere;display:flex;align-items:center;gap:6px;min-width:0}
 .srow:focus-visible{outline:2px solid var(--ac);outline-offset:2px}
+.allToggle{display:flex;align-items:center;gap:8px;width:100%;text-align:left;background:none;border:0;border-radius:0;padding:2px 0;font-size:15px;font-weight:700}
+.allToggle .allSum{margin-left:auto;color:var(--sub);font-size:12px;font-weight:500;white-space:nowrap}
+.allToggle .allChev{color:var(--sub);flex:none;font-weight:400}
 @media (prefers-reduced-motion:no-preference){.bar{transition:filter .15s}.bar:hover{filter:brightness(.96)}.sheet{animation:up .18s ease-out}@keyframes up{from{transform:translateY(24px);opacity:.6}to{transform:none;opacity:1}}}
 </style>
 
@@ -138,10 +140,13 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 </div>
 
 <div class="card" id="allCard">
-<div class="hd"><strong>未実装のイベント</strong><small id="todoCount"></small></div>
+<button type="button" id="allToggle" class="allToggle" aria-expanded="false"><span>全イベント一覧</span><span class="allSum" id="allSum"></span><span class="allChev" id="allChev" aria-hidden="true">▽</span></button>
+<div id="allBody" hidden>
+<div class="hd" style="margin-top:10px"><strong>未実装のイベント</strong><small id="todoCount"></small></div>
 <div class="list" id="todoList"></div>
 <div class="hd" style="margin-top:14px"><strong>実装済みのイベント</strong><small id="doneCount"></small></div>
 <div class="list" id="doneList"></div>
+</div>
 </div>
 
 <div class="card">
@@ -364,7 +369,6 @@ function rng(ev){var a=md(ev.s)+"("+wd(ev.s)+")";var b=ev.s.slice(0,7)===ev.e.sl
 function srow(ev){
   var li=el("div","srow");
   li.appendChild(el("span","sd",rng(ev)));
-  li.appendChild(el("span","ss","ーー"));
   var nm=el("span","sn",ev.n);
   if(ni0(ev)){var pi=pic();pi.setAttribute("role","img");pi.setAttribute("aria-label","画像あり");nm.appendChild(pi)}
   li.appendChild(nm);
@@ -376,6 +380,7 @@ function renderAll(){
   var done=EV.filter(function(e){return matchFmt(e)&&e.done}).sort(function(a,b){return D(a.s)-D(b.s)||D(a.e)-D(b.e)});
   $("todoCount").textContent=todo.length+"件";
   $("doneCount").textContent=done.length+"件";
+  $("allSum").textContent="未実装"+todo.length+"件／実装済み"+done.length+"件";
   var tl=$("todoList");tl.innerHTML="";
   if(!todo.length)tl.appendChild(el("div","empty","未実装のイベントはありません。"));
   todo.forEach(function(e){tl.appendChild(srow(e))});
@@ -394,6 +399,7 @@ var jEl=$("jump");
 (function(){var yy=+MIN.slice(0,4),mm=+MIN.slice(5);for(;;){var v=yy+"-"+String(mm).padStart(2,"0");var o=el("option","",yy+"年"+mm+"月");o.value=v;jEl.appendChild(o);if(v===MAX)break;mm++;if(mm>12){mm=1;yy++}}})();
 jEl.onchange=function(){ym=jEl.value;renderMonth()};
 $("todayBtn").onclick=function(){ym=today.slice(0,7);if(ym<MIN)ym=MIN;if(ym>MAX)ym=MAX;sel=today;renderSel();renderMonth()};
+$("allToggle").onclick=function(){var b=$("allBody"),open=b.hidden;b.hidden=!open;this.setAttribute("aria-expanded",String(open));$("allChev").textContent=open?"△":"▽"};
 $("lgPic").appendChild(pic());
 function renderSearch(){
   var list=$("qList");list.innerHTML="";
