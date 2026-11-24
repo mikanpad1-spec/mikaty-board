@@ -542,7 +542,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <div id="honorTierList"></div>
 <div class="honorSub">・デバフ</div>
 <div id="honorKyoubouList"></div>
-<div class="skinLimit">狂暴：チェック1つにつき パッシブ効果-6%（最大2回チェック可能）</div>
+<div class="skinLimit">固守：チェック1つにつき パッシブ効果-12%（最大2回チェック可能）</div>
 <div id="honorSum" class="honorSum"></div>
 </section>
 <script src="charimg1.js"></script><script src="charimg2.js"></script><script>
@@ -788,10 +788,10 @@ let honorHel=false;try{honorHel=localStorage.getItem("honor_hel_v1")==="1"}catch
 const HONOR_TIERS=[{v:40,label:"1w〜80w"},{v:50,label:"81w〜90w"},{v:60,label:"91〜100w"}];
 let honorTier=60,honorKyoubou=0,honorKyFlags=[false,false];
 try{const t=Number(localStorage.getItem("honor_hel_tier_v1"));if(HONOR_TIERS.some(x=>x.v===t))honorTier=t;const kf=localStorage.getItem("honor_hel_kyflags_v1");if(kf&&/^[01]{2}$/.test(kf))honorKyFlags=[kf[0]==="1",kf[1]==="1"];honorKyoubou=honorKyFlags.filter(Boolean).length}catch(e){}
-function honorPenalty(){return honorTier+6*honorKyoubou}
+function honorPenalty(){return honorTier+12*honorKyoubou}
 let steamEra=skinStore.normal.steamEra,otherPassive=skinStore.normal.otherPassive;
 function extraPassive(){return extraPassiveFor(boardMode)}
-let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false};
+let normalDebuffs={collapse:false,forbidden:false}, opponentDebuffs={collapse:false,forbidden:false}, honorHellVariantDebuffs={collapse:false,forbidden:false};
 let normalGrid=Array.from({length:24},()=>null), opponentGrid=Array.from({length:24},()=>null), collapseSpaceGrid=Array.from({length:30},()=>null), godTrialGrid=Array.from({length:30},()=>null), battleRoyale1Grid=Array.from({length:24},()=>null), honorHellVariantGrid=Array.from({length:24},()=>null);
 try{const x=JSON.parse(localStorage.getItem("grid_stack_drag_24_v1")||"null");if(Array.isArray(x)&&x.length===24)normalGrid=x}catch(e){}
 try{const x=JSON.parse(localStorage.getItem("grid_opponent_24_v1")||"null");if(Array.isArray(x)&&x.length===24)opponentGrid=x}catch(e){}
@@ -827,7 +827,8 @@ function targetPool(i){
 }
 
 function debuffState(){
- if(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1" || boardMode==="honorHellVariant") return {collapse:false,forbidden:false};
+ if(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1") return {collapse:false,forbidden:false};
+ if(boardMode==="honorHellVariant") return honorHellVariantDebuffs;
  return boardMode==="opponent" ? opponentDebuffs : normalDebuffs;
 }
 function syncDebuffUI(){
@@ -835,7 +836,7 @@ function syncDebuffUI(){
  document.getElementById("debuffCollapse").checked=!!d.collapse;
  document.getElementById("debuffForbidden").checked=!!d.forbidden;
  const box=document.querySelector(".debuff");
- if(box) box.style.display=(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1" || boardMode==="honorHellVariant")?"none":"";
+ if(box) box.style.display=(boardMode==="collapseSpace" || boardMode==="godTrial" || boardMode==="battleRoyale1")?"none":"";
 }
 function maxCopies(charIndex){
  const role=roleByIndex[charIndex], d=debuffState();
@@ -855,10 +856,10 @@ function canAdd(charIndex,amount=1,excludeSlot=-1){
  return charCount(charIndex,excludeSlot)+amount<=maxCopies(charIndex);
 }
 function initStack(ci,ex){if(!canStack(ci))return 1;const room=maxCopies(ci)-charCount(ci,ex);return Math.max(1,Math.min(3,room))}
-function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="honorHellVariant"?24:(debuffState().forbidden?21:24))))}
+function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="honorHellVariant"?(debuffState().forbidden?21:24):(debuffState().forbidden?21:24))))}
 function normalizeRules(){
  // 禁制領域ON時は使えない後半3マスを空にする
- if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && boardMode!=="battleRoyale1" && boardMode!=="honorHellVariant" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
+ if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && boardMode!=="battleRoyale1" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
  for(let i=0;i<grid.length;i++){
    const v=grid[i];
@@ -1036,7 +1037,7 @@ function render(){
  board.classList.toggle("honorHellBoard",honorHellVariant);
  document.getElementById("dungeonTitle").style.display=collapseSpace?"none":"";
  document.getElementById("dungeonRow").style.display=collapseSpace?"none":"";
- document.querySelector(".debuff").style.display=(collapseSpace||godTrial||battleRoyale1||honorHellVariant)?"none":"";
+ document.querySelector(".debuff").style.display=(collapseSpace||godTrial||battleRoyale1)?"none":"";
  const titleEl=document.querySelector(".sectionTitle"); if(titleEl) titleEl.textContent=boardMode==="opponent"?"相手の盤面":"盤面";
  if(collapseSpace){
    for(let i=0;i<30;i++)board.appendChild(makeSlot(i));
@@ -1059,7 +1060,7 @@ function render(){
    const shape=[[1,0,1,1,1,1,0,1],[1,0,1,0,0,1,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1]];
    let slotIndex=0;
    shape.flat().forEach(on=>{if(on)board.appendChild(makeSlot(slotIndex++));else{const bush=document.createElement("div");bush.className="honorBush";bush.textContent="\uD83C\uDF3F";bush.title="茂み（配置できません）";board.appendChild(bush);}});
-   for(let i=18;i<24;i++)extras.appendChild(makeSlot(i,true));
+   const hend=activeSlots(); for(let i=18;i<hend;i++)extras.appendChild(makeSlot(i,true));
  }else{
    for(let i=0;i<18;i++)board.appendChild(makeSlot(i));
    const end=activeSlots();
@@ -1228,6 +1229,7 @@ try{
  if(d && typeof d==="object"){
   normalDebuffs={collapse:!!d.normal?.collapse,forbidden:!!d.normal?.forbidden};
   opponentDebuffs={collapse:!!d.opponent?.collapse,forbidden:!!d.opponent?.forbidden};
+  honorHellVariantDebuffs={collapse:!!d.honorHellVariant?.collapse,forbidden:!!d.honorHellVariant?.forbidden};
  }else{
   const old=JSON.parse(localStorage.getItem("debuff_v1")||"{}");
   normalDebuffs={collapse:!!old.collapse,forbidden:!!old.forbidden};
@@ -1235,11 +1237,11 @@ try{
 }catch(e){}
 function saveDebuffs(){
  if(boardMode!=="collapseSpace"){
-  const target=boardMode==="opponent"?opponentDebuffs:normalDebuffs;
+  const target=boardMode==="opponent"?opponentDebuffs:(boardMode==="honorHellVariant"?honorHellVariantDebuffs:normalDebuffs);
   target.collapse=document.getElementById("debuffCollapse").checked;
   target.forbidden=document.getElementById("debuffForbidden").checked;
  }
- localStorage.setItem("debuff_v2",JSON.stringify({normal:normalDebuffs,opponent:opponentDebuffs}));
+ localStorage.setItem("debuff_v2",JSON.stringify({normal:normalDebuffs,opponent:opponentDebuffs,honorHellVariant:honorHellVariantDebuffs}));
 }
 document.getElementById("debuffCollapse").addEventListener("change",()=>{saveDebuffs();normalizeRules();render()});
 document.getElementById("debuffForbidden").addEventListener("change",()=>{saveDebuffs();normalizeRules();render()});
@@ -1585,7 +1587,7 @@ document.addEventListener("DOMContentLoaded",()=>{
    const br=$('boardRemain'),dr=$('dungeonRemain'),bar=$('slotDetailBar'),sp=$('specialEffectBar'); if(!br||!dr||!bar)return;
    if(boardMode==='collapseSpace'){br.textContent=Math.max(0,30-countOccupied(grid,0,30));dr.textContent='—';bar.children[1].style.display='none';}
    else if(boardMode==='battleRoyale1'){br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,6-countOccupied(grid,18,24));bar.children[1].style.display='';}
-   else if(boardMode==='honorHellVariant'){br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,6-countOccupied(grid,18,24));bar.children[1].style.display='';}
+   else if(boardMode==='honorHellVariant'){const dend=activeSlots();br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,(dend-18)-countOccupied(grid,18,dend));bar.children[1].style.display='';}
    else if(boardMode==='godTrial'){br.textContent=Math.max(0,24-countOccupied(grid,0,24));dr.textContent=Math.max(0,6-countOccupied(grid,24,30));bar.children[1].style.display='';}
    else{const dend=activeSlots();br.textContent=Math.max(0,18-countOccupied(grid,0,18));dr.textContent=Math.max(0,(dend-18)-countOccupied(grid,18,dend));bar.children[1].style.display='';}
    if(sp){const bodies=grid.reduce((n,v)=>n+(v&&(v.char===2||v.char===44||v.char===3)?(Number(v.stack)||1):0),0);const hasI=grid.some(v=>v&&v.char===3),hasM=grid.some(v=>v&&v.char===9);let a=[];if(hasI){const hb=holyMythBodies(grid);a.push('イサイ：攻撃 +'+Math.min(hb,4)*5+'%（神聖・神話 '+hb+'体）');}if(hasM){const hb=holyMythBodies(grid);a.push('ミカエル：攻撃 +'+Math.min(hb,5)*5+'%（神聖・神話 '+hb+'体）');}sp.textContent=a.join(' ｜ ');sp.classList.toggle('show',a.length>0);}
@@ -2288,10 +2290,10 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
       const lab=document.createElement('label');lab.className='honorRow'+(honorKyFlags[n-1]?' sel':'');
       const c=document.createElement('input');c.type='checkbox';c.checked=honorKyFlags[n-1];
       c.addEventListener('change',()=>{honorKyFlags[n-1]=c.checked;honorKyoubou=honorKyFlags.filter(Boolean).length;save();build();render()});
-      const s=document.createElement('span');s.textContent='狂暴'+n;
+      const s=document.createElement('span');s.textContent='固守'+n;
       lab.append(c,s);kyEl.appendChild(lab);
     }
-    sumEl.textContent='現在のパッシブ低下：-'+honorPenalty()+'%'+(honorKyoubou?'（狂暴 -'+(6*honorKyoubou)+'% 含む）':'')+(honorHel?'':'　※栄誉ヘルがOFFのため未適用');
+    sumEl.textContent='現在のパッシブ低下：-'+honorPenalty()+'%'+(honorKyoubou?'（固守 -'+(12*honorKyoubou)+'% 含む）':'')+(honorHel?'':'　※栄誉ヘルがOFFのため未適用');
   }
   window.__honorSettingsRefresh=build;
   document.getElementById('honorHelBtn')?.addEventListener('click',()=>setTimeout(build,0));
@@ -2353,7 +2355,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
   }
 
   function solve(){
-    const A=prefs.forbidden?21:24,E=prefs.rage?5:8,N=Math.max(0,A-E);
+    const A=prefs.forbidden?21:24,E=prefs.rage?7:8,N=Math.max(0,A-E);
     const mc=i=>{const role=roleByIndex[i];if(role==='immortal'||i===7)return 1;if(prefs.collapse&&role==='myth')return 3;if(prefs.collapse&&role==='legend')return 9;return Infinity};
     const C=Math.min(Math.max(0,Math.floor(prefs.cap)),N*3);
     if(N<1||C<1)return {error:'キャラ上限が小さすぎるか、空けるマス数が多すぎて配置できません。'};
@@ -2464,7 +2466,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     const r3=document.createElement('div');r3.className='spRow';
     r3.innerHTML='<div class="spLabel">暴怒</div>';
     const seg3=document.createElement('div');seg3.className='spSeg';
-    [[false,'OFF（8マス空け）'],[true,'ON（5マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
+    [[false,'OFF（8マス空け）'],[true,'ON（7マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
     r3.appendChild(seg3);card.appendChild(r3);
 
     const mkToggle=(title,key)=>{
