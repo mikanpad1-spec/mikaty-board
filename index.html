@@ -321,9 +321,9 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
 /* 神の試練：指定の6x6形状。空白セルはスペースだけ保持 */
 .board.godTrialBoard{grid-template-columns:repeat(6,minmax(0,1fr))!important;grid-template-rows:repeat(6,105px)!important;padding-left:3px!important;padding-right:3px!important;overflow:visible!important}
 .board.godTrialBoard>.slot{transform:none!important}
-.board.godTrialBoard>.godTrialBlank{visibility:hidden;pointer-events:none;min-width:0}
+.board.godTrialBoard>.godTrialBlank{pointer-events:none;min-width:0;aspect-ratio:1/1;border-radius:10px;background:rgba(130,150,170,.13);box-shadow:inset 0 0 0 2px rgba(140,160,180,.16)}
 @media(min-width:700px){.board.godTrialBoard{grid-template-rows:repeat(6,minmax(0,1fr))!important;aspect-ratio:1/1;max-height:none!important}}
-@media(max-width:699px){.board.godTrialBoard{grid-template-rows:repeat(6,auto)!important;padding-left:3px!important;padding-right:3px!important}.board.godTrialBoard>.godTrialBlank{aspect-ratio:1/1}.board.battleRoyaleBoard{grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,auto)!important}.board.battleRoyaleBoard>.battleRoyaleBlank{aspect-ratio:1/1;visibility:hidden;pointer-events:none;min-width:0}}
+@media(max-width:699px){.board.godTrialBoard{grid-template-rows:repeat(6,auto)!important;padding-left:3px!important;padding-right:3px!important}.board.godTrialBoard>.godTrialBlank{aspect-ratio:1/1}.board.battleRoyaleBoard{grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,auto)!important}.board.battleRoyaleBoard>.battleRoyaleBlank{aspect-ratio:1/1;pointer-events:none;min-width:0;border-radius:10px;background:rgba(130,150,170,.13);box-shadow:inset 0 0 0 2px rgba(140,160,180,.16)}}
 </style>
 
 <style>
@@ -380,7 +380,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   #favoriteChars{width:100%!important}
   .skinPanel{width:100%!important;box-sizing:border-box!important}
 }
-.board.battleRoyaleBoard{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:4px!important;aspect-ratio:2/1;overflow:visible!important}.board.battleRoyaleBoard>.battleRoyaleBlank{visibility:hidden;pointer-events:none;min-width:0;aspect-ratio:1/1}@media(min-width:700px){.board.battleRoyaleBoard>.slot{min-width:0;aspect-ratio:1/1;height:auto!important}}
+.board.battleRoyaleBoard{display:grid!important;grid-template-columns:repeat(8,minmax(0,1fr))!important;grid-template-rows:repeat(4,minmax(0,1fr))!important;gap:4px!important;padding:4px!important;aspect-ratio:2/1;overflow:visible!important}.board.battleRoyaleBoard>.battleRoyaleBlank{pointer-events:none;min-width:0;aspect-ratio:1/1;border-radius:10px;background:rgba(130,150,170,.13);box-shadow:inset 0 0 0 2px rgba(140,160,180,.16)}@media(min-width:700px){.board.battleRoyaleBoard>.slot{min-width:0;aspect-ratio:1/1;height:auto!important}}
 .board.honorHellBoard{grid-template-columns:repeat(8,minmax(0,1fr))!important}.board.honorHellBoard>.honorBlank{pointer-events:none;min-width:0;aspect-ratio:1/1;border-radius:10px;background:rgba(130,150,170,.13);box-shadow:inset 0 0 0 2px rgba(140,160,180,.16)}.board.honorHellBoard>.honorBush{pointer-events:none;min-width:0;aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;font-size:clamp(20px,6vw,40px);border-radius:10px;background:radial-gradient(circle at 35% 35%,#4d7c3a,#2c5222 70%);box-shadow:inset 0 0 0 2px rgba(20,50,15,.55)}
 /* サポート提案 */
 #supportBtn{display:none;align-items:center;background:#1b4f5e!important;border-color:#3fa0b8!important;color:#d6f4ff!important;box-shadow:none!important}
@@ -1047,13 +1047,13 @@ function render(){
    let slotIndex=0;
    shape.flat().forEach(on=>{
      if(on) board.appendChild(makeSlot(slotIndex++));
-     else{const blank=document.createElement("div");blank.className="godTrialBlank";board.appendChild(blank);}
+     else{const blank=document.createElement("div");blank.className="godTrialBlank";blank.title="配置できません";board.appendChild(blank);}
    });
    for(let i=24;i<30;i++)extras.appendChild(makeSlot(i,true));
  }else if(battleRoyale1){
    const shape=[[1,1,0,1,1,0,1,1],[1,0,0,1,1,0,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1]];
    let slotIndex=0;
-   shape.flat().forEach(on=>{if(on)board.appendChild(makeSlot(slotIndex++));else{const blank=document.createElement("div");blank.className="battleRoyaleBlank";board.appendChild(blank);}});
+   shape.flat().forEach(on=>{if(on)board.appendChild(makeSlot(slotIndex++));else{const blank=document.createElement("div");blank.className="battleRoyaleBlank";blank.title="配置できません";board.appendChild(blank);}});
    for(let i=18;i<24;i++)extras.appendChild(makeSlot(i,true));
  }else if(honorHellVariant){
    // 栄誉ヘル変形：8x4盤面。本人指定パターン（◾=配置可18マス／◻=茂み・配置不可14マス）
@@ -1293,7 +1293,7 @@ async function exportFormationImage(){
   }else if(battleRoyale1){
     ctx.fillStyle="#111";ctx.font="bold 28px sans-serif";ctx.fillText("バトロワ変形1",65,90);
     const shape=[[1,1,0,1,1,0,1,1],[1,0,0,1,1,0,0,1],[1,0,1,1,1,1,0,1],[1,0,0,0,0,0,0,1]];
-    let si=0;const bc=82,bg=12,bx=140,by=150;shape.forEach((row,r)=>row.forEach((on,c)=>{if(!on)return;const x=bx+c*(bc+bg),y=by+r*(bc+bg);ctx.fillStyle="#fff";ctx.strokeStyle="#cfcfd6";ctx.lineWidth=2;ctx.fillRect(x,y,bc,bc);ctx.strokeRect(x,y,bc,bc);const v=grid[si++];if(!v)return;const im=map.get(v.char);if(im){const sc=Math.min((bc-8)/im.width,(bc-8)/im.height),iw=im.width*sc,ih=im.height*sc;ctx.drawImage(im,x+(bc-iw)/2,y+(bc-ih)/2,iw,ih)}if(v.stack>1){ctx.fillStyle="#111";ctx.font="bold 15px sans-serif";ctx.fillText("×"+v.stack,x+4,y+17)}}));
+    let si=0;const bc=82,bg=12,bx=140,by=150;shape.forEach((row,r)=>row.forEach((on,c)=>{const x=bx+c*(bc+bg),y=by+r*(bc+bg);if(!on){ctx.fillStyle="#dcdce2";ctx.fillRect(x,y,bc,bc);return}ctx.fillStyle="#fff";ctx.strokeStyle="#cfcfd6";ctx.lineWidth=2;ctx.fillRect(x,y,bc,bc);ctx.strokeRect(x,y,bc,bc);const v=grid[si++];if(!v)return;const im=map.get(v.char);if(im){const sc=Math.min((bc-8)/im.width,(bc-8)/im.height),iw=im.width*sc,ih=im.height*sc;ctx.drawImage(im,x+(bc-iw)/2,y+(bc-ih)/2,iw,ih)}if(v.stack>1){ctx.fillStyle="#111";ctx.font="bold 15px sans-serif";ctx.fillText("×"+v.stack,x+4,y+17)}}));
     ctx.fillStyle="#111";ctx.font="bold 25px sans-serif";ctx.fillText("ダンジョン",140,660);
     for(let j=0;j<6;j++)drawCell(grid,18+j,140+j*(bc+bg),680);
   }else if(honorHellVariant){
@@ -2355,7 +2355,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
   }
 
   function solve(){
-    const A=prefs.forbidden?21:24,E=prefs.rage?7:8,N=Math.max(0,A-E);
+    const A=prefs.forbidden?21:24,E=prefs.rage?7:5,N=Math.max(0,A-E);
     const mc=i=>{const role=roleByIndex[i];if(role==='immortal'||i===7)return 1;if(prefs.collapse&&role==='myth')return 3;if(prefs.collapse&&role==='legend')return 9;return Infinity};
     const C=Math.min(Math.max(0,Math.floor(prefs.cap)),N*3);
     if(N<1||C<1)return {error:'キャラ上限が小さすぎるか、空けるマス数が多すぎて配置できません。'};
@@ -2466,7 +2466,7 @@ body.isDragging .slot.empty,body.isDragging .extra.empty{background:#1f3a60!impo
     const r3=document.createElement('div');r3.className='spRow';
     r3.innerHTML='<div class="spLabel">暴怒</div>';
     const seg3=document.createElement('div');seg3.className='spSeg';
-    [[false,'OFF（8マス空け）'],[true,'ON（7マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
+    [[false,'OFF（5マス空け）'],[true,'ON（7マス空け）']].forEach(([val,label])=>{const b=document.createElement('button');b.type='button';b.textContent=label;b.className=prefs.rage===val?'on':'';b.addEventListener('click',()=>{prefs.rage=val;savePrefs();[...seg3.children].forEach((x,ix)=>x.classList.toggle('on',(ix===1)===val))});seg3.appendChild(b)});
     r3.appendChild(seg3);card.appendChild(r3);
 
     const mkToggle=(title,key)=>{
