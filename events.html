@@ -194,7 +194,7 @@ padding:env(safe-area-inset-top,0px) env(safe-area-inset-right,0px) env(safe-are
 
 
 <script>
-var FMT=["化身イベ","狩人","コラボ","滑り台","コラボ","幸運ガチャ","遺跡","ドライべ","花イベ","コラボ","滑り台","狩人","特殊","特殊","滑り台","コラボ","ドライべ","遺跡","滑り台","コラボ","花イベ","狩人","特殊","滑り台","特殊","狩人","コラボ","ドライべ"];
+var FMT=["化身イベ","狩人","コラボ","滑り台","コラボ","幸運ガチャ","遺跡","ドライべ","花イベ","コラボ","滑り台","狩人","特殊","特殊","滑り台","コラボ","ドライべ","遺跡","滑り台","コラボ","花イベ","狩人","特殊","滑り台","特殊","狩人","コラボ","ドライべ","特殊"];
 var EV=[
 ["2026-05-02","2026-05-09","キキララ",1],
 ["2026-05-10","2026-05-18","ミカエル実装",1],
@@ -223,7 +223,8 @@ var EV=[
 ["2026-11-01","2026-11-08","ハロウィン",1],
 ["2026-11-09","2026-11-15","デラカラー",0],
 ["2026-11-16","2026-11-22","狐コラボ復刻",0],
-["2026-11-23","2026-11-29","鯨乗り物",0]
+["2026-11-23","2026-11-29","鯨乗り物",0],
+["2026-11-25","2026-12-08","恐竜猫カラー",0]
 
 ].map(function(e,i){return{id:i,s:e[0],e:e[1],n:e[2],done:!!e[3],c:i%4,f:FMT[i]}});
 /* イベント番号(上の並び順で0から)ごとの詳細画像。画像は img/ に置いて相対パスで指定する */
@@ -423,7 +424,7 @@ function renderSearch(){
 (function(){var seen={};EV.forEach(function(ev){var f=catOf(ev);if(seen[f])return;seen[f]=1;var o=el("option","",f);o.value=f;$("fmt").appendChild(o)})})();
 $("fmt").addEventListener("change",function(){fmt=this.value;renderSearch();renderSel();renderMonth();renderAll()});
 var IMG={},_imgReady=false,_imgP=null,_curEv=null;
-function loadIMG(){if(_imgP)return _imgP;_imgP=Promise.all([1,2,3,4,5].map(function(n){return new Promise(function(res){var s=document.createElement("script");s.src="imgdata"+n+".js";s.onload=s.onerror=function(){res()};document.head.appendChild(s)})})).then(function(){_imgReady=true;renderSearch();renderSel();renderMonth();renderAll();if(_curEv&&!$("ov").hidden)openDetail(_curEv)});return _imgP}
+function loadIMG(){if(_imgP)return _imgP;_imgP=Promise.all([1,2,3,4,5,6].map(function(n){return new Promise(function(res){var s=document.createElement("script");s.src="imgdata"+n+".js";s.onload=s.onerror=function(){res()};document.head.appendChild(s)})})).then(function(){_imgReady=true;renderSearch();renderSel();renderMonth();renderAll();if(_curEv&&!$("ov").hidden)openDetail(_curEv)});return _imgP}
 renderSearch();
 renderSel();renderMonth();renderAll();
 if(window.requestIdleCallback)requestIdleCallback(function(){loadIMG()},{timeout:3000});else setTimeout(loadIMG,1800);
