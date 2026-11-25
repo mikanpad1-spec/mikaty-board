@@ -187,7 +187,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   .characterHeading{margin-top:8px}
   .characterControls{border:1px solid #294866;border-radius:12px 12px 0 0;padding:6px!important;box-shadow:0 -5px 18px #0005}
   .roleSection.activeRole{background:#0d1c30;border:1px solid #294866;border-top:0;border-radius:0 0 12px 12px;padding:5px 4px 1px;margin-top:0}
-  .charCardWrap.placeReady .card{outline:2px solid #f1ca52;outline-offset:-2px;box-shadow:0 0 10px #f1ca5266}.charCardWrap.fukyuBanned{opacity:.35;filter:grayscale(.85)}.slot.fixedLord{box-shadow:inset 0 0 0 2px rgba(241,202,82,.85);cursor:default}
+  .charCardWrap.placeReady .card{outline:2px solid #f1ca52;outline-offset:-2px;box-shadow:0 0 10px #f1ca5266}.charCardWrap.fukyuBanned{opacity:.35;filter:grayscale(.85)}.slot.fixedLord{box-shadow:inset 0 0 0 3px rgba(241,202,82,.95)!important;outline:2px solid rgba(241,202,82,.9);outline-offset:-2px;cursor:default}
 }
 .placeHint{display:none;color:#f6d86e;font-size:11px;font-weight:800;text-align:center;margin:3px 0}
 @media(max-width:699px){.placeHint.show{display:block}}
@@ -860,7 +860,7 @@ function initStack(ci,ex){if(!canStack(ci))return 1;const room=maxCopies(ci)-cha
 function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="morite"?27:(boardMode==="honorHellVariant"?(debuffState().forbidden?21:24):(debuffState().forbidden?21:24)))))}
 function fixMoriteGrid(){
  if(boardMode!=="morite")return;
- for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&(roleByIndex[v.char]==="immortal"||(v.char===7&&i!==5)))grid[i]=null;}
+ for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&(roleByIndex[v.char]==="immortal"||(v.char===7&&i!==5)))grid[i]=null;else if(v)v.stack=1;}
  grid[5]={char:7,stack:1};
 }
 function normalizeRules(){
@@ -2049,6 +2049,7 @@ html:has(#godTrialBtn.active){--ui-glow:rgba(255,190,70,.24)}
 html:has(#battleRoyale1Btn.active){--ui-glow:rgba(70,220,190,.24)}
 html:has(#honorHellShapeBtn.active){--ui-glow:rgba(255,150,60,.24)}
 html:has(#moriteBtn.active){--ui-glow:rgba(255,90,160,.24)}
+body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCardWrap{opacity:.35!important;filter:grayscale(.85)!important}
 
 /* デバフ選択をチップ化 */
 .debuff strong{display:inline!important;margin:0!important;font-size:12px;color:var(--ui-muted)}
