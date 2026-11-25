@@ -187,7 +187,7 @@ body.opponent-board .board{box-shadow:0 0 0 2px rgba(210,70,90,.22);background:#
   .characterHeading{margin-top:8px}
   .characterControls{border:1px solid #294866;border-radius:12px 12px 0 0;padding:6px!important;box-shadow:0 -5px 18px #0005}
   .roleSection.activeRole{background:#0d1c30;border:1px solid #294866;border-top:0;border-radius:0 0 12px 12px;padding:5px 4px 1px;margin-top:0}
-  .charCardWrap.placeReady .card{outline:2px solid #f1ca52;outline-offset:-2px;box-shadow:0 0 10px #f1ca5266}
+  .charCardWrap.placeReady .card{outline:2px solid #f1ca52;outline-offset:-2px;box-shadow:0 0 10px #f1ca5266}.charCardWrap.fukyuBanned{opacity:.35;filter:grayscale(.85)}
 }
 .placeHint{display:none;color:#f6d86e;font-size:11px;font-weight:800;text-align:center;margin:3px 0}
 @media(max-width:699px){.placeHint.show{display:block}}
@@ -859,6 +859,8 @@ function canAdd(charIndex,amount=1,excludeSlot=-1){
 function initStack(ci,ex){if(!canStack(ci))return 1;const room=maxCopies(ci)-charCount(ci,ex);return Math.max(1,Math.min(3,room))}
 function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="morite"?26:(boardMode==="honorHellVariant"?(debuffState().forbidden?21:24):(debuffState().forbidden?21:24)))))}
 function normalizeRules(){
+ // 守り手では不朽キャラを使えない
+ if(boardMode==="morite"){for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&roleByIndex[v.char]==="immortal")grid[i]=null;}}
  // 禁制領域ON時は使えない後半3マスを空にする
  if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && boardMode!=="battleRoyale1" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
@@ -1090,6 +1092,7 @@ function render(){
  updateTotal();
  const ready=selected>=0 && selected<activeSlots() && !grid[selected];
  document.querySelectorAll(".charCardWrap").forEach(el=>el.classList.toggle("placeReady",ready));
+ document.querySelectorAll(".charCardWrap").forEach(el=>el.classList.toggle("fukyuBanned",boardMode==="morite"&&roleByIndex[Number(el.dataset.charIndex)]==="immortal"));
  const ph=document.getElementById("placeHint"); if(ph) ph.classList.toggle("show",ready);
  const ident=document.getElementById("boardIdentity"); if(ident) ident.textContent=boardMode==="collapseSpace"?"🟣 崩壊空間":(boardMode==="godTrial"?"🟡 神の試練":(boardMode==="battleRoyale1"?"🟢 バトロワ変形1":(boardMode==="honorHellVariant"?"🟠 栄誉ヘル変形":(boardMode==="morite"?"🛡 守り手":"🔵 自分の盤面"))));
  const selBar=document.getElementById("selectedCharBar"); if(selBar) selBar.classList.toggle("show",ready);
