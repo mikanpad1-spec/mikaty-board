@@ -423,6 +423,8 @@ html body .board .slot .badge{z-index:3}
 html body .slot img.possessBadge,html body .extra img.possessBadge{position:absolute;top:1px;right:1px;width:40%;height:40%;object-fit:contain;z-index:5;cursor:pointer;border-radius:6px;background:rgba(8,17,31,.45);box-shadow:0 0 0 1.5px #f1ca52}
 .evolveCardBadge{display:none;position:absolute;left:2px;top:2px;z-index:4;font-size:9px;font-weight:900;color:#08111f;background:linear-gradient(180deg,#ffd94d,#f5a623);border-radius:999px;padding:1px 5px;box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
 body:has(#moriteBtn.active) .evolveCardBadge{display:block}
+body:has(#moriteBtn.active) #dungeonTitle{display:none!important}
+body:has(#moriteBtn.active) #extras{display:none!important}
 .slot .evolveBadge,.extra .evolveBadge{position:absolute;bottom:1px;right:1px;z-index:6;font-size:9px;font-weight:900;color:#08111f;background:linear-gradient(180deg,#ffd94d,#f5a623);border-radius:999px;padding:1px 5px;box-shadow:0 0 0 1.5px rgba(0,0,0,.35);pointer-events:none;animation:evolvePulse 1.6s ease-in-out infinite}
 @keyframes evolvePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
 #evolveChartBar{display:none;margin:8px 0 0}
