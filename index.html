@@ -550,7 +550,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <script src="charimg1.js"></script><script src="charimg2.js"></script><script>
 const chars=window.CHARS_DATA;
 
-const charNames=["かぐや姫","妖精シンガー","聖使者（神格前）","イサイ","牛","大剣ペンギン","白梟投手","領主","玄武","ミカエル","アレス","イグニス","コイン式機械","ブラストネコ","炎の魔竜（孵化前）","死霊術の魔女","グリフィン","ロン","剣霊","ワニキング","パルス装置","ハンター","破壊装置","暗影ハンター","ブードゥー祭祀","厳冬の心","終結者","緋色の鎌","悟空","閃光","ホタル","爆破兵","元素霊","レンジャー","戦士","鬼武者","ファンネル","シスター","弓術士","十字軍","銃士","演奏家","嵐の魔道士","時空砲兵","聖使者","炎の魔竜","闘戦勝仏","鏡玄","デラ"];
+const charNames=["かぐや姫","妖精シンガー","聖使者（神格前）","イサイ","牛","大剣ペンギン","白梟投手","領主","玄武","ミカエル","アレス","イグニス","コイン式機械","ブラストネコ","炎の魔竜（孵化前）","死霊術の魔女","グリフィン","ロン","剣霊","ワニキング","パルス装置","ハンター","破壊装置","暗影ハンター","ブードゥー祭祀","厳冬の心","終結者","緋色の鎌","悟空","閃光","ホタル","爆破兵","元素霊","レンジャー","戦士","鬼武者","ファンネル","シスター","弓術士","十字軍","銃士","演奏家","嵐の魔道士","時空砲兵","聖使者","炎の魔竜","闘戦勝仏","鏡玄","デラ","バトロワ破壊装置","通常牛","ヘル牛","魔道士","白魔道士","時空砲","破壊装置"];
 
 /* ===== 属性・種族データ（インデックス＝charNamesの番号） =====
    空欄のキャラは未設定。追加したい場合は下の表に書き足すだけで、表示・合計に反映されます。 */
@@ -558,6 +558,13 @@ const CHAR_ATTR={
   46:["自然"],        // 闘戦勝仏
   47:["稲妻"],        // 鏡玄
   48:["氷霜"],        // デラ
+  49:["稲妻"],        // バトロワ破壊装置（守り手専用）
+  50:["物理"],        // 通常牛（守り手専用）
+  51:["物理"],        // ヘル牛（守り手専用）
+  52:["自然"],        // 魔道士（守り手専用）
+  53:["自然"],        // 白魔道士（守り手専用）
+  54:["炎"],          // 時空砲（守り手専用）
+  55:["稲妻"],        // 破壊装置（守り手専用）
   0:["氷霜","自然"],  // かぐや姫
   1:["自然"],         // 妖精シンガー
   2:["神聖"],         // 聖使者（神格前）
@@ -610,7 +617,8 @@ const CHAR_RACE={
   23:["人間"],24:["獣族"],25:["エルフ族"],26:["人間"],27:["悪魔族"],28:["神族"],29:["獣族"],30:["悪魔族"],
   4:["獣族"],5:["獣族"],6:["獣族"],20:["機械族"],21:["人間"],22:["機械族"],31:["人間"],32:["エルフ族"],33:["人間"],
   34:["人間"],35:["悪魔族"],36:["機械族"],37:["人間"],38:["人間"],39:["人間"],40:["人間"],41:["エルフ族"],42:["人間"],43:["人間"],
-  44:["神族"],45:["竜族"],46:["神族"],47:["人間"],48:["悪魔族"]
+  44:["神族"],45:["竜族"],46:["神族"],47:["人間"],48:["悪魔族"],
+  49:["機械族"],50:["獣族"],51:["獣族"],52:["人間"],53:["人間"],54:["人間"],55:["機械族"]
 };
 const TAG_COLORS={
   "物理":["#cfdbe3","#34566b"],"炎":["#f8d3d0","#b8312a"],"稲妻":["#fbe6a2","#8f6200"],
@@ -659,7 +667,9 @@ const DEFAULT_CHAR_STATS = {
   6:{attack:0,speed:6,passive:0},    // 白梟投手
   44:{attack:0,speed:10,passive:0},  // 聖使者（聖使者（神格前）[2]と同じ設定）
   45:{attack:10,speed:0,passive:0},  // 炎の魔竜（孵化前のドラゴン[14]と同じ設定）
-  48:{attack:10,speed:0,passive:0}   // デラ
+  48:{attack:10,speed:0,passive:0},   // デラ
+  50:{attack:0,speed:5,passive:0},    // 通常牛（牛と同じ設定）
+  51:{attack:0,speed:5,passive:0}     // ヘル牛（牛と同じ設定）
 };
 Object.entries(DEFAULT_CHAR_STATS).forEach(([i,v])=>{
   charStats[Number(i)]={...charStats[Number(i)],...v};
@@ -822,7 +832,7 @@ poolRare=document.getElementById("poolRare"),
 poolNormal=document.getElementById("poolNormal"),
 poolFav=document.getElementById("poolFav");
 const allPools=[poolImmortal,poolMyth,poolLegend,poolRare,poolOther,poolElite,poolNormal,poolFav];
-const roleByIndex=["immortal","myth","myth","myth","legend","rare","rare","other","myth","immortal","immortal","immortal","myth","myth","myth","myth","myth","myth","myth","myth","rare","normal","legend","myth","myth","myth","myth","myth","myth","myth","myth","normal","normal","normal","normal","elite","elite","elite","elite","elite","rare","rare","legend","legend","myth","myth","immortal","myth","myth"];
+const roleByIndex=["immortal","myth","myth","myth","legend","rare","rare","other","myth","immortal","immortal","immortal","myth","myth","myth","myth","myth","myth","myth","myth","rare","normal","legend","myth","myth","myth","myth","myth","myth","myth","myth","normal","normal","normal","normal","elite","elite","elite","elite","elite","rare","rare","legend","legend","myth","myth","immortal","myth","myth","legend","legend","legend","legend","legend","legend","legend"];
 function targetPool(i){
  return roleByIndex[i]==="immortal"?poolImmortal:
         roleByIndex[i]==="myth"?poolMyth:
@@ -864,9 +874,11 @@ function canAdd(charIndex,amount=1,excludeSlot=-1){
 function initStack(ci,ex){if(!canStack(ci))return 1;const room=maxCopies(ci)-charCount(ci,ex);return Math.max(1,Math.min(3,room))}
 function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="morite"?27:(boardMode==="honorHellVariant"?(debuffState().forbidden?21:24):(debuffState().forbidden?21:24)))))}
 // 守り手で出せるのは指定の神話と伝説だけ（2026-11-26 本人指定のスクショ準拠）
-const MORITE_ALLOWED=new Set([4,22,42,43,1,3,8,12,13,15,16,17,18,19,24,25,26,27,28,29,30,44,45,47,48]);
-// 伝説→進化先の神話（牛と破壊装置と嵐の魔道士は2系統分を統合）
-const MORITE_EVOLUTIONS={4:[8,19,29,1,17,16],22:[27,28,12,26,47,3],42:[25,13,45,15,30,44],43:[24,18,48]};
+const MORITE_ALLOWED=new Set([49,50,51,52,53,54,55,1,2,3,8,12,13,15,16,17,18,19,24,25,26,27,28,29,30,44,45,47,48]);
+// 守り手専用キャラ（他の盤面では出せない・一覧にも出ない）
+const MORITE_ONLY=new Set([49,50,51,52,53,54,55]);
+// 伝説→進化先の神話（守り手専用の伝説7体、それぞれ3択）
+const MORITE_EVOLUTIONS={49:[27,28,12],50:[8,19,29],51:[1,17,16],52:[25,13,45],53:[15,30,44],54:[24,18,48],55:[26,47,3]};
 let evolvePickerEl=null;
 function closeEvolvePicker(){if(evolvePickerEl){evolvePickerEl.remove();evolvePickerEl=null;}}
 function openEvolvePicker(i){
@@ -903,6 +915,8 @@ function fixMoriteGrid(){
  grid[5]=grid[5]&&grid[5].possess!=null?{char:7,stack:1,possess:grid[5].possess}:{char:7,stack:1};
 }
 function normalizeRules(){
+ // 守り手専用キャラは他の盤面では使えない
+ if(boardMode!=="morite") grid.forEach((v,idx)=>{if(v&&MORITE_ONLY.has(v.char))grid[idx]=null;});
  // 守り手では不朽キャラを使えず、右上（index 5）に領主が固定される
  fixMoriteGrid();
  // デラは単体配置と憑依を同時にしない（単体がいれば憑依を解除。憑依への移行はdropOn側で単体を消す）
@@ -1082,8 +1096,8 @@ function makeSlot(i,extra=false){
 function render(){
  fixMoriteGrid();
  {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。伝説をタップすると進化できます。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
- document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));});
- document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")).length;sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=(boardMode==="morite"?vis:wraps.length)+"体";const role=sec.dataset.roleSection;if(role)document.querySelectorAll('.roleTab[data-role="'+role+'"]').forEach(t=>t.classList.toggle("moriteTabHidden",boardMode==="morite"&&vis===0));});
+ document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));w.classList.toggle("moriteOnlyHidden",boardMode!=="morite"&&MORITE_ONLY.has(ci));});
+ document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")&&!w.classList.contains("moriteOnlyHidden")).length;sec.classList.toggle("moriteSectionHidden",wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=vis+"体";const role=sec.dataset.roleSection;if(role)document.querySelectorAll('.roleTab[data-role="'+role+'"]').forEach(t=>t.classList.toggle("moriteTabHidden",wraps.length>0&&vis===0));});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
  if(rangeSet.length)rangeSet=boardMode==="normal"?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
  if(desertSet.length)desertSet=boardMode==="normal"?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
@@ -1718,7 +1732,7 @@ document.addEventListener("DOMContentLoaded",()=>{
     h.append(left,btn);
     if(saved[role]) sec.classList.add('rarityCollapsed');
     const refresh=()=>{
-      const n=pool.querySelectorAll('.charCardWrap').length;
+      const n=[...pool.querySelectorAll('.charCardWrap')].filter(w=>!w.classList.contains('moriteHidden')&&!w.classList.contains('moriteOnlyHidden')).length;
       count.textContent=n+'体';
       const closed=sec.classList.contains('rarityCollapsed');
       btn.textContent=closed?'表示する ＋':'しまう −';
@@ -2110,6 +2124,7 @@ body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCard
 .charCardWrap.moriteHidden{display:none!important}
 .roleSection.moriteSectionHidden{display:none!important}
 .roleTab.moriteTabHidden{display:none!important}
+.charCardWrap.moriteOnlyHidden{display:none!important}
 #evolvePicker{position:fixed;inset:0;background:rgba(2,6,16,.72);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
 .evolvePanel{background:#0d1c30;border:1px solid #365574;border-radius:14px;padding:14px;max-width:340px;width:100%}
 .evolveTitle{font-weight:900;font-size:15px;margin-bottom:10px;color:#eaf3ff}
@@ -2785,7 +2800,7 @@ window.uiConfirm=function(msg){return new Promise(res=>{
   document.querySelectorAll('.roleSection[data-role-section]').forEach(sec=>{
     const role=sec.dataset.roleSection; if(role==='fav')return;
     const pool=sec.querySelector('.pool'); if(!pool)return;
-    const n=pool.querySelectorAll('.charCardWrap').length;
+    const n=[...pool.querySelectorAll('.charCardWrap')].filter(w=>!w.classList.contains('moriteHidden')&&!w.classList.contains('moriteOnlyHidden')).length;
     const cnt=sec.querySelector('.rarityCount'); if(cnt)cnt.textContent=n+'体';
     sec.classList.toggle('roleEmpty',n===0);
     document.querySelectorAll('.roleTab[data-role="'+role+'"]').forEach(t=>t.classList.toggle('roleEmpty',n===0));
