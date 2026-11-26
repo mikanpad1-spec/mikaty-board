@@ -421,6 +421,23 @@ html body .board .slot.ultRange>img,html body .board .slot.ultCenter>img{positio
 html body .board .slot .badge{z-index:3}
 .slot,.extra{position:relative}
 html body .slot img.possessBadge,html body .extra img.possessBadge{position:absolute;top:1px;right:1px;width:40%;height:40%;object-fit:contain;z-index:5;cursor:pointer;border-radius:6px;background:rgba(8,17,31,.45);box-shadow:0 0 0 1.5px #f1ca52}
+.evolveCardBadge{display:none;position:absolute;left:2px;top:2px;z-index:4;font-size:9px;font-weight:900;color:#08111f;background:linear-gradient(180deg,#ffd94d,#f5a623);border-radius:999px;padding:1px 5px;box-shadow:0 0 0 1.5px rgba(0,0,0,.35)}
+body:has(#moriteBtn.active) .evolveCardBadge{display:block}
+.slot .evolveBadge,.extra .evolveBadge{position:absolute;bottom:1px;right:1px;z-index:6;font-size:9px;font-weight:900;color:#08111f;background:linear-gradient(180deg,#ffd94d,#f5a623);border-radius:999px;padding:1px 5px;box-shadow:0 0 0 1.5px rgba(0,0,0,.35);pointer-events:none;animation:evolvePulse 1.6s ease-in-out infinite}
+@keyframes evolvePulse{0%,100%{transform:scale(1)}50%{transform:scale(1.14)}}
+#evolveChartBar{display:none;margin:8px 0 0}
+body:has(#moriteBtn.active) #evolveChartBar{display:block}
+#evolveChartBtn{background:linear-gradient(180deg,#ffd94d,#f5a623);color:#08111f;font-weight:900;border:0;border-radius:999px;padding:7px 14px;cursor:pointer;font-size:13px}
+#evolveChart{position:fixed;inset:0;background:rgba(2,6,16,.72);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
+.chartPanel{background:#0d1c30;border:1px solid #365574;border-radius:14px;padding:14px;max-width:560px;width:100%;max-height:86vh;overflow-y:auto}
+.chartTitle{font-weight:900;font-size:15px;margin-bottom:10px;color:#eaf3ff}
+.chartRow{display:flex;align-items:center;gap:8px;margin-bottom:10px;background:#10233c;border:1px solid #24405f;border-radius:10px;padding:6px}
+.chartCell{display:flex;flex-direction:column;align-items:center;gap:3px;color:#eaf3ff;font-size:10px;width:64px;text-align:center;flex:0 0 auto}
+.chartCell img{width:46px;height:46px;object-fit:contain}
+.chartCell.from{font-weight:900}
+.chartArrow{color:#ffd94d;font-weight:900;font-size:16px;flex:0 0 auto}
+.chartTargets{display:flex;gap:6px;flex-wrap:wrap}
+.chartClose{margin-top:4px;width:100%;padding:9px;background:#1a2f47;border:1px solid #365574;border-radius:9px;color:#cfe2f7;cursor:pointer}
 html body .board .slot .ultNum{position:absolute;left:2px;top:2px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--ultc,#9a63e6);color:#fff;font-size:11px;font-weight:900;line-height:16px;text-align:center;z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:none}
 html body .board.ultActive .slot:not(.ultRange):not(.ultCenter){opacity:.4}
 html body .board .slot.ultCenter{outline:3px solid #c98cff;outline-offset:-3px}
@@ -502,7 +519,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <div style="text-align:center;color:#666;font-size:14px;font-weight:600;margin:10px 0 14px">製作者 みかてぃ</div><main>
 <div class="jumpLinks"><a href="#skinPanel">↓ スキン設定へ</a><a href="#honorHelPanel">↓ 栄誉ヘル詳細設定</a></div>
 <h1>ペタペタペンギン団盤面シミュレーター</h1><p class="seoIntro">ペタペン盤面シュミレーター｜ペタペタペンギン団の盤面・編成作成とステータス計算に対応。</p>
-<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button><button type="button" id="battleRoyale1Btn" class="modeBtn battleRoyaleMode">バトロワ変形1</button><button type="button" id="honorHellShapeBtn" class="modeBtn honorHellMode">栄誉ヘル変形</button><button type="button" id="moriteBtn" class="modeBtn moriteMode">守り手</button></div>
+<div class="modeSwitch"><button type="button" id="normalModeBtn" class="modeBtn active">通常盤面</button><button type="button" id="collapseSpaceBtn" class="modeBtn collapseMode">崩壊空間</button><button type="button" id="godTrialBtn" class="modeBtn godTrialMode">神の試練</button><button type="button" id="battleRoyale1Btn" class="modeBtn battleRoyaleMode">バトロワ変形1</button><button type="button" id="honorHellShapeBtn" class="modeBtn honorHellMode">栄誉ヘル変形</button><button type="button" id="moriteBtn" class="modeBtn moriteMode">守り手</button></div><div id="evolveChartBar"><button type="button" id="evolveChartBtn">📖 進化図鑑（守り手）</button></div>
 <p class="sub">配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。</p>
 <p class="sub" id="ultHint">シンガー・かぐや姫をタップすると「究極範囲」が紫色で表示されます（複数タップ可・左上の数字が重なっている数で、数が多いほど色が濃く／もう一度タップで解除）。領主をタップすると「砂漠範囲」（周囲2マス）が黄色で表示されます。</p>
 <div class="tools"><button id="undoBtn" type="button">↶ 元に戻す</button><button id="redoBtn" type="button">↷ やり直す</button><button id="clearBtn">盤面消去</button><button id="resetAllBtn" type="button">全部リセット</button><button type="button" id="exportImageBtn">画像保存</button><button type="button" id="shareBtn">🔗 編成URLをコピー</button><button type="button" id="honorHelBtn" aria-pressed="false" title="ON：パッシブ低下を詳細設定の値（初期-60%）で開始し、攻撃・速度に ×(1＋パッシブ%) をかけます">栄誉ヘル</button><button type="button" id="presetBtn" title="通常盤面：自分の盤面を3セットまで登録・呼び出し">盤面プリセット</button><button type="button" id="supportBtn" title="通常盤面のみ：条件から一番数値が盛れる編成を提案します">サポート提案</button><button type="button" id="moreToolsBtn" aria-label="その他の操作">⋯</button><div class="count">合計キャラ数 <b id="topTotal">0</b></div><div class="statsBox"><span class="statItem">残り <b id="remainingSlots">24</b></span><span class="statItem">⚔ 攻撃 <b id="atkTotal">0</b>%</span><span class="statItem">⚡ 速度 <b id="spdTotal">0</b>%</span><span class="statItem">✦ パッシブ <b id="passTotal">0</b>%</span><span class="statItem" id="attrKindsItem"><b id="attrKinds">0</b>属性</span><span class="statItem" id="raceKindsItem"><b id="raceKinds">0</b>種族</span><div id="statsBreakdown" class="statsBreakdown"></div>
@@ -881,6 +898,37 @@ const MORITE_ONLY=new Set([49,50,51,52,53,54,55]);
 const MORITE_EVOLUTIONS={49:[27,28,12],50:[8,19,29],51:[1,17,16],52:[25,13,45],53:[15,30,44],54:[24,18,48],55:[26,47,3]};
 let evolvePickerEl=null;
 function closeEvolvePicker(){if(evolvePickerEl){evolvePickerEl.remove();evolvePickerEl=null;}}
+let evolveChartEl=null;
+function closeEvolveChart(){if(evolveChartEl){evolveChartEl.remove();evolveChartEl=null;}}
+function openEvolveChart(){
+ closeEvolveChart();
+ const ov=document.createElement("div"); ov.id="evolveChart";
+ const panel=document.createElement("div"); panel.className="chartPanel";
+ const title=document.createElement("div"); title.className="chartTitle"; title.textContent="進化図鑑（守り手）";
+ panel.appendChild(title);
+ Object.keys(MORITE_EVOLUTIONS).map(Number).sort((a,b)=>a-b).forEach(legend=>{
+  const row=document.createElement("div"); row.className="chartRow";
+  const from=document.createElement("div"); from.className="chartCell from";
+  const fi=document.createElement("img"); fi.src=chars[legend]; fi.alt=charNames[legend];
+  const fn=document.createElement("span"); fn.textContent=charNames[legend];
+  from.append(fi,fn);
+  const arrow=document.createElement("div"); arrow.className="chartArrow"; arrow.textContent="\u2192";
+  const targets=document.createElement("div"); targets.className="chartTargets";
+  MORITE_EVOLUTIONS[legend].forEach(t=>{
+   const cell=document.createElement("div"); cell.className="chartCell";
+   const im=document.createElement("img"); im.src=chars[t]; im.alt=charNames[t];
+   const nm=document.createElement("span"); nm.textContent=charNames[t];
+   cell.append(im,nm); targets.appendChild(cell);
+  });
+  row.append(from,arrow,targets); panel.appendChild(row);
+ });
+ const closeBtn=document.createElement("button"); closeBtn.type="button"; closeBtn.className="chartClose"; closeBtn.textContent="閉じる";
+ closeBtn.addEventListener("click",closeEvolveChart);
+ panel.appendChild(closeBtn);
+ ov.appendChild(panel);
+ ov.addEventListener("click",e=>{if(e.target===ov)closeEvolveChart();});
+ document.body.appendChild(ov); evolveChartEl=ov;
+}
 function openEvolvePicker(i){
  closeEvolvePicker();
  const opts=MORITE_EVOLUTIONS[grid[i].char]; if(!opts)return;
@@ -1052,6 +1100,7 @@ function makeSlot(i,extra=false){
    s.appendChild(makeImg(chars[v.char]));
    if(v.stack>1){const b=document.createElement("span");b.className="badge";b.textContent="×"+v.stack;s.appendChild(b)}
    if(v.possess!=null){const p=document.createElement("img");p.src=chars[v.possess];p.className="possessBadge";p.alt="憑依";p.title="デラ憑依中（タップで解除）";p.draggable=false;p.addEventListener("click",e=>{e.stopPropagation();delete grid[i].possess;normalizeRules();render();});s.appendChild(p)}
+   if(boardMode==="morite"&&v&&MORITE_EVOLUTIONS[v.char]){const eb=document.createElement("span");eb.className="evolveBadge";eb.textContent="進化";s.appendChild(eb)}
    s.draggable=true;
    s.addEventListener("dragstart",e=>{dragData={type:"slot",from:i};e.dataTransfer.effectAllowed="move"});
  }
@@ -1095,7 +1144,7 @@ function makeSlot(i,extra=false){
 }
 function render(){
  fixMoriteGrid();
- {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。伝説をタップすると進化できます。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
+ {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。伝説はタップで進化できます（金の「進化」バッジが目印）。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
  document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));w.classList.toggle("moriteOnlyHidden",boardMode!=="morite"&&MORITE_ONLY.has(ci));});
  document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")&&!w.classList.contains("moriteOnlyHidden")).length;sec.classList.toggle("moriteSectionHidden",wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=vis+"体";const role=sec.dataset.roleSection;if(role)document.querySelectorAll('.roleTab[data-role="'+role+'"]').forEach(t=>t.classList.toggle("moriteTabHidden",wraps.length>0&&vis===0));});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
@@ -1199,7 +1248,7 @@ const CHAR_DISPLAY_ORDER=[...chars.keys()].sort((x,y)=>{
 });
 function buildCard(i){
  const src=chars[i];
- const wrap=document.createElement("div");wrap.className="charCardWrap";wrap.dataset.charIndex=i;if(selected>=0&&selected<activeSlots()&&!grid[selected])wrap.classList.add("placeReady");const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);{const tg=charTagsEl(i);if(tg)wrap.appendChild(tg);}
+ const wrap=document.createElement("div");wrap.className="charCardWrap";wrap.dataset.charIndex=i;if(selected>=0&&selected<activeSlots()&&!grid[selected])wrap.classList.add("placeReady");const c=document.createElement("div");c.className="card";c.draggable=true;c.appendChild(makeImg(src));const nm=document.createElement("div");nm.className="charName";nm.textContent=charNames[i];wrap.append(c,nm);if(MORITE_EVOLUTIONS[i]){const eb=document.createElement("span");eb.className="evolveCardBadge";eb.textContent="進化";wrap.appendChild(eb);}{const tg=charTagsEl(i);if(tg)wrap.appendChild(tg);}
  c.addEventListener("dragstart",e=>{dragData={type:"char",char:i};e.dataTransfer.effectAllowed="copy"});
  c.addEventListener("touchstart",()=>{dragData={type:"char",char:i}},{passive:true});
  c.addEventListener("touchend",e=>{
@@ -1289,7 +1338,7 @@ function refreshSkinModeUI(){
  renderSkinUI();
 }
 function switchBoardMode(mode){
- closeEvolvePicker();
+ closeEvolvePicker(); closeEvolveChart();
  saveCurrentBoard();syncSkinGlobalsToStore();persistSkinStore();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="battleRoyale1"?battleRoyale1Grid:(mode==="honorHellVariant"?honorHellVariantGrid:(mode==="morite"?moriteGrid:normalGrid))));selected=-1;dragData=null;applySkinMode(mode);
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
@@ -1307,6 +1356,7 @@ document.getElementById("godTrialBtn").addEventListener("click",()=>switchBoardM
 document.getElementById("battleRoyale1Btn").addEventListener("click",()=>switchBoardMode("battleRoyale1"));
 document.getElementById("honorHellShapeBtn").addEventListener("click",()=>switchBoardMode("honorHellVariant"));
 document.getElementById("moriteBtn").addEventListener("click",()=>switchBoardMode("morite"));
+document.getElementById("evolveChartBtn").addEventListener("click",openEvolveChart);
 
 
 try{
