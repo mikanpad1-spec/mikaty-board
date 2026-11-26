@@ -863,9 +863,13 @@ function canAdd(charIndex,amount=1,excludeSlot=-1){
 }
 function initStack(ci,ex){if(!canStack(ci))return 1;const room=maxCopies(ci)-charCount(ci,ex);return Math.max(1,Math.min(3,room))}
 function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTrial"?30:(boardMode==="battleRoyale1"?24:(boardMode==="morite"?27:(boardMode==="honorHellVariant"?(debuffState().forbidden?21:24):(debuffState().forbidden?21:24)))))}
+// 守り手で出せるのは指定の神話と伝説だけ（2026-11-26 本人指定のスクショ準拠）
+const MORITE_ALLOWED=new Set([4,22,42,43,1,3,8,12,13,15,16,17,18,19,24,25,26,27,28,29,30,44,45,47,48]);
+// 伝説→進化先の神話（牛と破壊装置と嵐の魔道士は2系統分を統合）
+const MORITE_EVOLUTIONS={4:[8,19,29,1,17,16],22:[27,28,12,26,47,3],42:[25,13,45,15,30,44],43:[24,18,48]};
 function fixMoriteGrid(){
  if(boardMode!=="morite")return;
- for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&(roleByIndex[v.char]==="immortal"||(v.char===7&&i!==5)))grid[i]=null;else if(v)v.stack=1;}
+ for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&i!==5&&!MORITE_ALLOWED.has(v.char))grid[i]=null;else if(v)v.stack=1;}
  grid[5]=grid[5]&&grid[5].possess!=null?{char:7,stack:1,possess:grid[5].possess}:{char:7,stack:1};
 }
 function normalizeRules(){
@@ -1043,7 +1047,8 @@ function makeSlot(i,extra=false){
 }
 function render(){
  fixMoriteGrid();
- {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：不朽キャラは使えません。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
+ {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
+ document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteBanned",boardMode==="morite"&&ci!==7&&!MORITE_ALLOWED.has(ci));});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
  if(rangeSet.length)rangeSet=boardMode==="normal"?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
  if(desertSet.length)desertSet=boardMode==="normal"?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
@@ -2066,6 +2071,7 @@ html:has(#battleRoyale1Btn.active){--ui-glow:rgba(70,220,190,.24)}
 html:has(#honorHellShapeBtn.active){--ui-glow:rgba(255,150,60,.24)}
 html:has(#moriteBtn.active){--ui-glow:rgba(255,90,160,.24)}
 body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCardWrap{opacity:.35!important;filter:grayscale(.85)!important}
+.charCardWrap.moriteBanned{opacity:.35!important;filter:grayscale(.85)!important}
 body:has(#moriteBtn.active) .board.moriteBoard>.slot.fixedLord{box-shadow:inset 0 0 0 3px #f1ca52!important;outline:3px solid #f1ca52!important;outline-offset:-3px!important;border-color:#f1ca52!important}
 
 /* デバフ選択をチップ化 */
