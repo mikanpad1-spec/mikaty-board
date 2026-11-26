@@ -419,6 +419,8 @@ html body .board .slot.ultRange[data-ult="3"]::before{background:rgba(255,138,61
 html body .board .slot.ultRange[data-ult="4"]::before{background:rgba(255,64,64,.38)}
 html body .board .slot.ultRange>img,html body .board .slot.ultCenter>img{position:relative;z-index:1}
 html body .board .slot .badge{z-index:3}
+.slot,.extra{position:relative}
+html body .board .slot img.possessBadge,html body .board .extra img.possessBadge{position:absolute;top:1px;right:1px;width:40%;height:40%;object-fit:contain;z-index:5;cursor:pointer;border-radius:6px;background:rgba(8,17,31,.45);box-shadow:0 0 0 1.5px #f1ca52}
 html body .board .slot .ultNum{position:absolute;left:2px;top:2px;min-width:16px;height:16px;padding:0 4px;box-sizing:border-box;border-radius:8px;background:var(--ultc,#9a63e6);color:#fff;font-size:11px;font-weight:900;line-height:16px;text-align:center;z-index:4;box-shadow:0 0 0 1px rgba(0,0,0,.45);pointer-events:none}
 html body .board.ultActive .slot:not(.ultRange):not(.ultCenter){opacity:.4}
 html body .board .slot.ultCenter{outline:3px solid #c98cff;outline-offset:-3px}
@@ -520,7 +522,7 @@ main>.honorPanel{grid-column:1/-1!important}
 <div class="roleSection" data-role-section="other"><h3>その他</h3><div id="poolOther" class="pool"></div></div>
 <div class="roleSection" data-role-section="elite"><h3>精鋭・ノーマル</h3><div id="poolElite" class="pool"></div></div>
 <div class="roleSection" data-role-section="normal"><h3>ノーマル</h3><div id="poolNormal" class="pool"></div></div>
-<details class="tipBox"><summary>使い方</summary><p class="tip">空きマスを選択 → キャラをタップで配置できます。キャラ一覧から空きマスへドラッグ＆ドロップ（スマホでは指でスライド）して配置することもできます。配置済みキャラは別のマスへドラッグ＆ドロップ／スライドして移動できます。配置済みキャラをタップすると ×2、もう一度で ×3、×3の状態でもう一度タップすると ×1 に戻ります。通常盤面の下部枠も同じ操作です。崩壊空間では縦5×横6の30マス盤面に切り替わります。</p></details>
+<details class="tipBox"><summary>使い方</summary><p class="tip">空きマスを選択 → キャラをタップで配置できます。キャラ一覧から空きマスへドラッグ＆ドロップ（スマホでは指でスライド）して配置することもできます。配置済みキャラは別のマスへドラッグ＆ドロップ／スライドして移動できます。配置済みキャラをタップすると ×2、もう一度で ×3、×3の状態でもう一度タップすると ×1 に戻ります。通常盤面の下部枠も同じ操作です。崩壊空間では縦5×横6の30マス盤面に切り替わります。デラは他のキャラへドラッグすると右上に小さく憑依します（憑依は盤面に1つまで。憑依中の小さいデラをタップすると解除）。</p></details>
 
 <section class="skinPanel" id="skinPanel">
 <h2>スキン設定</h2>
@@ -864,7 +866,7 @@ function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTr
 function fixMoriteGrid(){
  if(boardMode!=="morite")return;
  for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&(roleByIndex[v.char]==="immortal"||(v.char===7&&i!==5)))grid[i]=null;else if(v)v.stack=1;}
- grid[5]={char:7,stack:1};
+ grid[5]=grid[5]&&grid[5].possess!=null?{char:7,stack:1,possess:grid[5].possess}:{char:7,stack:1};
 }
 function normalizeRules(){
  // 守り手では不朽キャラを使えず、右上（index 5）に領主が固定される
@@ -890,11 +892,11 @@ function normalizeRules(){
 }
 
 function makeImg(src){const im=new Image();im.src=src;im.decoding="async";im.draggable=false;return im}
-function totalCount(){return grid.reduce((n,v)=>n+(v?v.stack:0),0)}
+function totalCount(){return grid.reduce((n,v)=>n+(v?v.stack+(v.possess!=null?1:0):0),0)}
 function updateTotal(){
  // 通常盤面と相手盤面では両方を合算。崩壊空間は従来どおり単独計算。
  const gridsToTotal=boardMode==="collapseSpace"?[collapseSpaceGrid]:(boardMode==="godTrial"?[godTrialGrid]:(boardMode==="battleRoyale1"?[battleRoyale1Grid]:(boardMode==="honorHellVariant"?[honorHellVariantGrid]:(boardMode==="morite"?[moriteGrid]:[normalGrid]))));
- const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1):0),0),0);
+ const n=gridsToTotal.reduce((sum,g)=>sum+g.reduce((a,v)=>a+(v?(Number(v.stack)||1)+(v.possess!=null?1:0):0),0),0);
  document.getElementById("total").textContent=n;
  document.getElementById("topTotal").textContent=n;
  function calcGridStats(sourceGrid){
@@ -904,6 +906,7 @@ function updateTotal(){
    let singerPassiveBodiesLeft=1;
    sourceGrid.forEach(v=>{
      if(!v)return;
+     if(v.possess!=null){const pst=effectiveStats(v.possess,sourceGrid);atk+=(Number(pst.attack)||0);spd+=(Number(pst.speed)||0);pas+=(Number(pst.passive)||0);}
      const st=effectiveStats(v.char,sourceGrid);
      const stack=Number(v.stack)||1;
      if(v.char===3){
@@ -930,7 +933,7 @@ function updateTotal(){
  document.getElementById("atkTotal").textContent=fmt(atk);
  document.getElementById("spdTotal").textContent=fmt(spd);
  document.getElementById("passTotal").textContent=fmt(pas);
-  {const ids=[];statGrids.forEach(g=>g.forEach(v=>{if(v)ids.push(v.char)}));const k=countKinds(ids);
+  {const ids=[];statGrids.forEach(g=>g.forEach(v=>{if(v){ids.push(v.char);if(v.possess!=null)ids.push(v.possess);}}));const k=countKinds(ids);
    const ae=document.getElementById("attrKinds"),re2=document.getElementById("raceKinds");
    if(ae){ae.textContent=k.attrs.length;ae.parentElement.title="属性："+(k.attrs.join("・")||"なし");}
    if(re2){re2.textContent=k.races.length;re2.parentElement.title="種族："+(k.races.join("・")||"なし");}}
@@ -950,6 +953,14 @@ function updateTotal(){
 function dropOn(i){
  if(!dragData||i>=activeSlots())return;
  if(boardMode==="morite"&&(i===5||(dragData.type==="slot"&&dragData.from===5)))return;
+ // デラの憑依：デラを他のヒーローへドロップすると、そのマスの右上に小さく憑依する（憑依は盤面に1つまで。移し替え可）
+ const dragChar=dragData.type==="char"?dragData.char:(dragData.type==="slot"&&grid[dragData.from]?grid[dragData.from].char:null);
+ if(dragChar===48 && grid[i] && grid[i].char!==48 && !(dragData.type==="slot"&&dragData.from===i)){
+   if(dragData.type==="slot") grid[dragData.from]=null;
+   grid.forEach(v=>{if(v)delete v.possess;});
+   grid[i].possess=48;
+   selected=-1; dragData=null; normalizeRules(); render(); return;
+ }
  if(dragData.type==="char"){
    const ci=dragData.char;
    if(grid[i] && grid[i].char===ci){
@@ -989,6 +1000,7 @@ function makeSlot(i,extra=false){
  if(v){
    s.appendChild(makeImg(chars[v.char]));
    if(v.stack>1){const b=document.createElement("span");b.className="badge";b.textContent="×"+v.stack;s.appendChild(b)}
+   if(v.possess!=null){const p=document.createElement("img");p.src=chars[v.possess];p.className="possessBadge";p.alt="憑依";p.title="デラ憑依中（タップで解除）";p.draggable=false;p.addEventListener("click",e=>{e.stopPropagation();delete grid[i].possess;normalizeRules();render();});s.appendChild(p)}
    s.draggable=true;
    s.addEventListener("dragstart",e=>{dragData={type:"slot",from:i};e.dataTransfer.effectAllowed="move"});
  }
