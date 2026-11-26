@@ -1083,7 +1083,7 @@ function render(){
  fixMoriteGrid();
  {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。伝説をタップすると進化できます。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
  document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));});
- document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")).length;sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=(boardMode==="morite"?vis:wraps.length)+"体";});
+ document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")).length;sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=(boardMode==="morite"?vis:wraps.length)+"体";const role=sec.dataset.roleSection;if(role)document.querySelectorAll('.roleTab[data-role="'+role+'"]').forEach(t=>t.classList.toggle("moriteTabHidden",boardMode==="morite"&&vis===0));});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
  if(rangeSet.length)rangeSet=boardMode==="normal"?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
  if(desertSet.length)desertSet=boardMode==="normal"?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
@@ -2109,6 +2109,7 @@ html:has(#moriteBtn.active){--ui-glow:rgba(255,90,160,.24)}
 body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCardWrap{opacity:.35!important;filter:grayscale(.85)!important}
 .charCardWrap.moriteHidden{display:none!important}
 .roleSection.moriteSectionHidden{display:none!important}
+.roleTab.moriteTabHidden{display:none!important}
 #evolvePicker{position:fixed;inset:0;background:rgba(2,6,16,.72);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
 .evolvePanel{background:#0d1c30;border:1px solid #365574;border-radius:14px;padding:14px;max-width:340px;width:100%}
 .evolveTitle{font-weight:900;font-size:15px;margin-bottom:10px;color:#eaf3ff}
