@@ -1048,7 +1048,8 @@ function makeSlot(i,extra=false){
 function render(){
  fixMoriteGrid();
  {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
- document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteBanned",boardMode==="morite"&&ci!==7&&!MORITE_ALLOWED.has(ci));});
+ document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));});
+ document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=sec.querySelectorAll(".charCardWrap");const allHidden=wraps.length>0&&[...wraps].every(w=>w.classList.contains("moriteHidden"));sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&allHidden);});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
  if(rangeSet.length)rangeSet=boardMode==="normal"?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
  if(desertSet.length)desertSet=boardMode==="normal"?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
@@ -2071,7 +2072,8 @@ html:has(#battleRoyale1Btn.active){--ui-glow:rgba(70,220,190,.24)}
 html:has(#honorHellShapeBtn.active){--ui-glow:rgba(255,150,60,.24)}
 html:has(#moriteBtn.active){--ui-glow:rgba(255,90,160,.24)}
 body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCardWrap{opacity:.35!important;filter:grayscale(.85)!important}
-.charCardWrap.moriteBanned{opacity:.35!important;filter:grayscale(.85)!important}
+.charCardWrap.moriteHidden{display:none!important}
+.roleSection.moriteSectionHidden{display:none!important}
 body:has(#moriteBtn.active) .board.moriteBoard>.slot.fixedLord{box-shadow:inset 0 0 0 3px #f1ca52!important;outline:3px solid #f1ca52!important;outline-offset:-3px!important;border-color:#f1ca52!important}
 
 /* デバフ選択をチップ化 */
