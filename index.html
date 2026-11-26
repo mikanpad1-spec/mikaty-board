@@ -867,6 +867,36 @@ function activeSlots(){return boardMode==="collapseSpace"?30:(boardMode==="godTr
 const MORITE_ALLOWED=new Set([4,22,42,43,1,3,8,12,13,15,16,17,18,19,24,25,26,27,28,29,30,44,45,47,48]);
 // 伝説→進化先の神話（牛と破壊装置と嵐の魔道士は2系統分を統合）
 const MORITE_EVOLUTIONS={4:[8,19,29,1,17,16],22:[27,28,12,26,47,3],42:[25,13,45,15,30,44],43:[24,18,48]};
+let evolvePickerEl=null;
+function closeEvolvePicker(){if(evolvePickerEl){evolvePickerEl.remove();evolvePickerEl=null;}}
+function openEvolvePicker(i){
+ closeEvolvePicker();
+ const opts=MORITE_EVOLUTIONS[grid[i].char]; if(!opts)return;
+ const ov=document.createElement("div"); ov.id="evolvePicker";
+ const panel=document.createElement("div"); panel.className="evolvePanel";
+ const title=document.createElement("div"); title.className="evolveTitle"; title.textContent=charNames[grid[i].char]+" の進化先を選択";
+ panel.appendChild(title);
+ const row=document.createElement("div"); row.className="evolveRow";
+ opts.forEach(ci=>{
+  const b=document.createElement("button"); b.type="button"; b.className="evolveOpt"; b.dataset.evolveChar=ci;
+  const img=document.createElement("img"); img.src=chars[ci]; img.alt=charNames[ci];
+  const nm=document.createElement("span"); nm.textContent=charNames[ci];
+  b.appendChild(img); b.appendChild(nm);
+  b.addEventListener("click",()=>{
+   grid.forEach((v,idx)=>{if(idx!==i&&v&&v.char===ci)grid[idx]=null;});
+   const keep=grid[i].possess; grid[i]={char:ci,stack:1}; if(keep!=null)grid[i].possess=keep;
+   closeEvolvePicker(); normalizeRules(); render();
+  });
+  row.appendChild(b);
+ });
+ panel.appendChild(row);
+ const cancel=document.createElement("button"); cancel.type="button"; cancel.className="evolveCancel"; cancel.textContent="やめる";
+ cancel.addEventListener("click",closeEvolvePicker);
+ panel.appendChild(cancel);
+ ov.appendChild(panel);
+ ov.addEventListener("click",e=>{if(e.target===ov)closeEvolvePicker();});
+ document.body.appendChild(ov); evolvePickerEl=ov;
+}
 function fixMoriteGrid(){
  if(boardMode!=="morite")return;
  for(let i=0;i<grid.length;i++){const v=grid[i];if(v&&i!==5&&!MORITE_ALLOWED.has(v.char))grid[i]=null;else if(v)v.stack=1;}
@@ -1029,6 +1059,7 @@ function makeSlot(i,extra=false){
      rangeSet=[];
      render();return;
    }
+   if(boardMode==="morite"&&grid[i]&&MORITE_EVOLUTIONS[grid[i].char]){ openEvolvePicker(i); return; }
    rangeSet=[];desertSet=[];
    if(grid[i]){
      const ci=grid[i].char;
@@ -1050,7 +1081,7 @@ function makeSlot(i,extra=false){
 }
 function render(){
  fixMoriteGrid();
- {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
+ {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。伝説をタップすると進化できます。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
  document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));});
  document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")).length;sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=(boardMode==="morite"?vis:wraps.length)+"体";});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
@@ -1244,6 +1275,7 @@ function refreshSkinModeUI(){
  renderSkinUI();
 }
 function switchBoardMode(mode){
+ closeEvolvePicker();
  saveCurrentBoard();syncSkinGlobalsToStore();persistSkinStore();boardMode=mode;grid=mode==="collapseSpace"?collapseSpaceGrid:(mode==="godTrial"?godTrialGrid:(mode==="battleRoyale1"?battleRoyale1Grid:(mode==="honorHellVariant"?honorHellVariantGrid:(mode==="morite"?moriteGrid:normalGrid))));selected=-1;dragData=null;applySkinMode(mode);
  document.getElementById("normalModeBtn").classList.toggle("active",mode==="normal");
  document.getElementById("collapseSpaceBtn").classList.toggle("active",mode==="collapseSpace");
@@ -2077,6 +2109,13 @@ html:has(#moriteBtn.active){--ui-glow:rgba(255,90,160,.24)}
 body:has(#moriteBtn.active) .roleSection[data-role-section="immortal"] .charCardWrap{opacity:.35!important;filter:grayscale(.85)!important}
 .charCardWrap.moriteHidden{display:none!important}
 .roleSection.moriteSectionHidden{display:none!important}
+#evolvePicker{position:fixed;inset:0;background:rgba(2,6,16,.72);display:flex;align-items:center;justify-content:center;z-index:999;padding:16px}
+.evolvePanel{background:#0d1c30;border:1px solid #365574;border-radius:14px;padding:14px;max-width:340px;width:100%}
+.evolveTitle{font-weight:900;font-size:15px;margin-bottom:10px;color:#eaf3ff}
+.evolveRow{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.evolveOpt{background:#132640;border:1px solid #365574;border-radius:10px;padding:6px 4px;display:flex;flex-direction:column;align-items:center;gap:4px;color:#eaf3ff;font-size:11px;cursor:pointer}
+.evolveOpt img{width:52px;height:52px;object-fit:contain}
+.evolveCancel{margin-top:10px;width:100%;padding:9px;background:#1a2f47;border:1px solid #365574;border-radius:9px;color:#cfe2f7;cursor:pointer}
 body:has(#moriteBtn.active) .board.moriteBoard>.slot.fixedLord{box-shadow:inset 0 0 0 3px #f1ca52!important;outline:3px solid #f1ca52!important;outline-offset:-3px!important;border-color:#f1ca52!important}
 
 /* デバフ選択をチップ化 */
