@@ -875,6 +875,8 @@ function fixMoriteGrid(){
 function normalizeRules(){
  // 守り手では不朽キャラを使えず、右上（index 5）に領主が固定される
  fixMoriteGrid();
+ // デラは単体配置と憑依を同時にしない（単体がいれば憑依を解除。憑依への移行はdropOn側で単体を消す）
+ if(grid.some(v=>v&&v.char===48)) grid.forEach(v=>{if(v)delete v.possess;});
  // 禁制領域ON時は使えない後半3マスを空にする
  if(boardMode!=="collapseSpace" && boardMode!=="godTrial" && boardMode!=="battleRoyale1" && debuffState().forbidden){for(let i=21;i<24;i++)grid[i]=null;}
  // 不朽・神話・領主は1マス内でスタックさせない
@@ -961,6 +963,7 @@ function dropOn(i){
  const dragChar=dragData.type==="char"?dragData.char:(dragData.type==="slot"&&grid[dragData.from]?grid[dragData.from].char:null);
  if(dragChar===48 && grid[i] && grid[i].char!==48 && !(dragData.type==="slot"&&dragData.from===i)){
    if(dragData.type==="slot") grid[dragData.from]=null;
+   grid.forEach((v,idx)=>{if(v&&v.char===48)grid[idx]=null;});
    grid.forEach(v=>{if(v)delete v.possess;});
    grid[i].possess=48;
    selected=-1; dragData=null; normalizeRules(); render(); return;
@@ -1049,7 +1052,7 @@ function render(){
  fixMoriteGrid();
  {const subEl=document.querySelector("p.sub");if(subEl)subEl.textContent=boardMode==="morite"?"守り手：出せるのは指定の神話と伝説だけです。右上に領主が固定されています。スタックはできません。":"配置したキャラをもう一度タップすると ×2 → ×3 までスタックできます。";}
  document.querySelectorAll(".charCardWrap").forEach(w=>{const ci=Number(w.dataset.charIndex);w.classList.toggle("moriteHidden",boardMode==="morite"&&!MORITE_ALLOWED.has(ci));});
- document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=sec.querySelectorAll(".charCardWrap");const allHidden=wraps.length>0&&[...wraps].every(w=>w.classList.contains("moriteHidden"));sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&allHidden);});
+ document.querySelectorAll(".roleSection").forEach(sec=>{const wraps=[...sec.querySelectorAll(".charCardWrap")];const vis=wraps.filter(w=>!w.classList.contains("moriteHidden")).length;sec.classList.toggle("moriteSectionHidden",boardMode==="morite"&&wraps.length>0&&vis===0);const cnt=sec.querySelector(".rarityCount");if(cnt)cnt.textContent=(boardMode==="morite"?vis:wraps.length)+"体";});
  {const uh=document.getElementById("ultHint");if(uh)uh.style.display=boardMode==="normal"?"":"none"}
  if(rangeSet.length)rangeSet=boardMode==="normal"?rangeSet.filter(ix=>ix<18&&grid[ix]&&(grid[ix].char===0||grid[ix].char===1)):[];
  if(desertSet.length)desertSet=boardMode==="normal"?desertSet.filter(ix=>ix<18&&grid[ix]&&grid[ix].char===7):[];
